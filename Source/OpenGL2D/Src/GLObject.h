@@ -43,7 +43,7 @@ namespace GL2D
 		@return
 			\p true si tout s'est bien passé.
 		*/
-		GL2D_API STDMETHOD( Initialise )( Ctor const & ctor, Dtor const & dtor )
+		GL2D_API STDMETHOD( Create )( Ctor const & ctor, Dtor const & dtor )
 		{
 			m_ctor = ctor;
 			m_dtor = dtor;
@@ -52,7 +52,7 @@ namespace GL2D
 
 		/** Détruit l'identificateur OpenGL.
 		*/
-		GL2D_API STDMETHOD( Cleanup )()
+		GL2D_API STDMETHOD( Destroy )()
 		{
 			HRESULT hr = m_dtor( 1, &m_name );
 			m_name = GL_INVALID_INDEX;

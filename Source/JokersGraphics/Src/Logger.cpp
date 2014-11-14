@@ -2,6 +2,8 @@
 
 #include "Logger.h"
 
+#include <iostream>
+
 #pragma warning( push )
 #pragma warning( disable:4290 )
 
@@ -13,6 +15,8 @@ static char THIS_FILE[] = __FILE__;
 
 namespace Joker
 {
+	static const uint32_t BUFFER_SIZE = 1024;
+
 	CConsoleInfo::CConsoleInfo()
 		:	m_uiOldCP			( 0						)
 		,	m_hScreenBuffer		( INVALID_HANDLE_VALUE	)
@@ -25,7 +29,7 @@ namespace Joker
 			if ( m_hScreenBuffer != INVALID_HANDLE_VALUE && ::SetConsoleActiveScreenBuffer( m_hScreenBuffer ) )
 			{
 				m_pOldInfos = new CONSOLE_FONT_INFOEX;
-				PCONSOLE_FONT_INFOEX l_pOldInfos = PCONSOLE_FONT_INFOEX( m_pOldInfos );
+				PCONSOLE_FONT_INFOEX l_pOldInfos = m_pOldInfos;
 				l_pOldInfos->cbSize = sizeof( CONSOLE_FONT_INFOEX );
 
 				if ( ::GetCurrentConsoleFontEx( m_hScreenBuffer, FALSE, l_pOldInfos ) )
@@ -37,13 +41,21 @@ namespace Joker
 					l_infos.nFont = 6;
 					l_infos.FontFamily = 54;
 					wcscpy_s( l_infos.FaceName, LF_FACESIZE, L"Lucida Console" );
-					::SetCurrentConsoleFontEx( m_hScreenBuffer, FALSE, & l_infos );
+
+					if ( !::SetCurrentConsoleFontEx( m_hScreenBuffer, FALSE, &l_infos ) )
+					{
+						delete m_pOldInfos;
+						m_pOldInfos = NULL;
+					}
 				}
 				else
 				{
 					delete m_pOldInfos;
 					m_pOldInfos = NULL;
 				}
+
+				COORD l_coord = { 160, 9999 };
+				::SetConsoleScreenBufferSize( m_hScreenBuffer, l_coord );
 			}
 
 			m_uiOldCP = ::GetConsoleOutputCP();
@@ -184,10 +196,58 @@ namespace Joker
 		m_strHeaders[eLOG_TYPE_MESSAGE	] = _T( "" );
 		m_strHeaders[eLOG_TYPE_WARNING	] = _T( "***WARNING*** " );
 		m_strHeaders[eLOG_TYPE_ERROR	] = _T( "***ERROR*** ");
+
+		m_outThread = std::thread( [&]()
+		{
+			char line[1024];
+			bool ended = false;
+
+			while ( !ended )
+			{
+				std::unique_lock< std::mutex > lock( m_outMutex );
+
+				while ( !m_cout.eof() )
+				{
+					m_cout.getline( line, 1024 );
+					if ( strlen( line ) )
+					{
+						CLogger::LogMessage( line );
+					}
+				}
+
+				m_cout.clear();
+
+				while ( !m_cerr.eof() )
+				{
+					m_cerr.getline( line, 1024 );
+					if ( strlen( line ) )
+					{
+						CLogger::LogError( line );
+					}
+				}
+
+				m_cerr.clear();
+
+				while ( !m_clog.eof() )
+				{
+					m_clog.getline( line, 1024 );
+					if ( strlen( line ) )
+					{
+						CLogger::LogDebug( line );
+					}
+				}
+
+				m_clog.clear();
+
+				ended = m_end.wait_for( lock, std::chrono::milliseconds( 10 ) ) != std::cv_status::timeout;
+			}
+		} );
 	}
 
 	CLogger::~CLogger()
 	{
+		m_end.notify_one();
+		m_outThread.join();
 	#if DEF_MT_LOGGER
 		if ( m_hThread != NULL )
 		{
@@ -250,7 +310,7 @@ namespace Joker
 	void CLogger::LogDebug( char const * p_pFormat, ... )
 	{
 	#if ! defined( NDEBUG )
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -265,7 +325,7 @@ namespace Joker
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
 	#else
-				vsnprintf_s( l_pText, 256, 256, p_pFormat, l_vaList );
+				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
 	#endif
 				va_end( l_vaList );
 	#if DEF_MT_LOGGER
@@ -310,7 +370,7 @@ namespace Joker
 	void CLogger::LogDebug( wchar_t const * p_pFormat , ... )
 	{
 	#if ! defined( NDEBUG )
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -324,7 +384,7 @@ namespace Joker
 				USES_CONVERSION;
 				if ( W2A( p_pFormat ) )
 				{
-					vsnprintf_s( l_pText, 256, 256, W2A( p_pFormat ), l_vaList );
+					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
 	#endif
 				va_end( l_vaList );
@@ -369,7 +429,7 @@ namespace Joker
 
 	void CLogger::LogMessage( char const * p_pFormat, ... )
 	{
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -384,7 +444,7 @@ namespace Joker
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
 	#else
-				vsnprintf_s( l_pText, 256, 256, p_pFormat, l_vaList );
+				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
 	#endif
 				va_end( l_vaList );
 	#if DEF_MT_LOGGER
@@ -425,7 +485,7 @@ namespace Joker
 
 	void CLogger::LogMessage( wchar_t const * p_pFormat , ... )
 	{
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -439,7 +499,7 @@ namespace Joker
 			USES_CONVERSION;
 				if ( W2A( p_pFormat ) )
 				{
-					vsnprintf_s( l_pText, 256, 256, W2A( p_pFormat ), l_vaList );
+					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
 	#endif
 				va_end( l_vaList );
@@ -482,7 +542,7 @@ namespace Joker
 
 	void CLogger::LogWarning( char const * p_pFormat, ... )
 	{
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -497,7 +557,7 @@ namespace Joker
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
 	#else
-				vsnprintf_s( l_pText, 256, 256, p_pFormat, l_vaList );
+				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
 	#endif
 				va_end( l_vaList );
 	#if DEF_MT_LOGGER
@@ -538,7 +598,7 @@ namespace Joker
 
 	void CLogger::LogWarning( wchar_t const * p_pFormat , ... )
 	{
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -552,7 +612,7 @@ namespace Joker
 				USES_CONVERSION;
 				if ( W2A( p_pFormat ) )
 				{
-					vsnprintf_s( l_pText, 256, 256, W2A( p_pFormat ), l_vaList );
+					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
 	#endif
 				va_end( l_vaList );
@@ -595,7 +655,7 @@ namespace Joker
 
 	void CLogger::LogError( char const * p_pFormat, ... )
 	{
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -610,7 +670,7 @@ namespace Joker
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
 	#else
-				vsnprintf_s( l_pText, 256, 256, p_pFormat, l_vaList );
+				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
 	#endif
 				va_end( l_vaList );
 	#if DEF_MT_LOGGER
@@ -657,7 +717,7 @@ namespace Joker
 
 	void CLogger::LogError( wchar_t const * p_pFormat , ... )
 	{
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -671,7 +731,7 @@ namespace Joker
 				USES_CONVERSION;
 				if ( W2A( p_pFormat ) )
 				{
-					vsnprintf_s( l_pText, 256, 256, W2A( p_pFormat ), l_vaList );
+					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
 	#endif
 				va_end( l_vaList );
@@ -729,7 +789,7 @@ namespace Joker
 			::LocalFree( l_szError );
 		}
 
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -744,7 +804,7 @@ namespace Joker
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
 	#else
-				vsnprintf_s( l_pText, 256, 256, p_pFormat, l_vaList );
+				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
 	#endif
 				va_end( l_vaList );
 				l_strError += String( _T( " - " ) ) + l_pText;
@@ -809,7 +869,7 @@ namespace Joker
 			::LocalFree( l_szError );
 		}
 
-		TCHAR l_pText[256];
+		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
 		if ( p_pFormat )
@@ -823,7 +883,7 @@ namespace Joker
 				USES_CONVERSION;
 				if ( W2A( p_pFormat ) )
 				{
-					vsnprintf_s( l_pText, 256, 256, W2A( p_pFormat ), l_vaList );
+					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
 	#endif
 				va_end( l_vaList );
@@ -1063,14 +1123,40 @@ namespace Joker
 
 		if ( p_eLogType >= eLOG_TYPE_COUNT )
 		{
-			for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < eLOG_TYPE_COUNT ; GL2D_SIZE_I++ )
+			for ( int i = 0 ; i < eLOG_TYPE_COUNT ; i++ )
 			{
-				m_logFilePath[GL2D_SIZE_I] = p_logFilePath;
+				m_logFilePath[i] = p_logFilePath;
+
+				if ( i == eLOG_TYPE_MESSAGE )
+				{
+					std::cout.rdbuf( m_cout.rdbuf() );
+				}
+				else if ( i == eLOG_TYPE_DEBUG )
+				{
+					std::clog.rdbuf( m_clog.rdbuf() );
+				}
+				else if ( i == eLOG_TYPE_ERROR )
+				{
+					std::cerr.rdbuf( m_cerr.rdbuf() );
+				}
 			}
 		}
 		else if ( p_eLogType >= 0 )
 		{
 			m_logFilePath[p_eLogType] = p_logFilePath;
+
+			if ( p_eLogType == eLOG_TYPE_MESSAGE )
+			{
+				std::cout.rdbuf( m_cout.rdbuf() );
+			}
+			else if ( p_eLogType == eLOG_TYPE_DEBUG )
+			{
+				std::clog.rdbuf( m_clog.rdbuf() );
+			}
+			else if ( p_eLogType == eLOG_TYPE_ERROR )
+			{
+				std::cerr.rdbuf( m_cerr.rdbuf() );
+			}
 		}
 
 		FILE * l_pFile;

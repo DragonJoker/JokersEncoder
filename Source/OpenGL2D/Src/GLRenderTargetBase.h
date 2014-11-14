@@ -3,7 +3,7 @@
 
 #include "OpenGL2DPrerequisites.h"
 #include "GLBaseTypes.h"
-#include "GLObject.h"
+#include "GLFrameBuffer.h"
 
 #include <memory>
 
@@ -16,7 +16,6 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	class CRenderTargetBase
 		: public CResource< Object, Interface >
-		, public CObject
 	{
 	public:
 		CRenderTargetBase();
@@ -297,8 +296,14 @@ namespace GL2D
 			return IsSupported(&renderTargetProperties);
 		}
 
+		CFrameBuffer * GetFrameBuffer()
+		{
+			return &m_frameBuffer;
+		}
+
 	protected:
 		GL2D_SIZE_U m_size;
+		CFrameBuffer m_frameBuffer;
 	};
 }
 

@@ -2,6 +2,8 @@
 
 #include "GLContext.h"
 
+#include <sstream>
+
 #define BUFFER_OFFSET( x ) ( ( const GLvoid * )( x ) )
 
 namespace GL2D
@@ -201,7 +203,14 @@ namespace GL2D
 	{
 		m_dc = ::GetDC( m_window );
 		m_context = DoCreateContext();
-		
+	}
+
+	CContext::~CContext()
+	{
+	}
+
+	HRESULT CContext::Initialise()
+	{
 		MakeCurrent();
 		m_pfnGenTextures = ::glGenTextures;
 		m_pfnDeleteTextures = ::glDeleteTextures;
@@ -247,6 +256,61 @@ namespace GL2D
 		gl_api::GetFunction( "glGetAttribLocation", "ARB", m_pfnGetAttribLocation );
 		gl_api::GetFunction( "glUseProgram", "ARB", m_pfnUseProgram );
 		gl_api::GetFunction( "glVertexAttribPointer", "ARB", m_pfnVertexAttribPointer );
+
+		std::string glVersion = ( char const * )glGetString( GL_VERSION	);
+		double dVersion;
+		std::stringstream stream( glVersion );
+		stream >> dVersion;
+		int version = int( dVersion * 10 );
+
+		std::function< HGLRC( HDC hDC, HGLRC hShareContext, int const * attribList ) > glCreateContextAttribs;
+		gl_api::GetFunction( "wglCreateContextAttribs", "ARB", glCreateContextAttribs );
+
+		if ( !glCreateContextAttribs )
+		{
+			gl_api::GetFunction( "wglCreateContextAttribs", "EXT", glCreateContextAttribs );
+		}
+
+		if ( glCreateContextAttribs )
+		{
+			std::vector< int > attribList;
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_MAJOR_VERSION );
+			attribList.push_back( version / 10 );
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_MINOR_VERSION );
+			attribList.push_back( version % 10 );
+#if !defined( NDEBUG )
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FLAGS );
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FORWARD_COMPATIBLE_BIT | GL2D_GL_CREATECONTEXT_ATTRIB_DEBUG_BIT );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_MASK );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_COMPATIBILITY_BIT );
+#else
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FLAGS );
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FORWARD_COMPATIBLE_BIT );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_MASK );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_CORE_BIT );
+#endif
+			attribList.push_back( 0 );
+			HGLRC context = glCreateContextAttribs( m_dc, NULL, &attribList[0] );
+			EndCurrent();
+			wglDeleteContext( m_context );
+			m_context = context;
+			MakeCurrent();
+		}
+
+		gl_api::GetFunction( "glDebugMessageCallback", "ARB", m_pfnDebugMessageCallback );
+		gl_api::GetFunction( "glDebugMessageCallbackAMD", "ARB", m_pfnDebugMessageCallbackAMD );
+
+		if ( m_pfnDebugMessageCallback )
+		{
+			m_pfnDebugMessageCallback( PFNGLDEBUGPROC( &CContext::StDebugLog ), this );
+			glEnable( GL2D_GL_DEBUG_OUTPUT_SYNCHRONOUS );
+		}
+
+		if ( m_pfnDebugMessageCallbackAMD )
+		{
+			m_pfnDebugMessageCallbackAMD( PFNGLDEBUGAMDPROC( &CContext::StDebugLogAMD ), this );
+			glEnable( GL2D_GL_DEBUG_OUTPUT_SYNCHRONOUS );
+		}
 		
 		std::string vssrc;
 		vssrc += "#version 130\n";
@@ -314,8 +378,13 @@ namespace GL2D
 			{
 				char * infoLog = new char[infologLength];
 				m_pfnGetProgramInfoLog( m_program, infologLength, &charsWritten, infoLog );
-				hr = glGetLastError( "GetProgramInfoLog" );
-				std::cout << infoLog << std::endl;
+
+				if ( strlen( infoLog ) > 0 && strcmp( "No errors.\n", infoLog ) )
+				{
+					hr = glGetLastError( "GetProgramInfoLog" );
+					std::cout << infoLog << std::endl;
+				}
+
 				delete [] infoLog;
 			}
 		}
@@ -371,16 +440,22 @@ namespace GL2D
 		}
 
 		EndCurrent();
-
-		if ( hr != S_OK )
-		{
-			throw std::exception( "Can't create context shader program" );
-		}
+		return hr;
 	}
 
-	CContext::~CContext()
+	void CContext::Cleanup()
 	{
-		DoCleanup();
+		if ( m_program != GL_INVALID_INDEX )
+		{
+			m_pfnDeleteProgram( m_program );
+		}
+		if ( m_buffer != GL_INVALID_INDEX )
+		{
+			m_pfnDeleteBuffers( 1, &m_buffer );
+		}
+
+		::ReleaseDC( m_window, m_dc );
+		wglDeleteContext( m_context );
 	}
 
 	HRESULT CContext::MakeCurrent()
@@ -597,7 +672,7 @@ namespace GL2D
 
 	HRESULT CContext::BufferData( GL2D_GL_BUFFER_TARGET target, ptrdiff_t size, const GLvoid * data, GL2D_GL_BUFFER_USAGE usage )
 	{
-		m_pfnBufferData( target, size, data, usage );
+		m_pfnBufferData( target, GLsizeiptr( size ), data, usage );
 		return glGetLastError( "BufferData" );
 	}
 
@@ -708,21 +783,6 @@ namespace GL2D
 		return result;
 	}
 
-	void CContext::DoCleanup()
-	{
-		if ( m_program != GL_INVALID_INDEX )
-		{
-			m_pfnDeleteProgram( m_program );
-		}
-		if ( m_buffer != GL_INVALID_INDEX )
-		{
-			m_pfnDeleteBuffers( 1, &m_buffer );
-		}
-
-		::ReleaseDC( m_window, m_dc );
-		wglDeleteContext( m_context );
-	}
-
 	GLuint CContext::DoCreateShader( const std::string & source, GL2D_GL_SHADER_TYPE type )
 	{
 		GLuint shader = m_pfnCreateShader( type );
@@ -755,8 +815,13 @@ namespace GL2D
 				{
 					char * infoLog = new char[infologLength];
 					m_pfnGetShaderInfoLog( shader, infologLength, &charsWritten, infoLog );
-					hr = glGetLastError( "GetShaderInfoLog" );
-					std::cout << infoLog << std::endl;
+
+					if ( strlen( infoLog ) > 0 && strcmp( "No errors.\n", infoLog ) )
+					{
+						hr = glGetLastError( "GetShaderInfoLog" );
+						std::cout << infoLog << std::endl;
+					}
+
 					delete [] infoLog;
 				}
 			}
@@ -769,5 +834,148 @@ namespace GL2D
 		}
 
 		return shader;
+	}
+	
+	void CContext::DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message )
+	{
+		std::stringstream toLog;
+		toLog << "OpenGl Debug - ";
+	
+		switch ( source )
+		{
+		case GL2D_GL_DEBUG_SOURCE_API:
+			toLog << "Source:OpenGL\t";
+			break;
+
+		case GL2D_GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+			toLog << "Source:Windows\t";
+			break;
+
+		case GL2D_GL_DEBUG_SOURCE_SHADER_COMPILER:
+			toLog << "Source:Shader compiler\t";
+			break;
+
+		case GL2D_GL_DEBUG_SOURCE_THIRD_PARTY:
+			toLog << "Source:Third party\t";
+			break;
+
+		case GL2D_GL_DEBUG_SOURCE_APPLICATION:
+			toLog << "Source:Application\t";
+			break;
+
+		case GL2D_GL_DEBUG_SOURCE_OTHER:
+			toLog << "Source:Other\t";
+			break;
+		}
+	
+		switch ( type )
+		{
+		case GL2D_GL_DEBUG_TYPE_ERROR:
+			toLog << "Type:Error\t";
+			break;
+
+		case GL2D_GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+			toLog << "Type:Deprecated behavior\t";
+			break;
+
+		case GL2D_GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+			toLog << "Type:Undefined behavior\t";
+			break;
+
+		case GL2D_GL_DEBUG_TYPE_PORTABILITY:
+			toLog << "Type:Portability\t";
+			break;
+
+		case GL2D_GL_DEBUG_TYPE_PERFORMANCE:
+			toLog << "Type:Performance\t";
+			break;
+
+		case GL2D_GL_DEBUG_TYPE_OTHER:
+			toLog << "Type:Other\t";
+			break;
+		}
+	
+		toLog << "ID:" << id << "\t";
+	
+		switch ( severity )
+		{
+		case GL2D_GL_DEBUG_SEVERITY_HIGH:
+			std::cerr << toLog.str() << "Severity:High\tMessage:" << message;
+			break;
+
+		case GL2D_GL_DEBUG_SEVERITY_MEDIUM:
+			std::cout << toLog.str() << "Severity:Medium\tMessage:" << message;
+			break;
+
+		case GL2D_GL_DEBUG_SEVERITY_LOW:
+			std::clog << toLog.str() << "Severity:Low\tMessage:" << message;
+			break;
+
+		default:
+			std::cout << toLog.str() << "Severity:Undefined\tMessage:" << message;
+			break;
+		}
+	}
+	
+	void CContext::DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message )
+	{
+		std::stringstream toLog;
+		toLog << "OpenGl Debug - ";
+
+		switch ( category )
+		{
+		case GL2D_GL_DEBUG_CATEGORY_API_ERROR:
+			toLog << "Category:OpenGL\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_WINDOW_SYSTEM:
+			toLog << "Category:Windows\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_DEPRECATION:
+			toLog << "Category:Deprecated behavior\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_UNDEFINED_BEHAVIOR:
+			toLog << "Category:Undefined behavior\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_PERFORMANCE:
+			toLog << "Category:Performance\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_SHADER_COMPILER:
+			toLog << "Category:Shader compiler\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_APPLICATION:
+			toLog << "Category:Application\t";
+			break;
+
+		case GL2D_GL_DEBUG_CATEGORY_OTHER:
+			toLog << "Category:Other\t";
+			break;
+		}
+
+		toLog << "ID:" << id << "\t";
+
+		switch ( severity )
+		{
+		case GL2D_GL_DEBUG_SEVERITY_HIGH:
+			std::cerr << toLog.str() << "Severity:High\tMessage:" << message;
+			break;
+
+		case GL2D_GL_DEBUG_SEVERITY_MEDIUM:
+			std::cout << toLog.str() << "Severity:Medium\tMessage:" << message;
+			break;
+
+		case GL2D_GL_DEBUG_SEVERITY_LOW:
+			std::clog << toLog.str() << "Severity:Low\tMessage:" << message;
+			break;
+
+		default:
+			std::cout << toLog.str() << "Severity:Undefined\tMessage:" << message;
+			break;
+		}
 	}
 }

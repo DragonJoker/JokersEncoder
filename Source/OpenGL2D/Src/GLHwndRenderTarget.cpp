@@ -12,12 +12,13 @@ namespace GL2D
 	{
 	}
 
-	STDMETHODIMP CComHwndRenderTarget::Create( const GL2D_RENDER_TARGET_PROPERTIES & renderTargetProperties, const GL2D_HWND_RENDER_TARGET_PROPERTIES & hwndRenderTargetProperties )
+	STDMETHODIMP CComHwndRenderTarget::CreateContext( const GL2D_RENDER_TARGET_PROPERTIES & renderTargetProperties, const GL2D_HWND_RENDER_TARGET_PROPERTIES & hwndRenderTargetProperties )
 	{
 		HRESULT hr = E_FAIL;
 		try
 		{
-			m_context = std::make_unique< CContext >( hwndRenderTargetProperties.hwnd );
+			m_context = std::make_shared< CContext >( hwndRenderTargetProperties.hwnd );
+			m_context->Initialise();
 			hr = S_OK;
 		}
 		catch( ... )
@@ -27,8 +28,9 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP_( void ) CComHwndRenderTarget::Destroy()
+	STDMETHODIMP_( void ) CComHwndRenderTarget::DestroyContext()
 	{
+		m_context->Cleanup();
 		m_context.reset();
 	}
 

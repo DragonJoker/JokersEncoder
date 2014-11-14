@@ -12,5 +12,6 @@
 #include <iostream>
 #include <cassert>
 #include <string>
+#include <vector>
 
 #include "OpenGL2DPrerequisites.h"

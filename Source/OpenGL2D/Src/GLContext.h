@@ -25,6 +25,9 @@ namespace GL2D
 		/** Destructeur
 		*/
 		~CContext();
+
+		HRESULT Initialise();
+		void Cleanup();
 		
 		HRESULT MakeCurrent();
 		HRESULT EndCurrent();
@@ -160,11 +163,32 @@ namespace GL2D
 		std::function< GLint ( GLuint program ) > m_pfnUseProgram;
 
 		//@}
+		/**@name Debug */
+		//@{
+
+		typedef void ( __stdcall * PFNGLDEBUGPROC )( uint32_t source, uint32_t type, uint32_t id, uint32_t severity, int length, const char * message, void * userParam );
+		typedef void ( __stdcall * PFNGLDEBUGAMDPROC )( uint32_t id, uint32_t category, uint32_t severity, int length, const char * message, void * userParam );
+		std::function< void	( PFNGLDEBUGPROC callback, void * userParam ) > m_pfnDebugMessageCallback;
+		std::function< void	( PFNGLDEBUGAMDPROC callback, void * userParam ) > m_pfnDebugMessageCallbackAMD;
+
+		//@}
 		
 		HGLRC DoCreateContext();
 		bool DoSelectPixelFormat();
 		void DoCleanup();
 		GLuint DoCreateShader( const std::string & source, GL2D_GL_SHADER_TYPE type );
+		void DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
+		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
+
+		static void StDebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message, void * userParam )
+		{
+			reinterpret_cast< CContext * >( userParam )->DebugLog( source, type, id, severity, length, message );
+		}
+
+		static void StDebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message, void * userParam )
+		{
+			reinterpret_cast< CContext * >( userParam )->DebugLogAMD( id, category, severity, length, message );
+		}
 	};
 }
 

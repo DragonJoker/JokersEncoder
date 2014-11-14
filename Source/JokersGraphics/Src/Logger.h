@@ -1,7 +1,11 @@
 #pragma once
 
 #include "StrUtils.h"
+
 #include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <fstream>
 
 #pragma warning( push)
 #pragma warning( disable:4290)
@@ -88,11 +92,17 @@ namespace Joker
 #endif
 		String					m_logFilePath[eLOG_TYPE_COUNT];
 		String					m_strHeaders[eLOG_TYPE_COUNT];
+		std::stringstream		m_cout;
+		std::stringstream		m_cerr;
+		std::stringstream		m_clog;
 		std::recursive_mutex	m_mutex;
 		eLOG_TYPE				m_eCurrentLogType;
 		PLogCallback			m_pfnCallback;
 		void *					m_pThis;
 		CDebugConsole			m_console;
+		std::thread				m_outThread;
+		std::mutex				m_outMutex;
+        std::condition_variable	m_end;
 
 	private:
 		/**@name Construction / Destruction */

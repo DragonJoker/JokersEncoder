@@ -158,12 +158,12 @@ namespace GL2D
 		if ( hwndRenderTarget )
 		{
 			CHwndRenderTarget * rt = reinterpret_cast< CHwndRenderTarget * >( CHwndRenderTarget::CreateInstance() );
-			hr = rt->Create( *renderTargetProperties, *hwndRenderTargetProperties );
+			hr = rt->CreateContext( *renderTargetProperties, *hwndRenderTargetProperties );
 
 			if ( hr == S_OK )
 			{
 				rt->GetContext()->MakeCurrent();
-				hr = rt->Initialise(
+				hr = rt->GetFrameBuffer()->Create(
 					std::bind( &CContext::GenFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 ),
 					std::bind( &CContext::DeleteFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 )
 					);

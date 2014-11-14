@@ -23,7 +23,7 @@ namespace GL2D
 				"CONTEXT_LOST",
 			};
 
-			std::cout << name << " failed (" << errors[err] << ")" << std::endl;
+			std::cerr << name << " failed (" << errors[err] << ")" << std::endl;
 		}
 
 		return err ? E_FAIL : S_OK;

@@ -12,13 +12,13 @@ namespace GL2D
 		GL2D_API CComRenderTarget();
 		GL2D_API virtual ~CComRenderTarget();
 
-		inline const std::unique_ptr< CContext > & GetContext()const
+		inline const std::shared_ptr< CContext > & GetContext()const
 		{
 			return m_context;
 		}
 
 	protected:
-		std::unique_ptr< CContext > m_context;
+		std::shared_ptr< CContext > m_context;
 	};
 }
 

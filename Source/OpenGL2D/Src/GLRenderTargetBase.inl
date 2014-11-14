@@ -75,14 +75,12 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	CRenderTargetBase< Object, Interface >::CRenderTargetBase()
 		: CResource< Object, Interface >()
-		, CObject()
 	{
 	}
 
 	template< typename Object, typename Interface >
 	CRenderTargetBase< Object, Interface >::~CRenderTargetBase()
 	{
-		CObject::Cleanup();
 	}
 
 	template< typename Object, typename Interface >
@@ -93,8 +91,8 @@ namespace GL2D
 		if ( bitmap )
 		{
 			CBitmap * bmp = reinterpret_cast< CBitmap * >( CBitmap::CreateInstance() );
-			const std::unique_ptr< CContext > & context = static_cast< Object * >( this )->GetContext();
-			static_cast< CObject * >( bmp )->Initialise(
+			std::shared_ptr< CContext > context = static_cast< Object * >( this )->GetContext();
+			static_cast< CObject * >( bmp )->Create(
 				std::bind( &CContext::GenTextures, context.get(), std::placeholders::_1, std::placeholders::_2 ),
 				std::bind( &CContext::DeleteTextures, context.get(), std::placeholders::_1, std::placeholders::_2 )
 				);
@@ -413,7 +411,7 @@ namespace GL2D
 	STDMETHODIMP_( void ) CRenderTargetBase< Object, Interface >::BeginDraw()
 	{
 		static_cast< Object * >( this )->GetContext()->MakeCurrent();
-		static_cast< Object * >( this )->GetContext()->BindFramebuffer( GL2D_GL_FRAMEBUFFER_MODE_DRAW, m_name );
+		m_frameBuffer.Bind( GL2D_GL_FRAMEBUFFER_MODE_DRAW );
 		glDisable( GL_DEPTH_TEST );
 		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity ();
@@ -424,9 +422,10 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	STDMETHODIMP CRenderTargetBase< Object, Interface >::EndDraw( GL2D_TAG *tag1, GL2D_TAG *tag2 )
 	{
-		static_cast< Object * >( this )->GetContext()->BindFramebuffer( GL2D_GL_FRAMEBUFFER_MODE_DRAW, 0 );
+		m_frameBuffer.Unbind();
+		HRESULT hr = glGetLastError( "BindFramebuffer" );
 		static_cast< Object * >( this )->GetContext()->EndCurrent();
-		return glGetLastError( "glBindFramebuffer" );
+		return hr;
 	}
 
 	template< typename Object, typename Interface >
