@@ -26,6 +26,11 @@ namespace GL2D
 			return new CRenderTargetBase< Object, Interface >();
 		}
 
+		inline const std::shared_ptr< CContext > & GetContext()const
+		{
+			return static_cast< Object const * >( this )->GetContext();
+		}
+
 		STDMETHOD( CreateBitmap )( GL2D_SIZE_U size, const void *srcData, uint32_t pitch, const GL2D_BITMAP_PROPERTIES *bitmapProperties, IGL2DBitmap **bitmap );
 		STDMETHOD( CreateBitmapFromWicBitmap )( IWICBitmapSource *wicBitmapSource, const GL2D_BITMAP_PROPERTIES *bitmapProperties, IGL2DBitmap **bitmap );
 		STDMETHOD( CreateSharedBitmap )( REFIID riid, void *data, const GL2D_BITMAP_PROPERTIES *bitmapProperties, IGL2DBitmap **bitmap );

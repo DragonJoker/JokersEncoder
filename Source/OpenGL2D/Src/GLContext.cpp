@@ -3,6 +3,7 @@
 #include "GLContext.h"
 
 #include <sstream>
+#include <glm/gtc/matrix_transform.hpp>
 
 #define BUFFER_OFFSET( x ) ( ( const GLvoid * )( x ) )
 
@@ -200,9 +201,11 @@ namespace GL2D
 	CContext::CContext( HWND window )
 		: m_window( window )
 		, m_previous( NULL )
+		, m_vao( GL_INVALID_INDEX )
 	{
 		m_dc = ::GetDC( m_window );
 		m_context = DoCreateContext();
+		m_matrices.push( glm::mat4x4( 1.0f ) );
 	}
 
 	CContext::~CContext()
@@ -212,231 +215,13 @@ namespace GL2D
 	HRESULT CContext::Initialise()
 	{
 		MakeCurrent();
-		m_pfnGenTextures = ::glGenTextures;
-		m_pfnDeleteTextures = ::glDeleteTextures;
-
-		gl_api::GetFunction( "glActiveTexture", "", m_pfnActiveTexture );
-		gl_api::GetFunction( "glDrawBuffers", "ARB", m_pfnDrawBuffers );
-		gl_api::GetFunction( "glBlitFramebuffer", "ARB", m_pfnBlitFramebuffer );
-		gl_api::GetFunction( "glGenRenderbuffers", "ARB", m_pfnGenRenderbuffers );
-		gl_api::GetFunction( "glDeleteRenderbuffers", "ARB", m_pfnDeleteRenderbuffers );
-		gl_api::GetFunction( "glBindRenderbuffer", "ARB", m_pfnBindRenderbuffer );
-		gl_api::GetFunction( "glRenderbufferStorage", "ARB", m_pfnRenderbufferStorage );
-		gl_api::GetFunction( "glRenderbufferStorageMultisample", "ARB", m_pfnRenderbufferStorageMultisample );
-		gl_api::GetFunction( "glGetRenderbufferParameteriv", "ARB", m_pfnGetRenderbufferParameteriv );
-		gl_api::GetFunction( "glFramebufferRenderbuffer", "ARB", m_pfnFramebufferRenderbuffer );
-		gl_api::GetFunction( "glGenFramebuffers", "ARB", m_pfnGenFramebuffers );
-		gl_api::GetFunction( "glDeleteFramebuffers", "ARB", m_pfnDeleteFramebuffers );
-		gl_api::GetFunction( "glBindFramebuffer", "ARB", m_pfnBindFramebuffer );
-		gl_api::GetFunction( "glFramebufferTexture", "ARB", m_pfnFramebufferTexture );
-		gl_api::GetFunction( "glFramebufferTexture1D", "ARB", m_pfnFramebufferTexture1D );
-		gl_api::GetFunction( "glFramebufferTexture2D", "ARB", m_pfnFramebufferTexture2D );
-		gl_api::GetFunction( "glFramebufferTexture3D", "ARB", m_pfnFramebufferTexture3D );
-		gl_api::GetFunction( "glFramebufferTextureLayer", "ARB", m_pfnFramebufferTextureLayer );
-		gl_api::GetFunction( "glCheckFramebufferStatus", "ARB", m_pfnCheckFramebufferStatus );
-		gl_api::GetFunction( "glGenBuffers", "ARB", m_pfnGenBuffers );
-		gl_api::GetFunction( "glDeleteBuffers", "ARB", m_pfnDeleteBuffers );
-		gl_api::GetFunction( "glBindBuffer", "ARB", m_pfnBindBuffer );
-		gl_api::GetFunction( "glBufferData", "ARB", m_pfnBufferData );
-		gl_api::GetFunction( "glCreateShader", "ARB", m_pfnCreateShader );
-		gl_api::GetFunction( "glDeleteShader", "ARB", m_pfnDeleteShader );
-		gl_api::GetFunction( "glShaderSource", "ARB", m_pfnShaderSource );
-		gl_api::GetFunction( "glCompileShader", "ARB", m_pfnCompileShader );
-		gl_api::GetFunction( "glGetShaderiv", "ARB", m_pfnGetShaderiv );
-		gl_api::GetFunction( "glGetShaderInfoLog", "ARB", m_pfnGetShaderInfoLog );
-		gl_api::GetFunction( "glAttachShader", "ARB", m_pfnAttachShader );
-		gl_api::GetFunction( "glCreateProgram", "ARB", m_pfnCreateProgram );
-		gl_api::GetFunction( "glDeleteProgram", "ARB", m_pfnDeleteProgram );
-		gl_api::GetFunction( "glAttachShader", "ARB", m_pfnAttachShader );
-		gl_api::GetFunction( "glLinkProgram", "ARB", m_pfnLinkProgram );
-		gl_api::GetFunction( "glGetProgramiv", "ARB", m_pfnGetProgramiv );
-		gl_api::GetFunction( "glGetProgramInfoLog", "ARB", m_pfnGetProgramInfoLog );
-		gl_api::GetFunction( "glGetUniformLocation", "ARB", m_pfnGetUniformLocation );
-		gl_api::GetFunction( "glUniform1i", "ARB", m_pfnUniform1i );
-		gl_api::GetFunction( "glGetAttribLocation", "ARB", m_pfnGetAttribLocation );
-		gl_api::GetFunction( "glUseProgram", "ARB", m_pfnUseProgram );
-		gl_api::GetFunction( "glVertexAttribPointer", "ARB", m_pfnVertexAttribPointer );
-
-		std::string glVersion = ( char const * )glGetString( GL_VERSION	);
-		double dVersion;
-		std::stringstream stream( glVersion );
-		stream >> dVersion;
-		int version = int( dVersion * 10 );
-
-		std::function< HGLRC( HDC hDC, HGLRC hShareContext, int const * attribList ) > glCreateContextAttribs;
-		gl_api::GetFunction( "wglCreateContextAttribs", "ARB", glCreateContextAttribs );
-
-		if ( !glCreateContextAttribs )
-		{
-			gl_api::GetFunction( "wglCreateContextAttribs", "EXT", glCreateContextAttribs );
-		}
-
-		if ( glCreateContextAttribs )
-		{
-			std::vector< int > attribList;
-			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_MAJOR_VERSION );
-			attribList.push_back( version / 10 );
-			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_MINOR_VERSION );
-			attribList.push_back( version % 10 );
-#if !defined( NDEBUG )
-			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FLAGS );
-			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FORWARD_COMPATIBLE_BIT | GL2D_GL_CREATECONTEXT_ATTRIB_DEBUG_BIT );
-			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_MASK );
-			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_COMPATIBILITY_BIT );
-#else
-			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FLAGS );
-			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FORWARD_COMPATIBLE_BIT );
-			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_MASK );
-			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_CORE_BIT );
-#endif
-			attribList.push_back( 0 );
-			HGLRC context = glCreateContextAttribs( m_dc, NULL, &attribList[0] );
-			EndCurrent();
-			wglDeleteContext( m_context );
-			m_context = context;
-			MakeCurrent();
-		}
-
-		gl_api::GetFunction( "glDebugMessageCallback", "ARB", m_pfnDebugMessageCallback );
-		gl_api::GetFunction( "glDebugMessageCallbackAMD", "ARB", m_pfnDebugMessageCallbackAMD );
-
-		if ( m_pfnDebugMessageCallback )
-		{
-			m_pfnDebugMessageCallback( PFNGLDEBUGPROC( &CContext::StDebugLog ), this );
-			glEnable( GL2D_GL_DEBUG_OUTPUT_SYNCHRONOUS );
-		}
-
-		if ( m_pfnDebugMessageCallbackAMD )
-		{
-			m_pfnDebugMessageCallbackAMD( PFNGLDEBUGAMDPROC( &CContext::StDebugLogAMD ), this );
-			glEnable( GL2D_GL_DEBUG_OUTPUT_SYNCHRONOUS );
-		}
-		
-		std::string vssrc;
-		vssrc += "#version 130\n";
-		vssrc += "\n";
-		vssrc += "in vec4 vertex;\n";
-		vssrc += "in vec2 texture;\n";
-		vssrc += "out vec2 vtx_texture;\n";
-		vssrc += "\n";
-		vssrc += "void main()\n";
-		vssrc += "{\n";
-		vssrc += "    gl_Position = vertex;\n";
-		vssrc += "    vtx_texture = texture;\n";
-		vssrc += "}\n";
-		GLuint vs = DoCreateShader( vssrc, GL2D_GL_SHADER_TYPE_VERTEX );
-		
-		std::string fssrc;
-		fssrc += "#version 130\n";
-		fssrc += "\n";
-		fssrc += "uniform sampler2D diffuse;\n";
-		fssrc += "in vec2 vtx_texture;\n";
-		fssrc += "out vec4 pxl_fragColor;\n";
-		fssrc += "\n";
-		fssrc += "void main()\n";
-		fssrc += "{\n";
-		fssrc += "    pxl_fragColor = texture( diffuse, vtx_texture );\n";
-		fssrc += "}\n";
-		GLuint fs = DoCreateShader( fssrc, GL2D_GL_SHADER_TYPE_FRAGMENT );
-		
-		HRESULT hr = ( fs != GL_INVALID_INDEX && vs != GL_INVALID_INDEX ) ? S_OK : E_FAIL;
+		DoLoadFunctions();
+		DoLoadContext();
+		HRESULT hr = DoLoadProgram();
 
 		if ( hr == S_OK )
 		{
-			m_program = m_pfnCreateProgram();
-			hr = glGetLastError( "CreateProgram" );
-		}
-
-		if ( hr == S_OK )
-		{
-			m_pfnAttachShader( m_program, vs );
-			hr = glGetLastError( "AttachShader" );
-		}
-
-		if ( hr == S_OK )
-		{
-			m_pfnAttachShader( m_program, fs );
-			hr = glGetLastError( "AttachShader" );
-		}
-
-		if ( hr == S_OK )
-		{
-			m_pfnLinkProgram( m_program );
-			hr = glGetLastError( "LinkProgram" );
-		}
-
-		if ( hr == S_OK )
-		{
-			int linked = 0;
-			m_pfnGetProgramiv( m_program, GL2D_GL_PROGRAM_QUERY_LINK_STATUS, &linked );
-			hr = glGetLastError( "GetProgramiv" );
-			int infologLength = 0;
-			int charsWritten  = 0;
-			m_pfnGetProgramiv( m_program, GL2D_GL_PROGRAM_QUERY_INFO_LOG_LENGTH, &infologLength );
-
-			if ( infologLength > 0 )
-			{
-				char * infoLog = new char[infologLength];
-				m_pfnGetProgramInfoLog( m_program, infologLength, &charsWritten, infoLog );
-
-				if ( strlen( infoLog ) > 0 && strcmp( "No errors.\n", infoLog ) )
-				{
-					hr = glGetLastError( "GetProgramInfoLog" );
-					std::cout << infoLog << std::endl;
-				}
-
-				delete [] infoLog;
-			}
-		}
-
-		if ( hr == S_OK )
-		{
-			m_sampler = m_pfnGetUniformLocation( m_program, "diffuse" );
-		}
-
-		if ( hr == S_OK )
-		{
-			m_vertex = m_pfnGetAttribLocation( m_program, "texture" );
-		}
-
-		if ( hr == S_OK )
-		{
-			m_texture = m_pfnGetAttribLocation( m_program, "vertex" );
-		}
-
-		if ( vs != GL_INVALID_INDEX )
-		{
-			m_pfnDeleteShader( vs );
-		}
-
-		if ( fs != GL_INVALID_INDEX )
-		{
-			m_pfnDeleteShader( fs );
-		}
-
-		hr = GenBuffers( 1, &m_buffer );
-
-		if ( hr == S_OK )
-		{
-			hr = BindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
-		}
-
-		if ( hr == S_OK )
-		{
-			float quad[16] =
-			{
-				0, 0, 0, 0,
-				1, 0, 1, 0,
-				1, 1, 1, 1,
-				0, 1, 0, 1
-			};
-
-			hr = BufferData( GL2D_GL_BUFFER_TARGET_ARRAY, sizeof( quad ), quad, GL2D_GL_BUFFER_USAGE_STATIC_DRAW );
-		}
-
-		if ( hr == S_OK )
-		{
-			hr = BindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, 0 );
+			hr = DoLoadBuffer();
 		}
 
 		EndCurrent();
@@ -449,9 +234,15 @@ namespace GL2D
 		{
 			m_pfnDeleteProgram( m_program );
 		}
+
 		if ( m_buffer != GL_INVALID_INDEX )
 		{
 			m_pfnDeleteBuffers( 1, &m_buffer );
+		}
+
+		if ( m_vao != GL_INVALID_INDEX )
+		{
+			m_pfnDeleteVertexArrays( 1, &m_vao );
 		}
 
 		::ReleaseDC( m_window, m_dc );
@@ -519,6 +310,31 @@ namespace GL2D
 		
 		m_mutex.unlock();
 		return value;
+	}
+
+	void CContext::Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar )
+	{
+		m_proj = glm::ortho( left, right, bottom, top, zNear, zFar );
+	}
+
+	void CContext::PushMatrix()
+	{
+		m_matrices.push( m_matrices.top() );
+	}
+
+	void CContext::PopMatrix()
+	{
+		m_matrices.pop();
+	}
+
+	void CContext::MultMatrix( glm::mat4x4 const & mtx )
+	{
+		m_matrices.top() = m_matrices.top() * mtx;
+	}
+
+	void CContext::LoadIdentity()
+	{
+		m_matrices.top() = glm::mat4x4( 1.0 );
 	}
 
 	HRESULT CContext::GenFramebuffers( GLsizei n, GLuint* framebuffers )
@@ -719,20 +535,72 @@ namespace GL2D
 
 		if ( hr == S_OK )
 		{
-			m_pfnVertexAttribPointer( m_vertex, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 0 ) );
-			hr = glGetLastError( "VertexAttribPointer" );
+			m_pfnUniform1i( m_sampler, 0 );
+			hr = glGetLastError( "Uniform1i" );
 		}
 
 		if ( hr == S_OK )
 		{
-			m_pfnVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
-			hr = glGetLastError( "VertexAttribPointer" );
+			m_pfnUniformMatrix4fv( m_projection, 1, false, &m_proj[0][0] );
+			hr = glGetLastError( "UniformMatrix4fv" );
 		}
 
 		if ( hr == S_OK )
 		{
-			glDrawArrays( GL_QUADS, 0, 4 );
+			m_pfnUniformMatrix4fv( m_view, 1, false, &m_matrices.top()[0][0] );
+			hr = glGetLastError( "UniformMatrix4fv" );
+		}
+
+		if ( m_vao != GL_INVALID_INDEX )
+		{
+			if ( hr == S_OK )
+			{
+				m_pfnBindVertexArray( m_vao );
+				hr = glGetLastError( "BindVertexArray" );
+			}
+		}
+		else
+		{
+			if ( hr == S_OK )
+			{
+				m_pfnBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
+				hr = glGetLastError( "BindBuffer" );
+			}
+
+			if ( hr == S_OK )
+			{
+				m_pfnVertexAttribPointer( m_vertex, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 0 ) );
+				hr = glGetLastError( "VertexAttribPointer" );
+			}
+
+			if ( hr == S_OK )
+			{
+				m_pfnVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
+				hr = glGetLastError( "VertexAttribPointer" );
+			}
+		}
+
+		if ( hr == S_OK )
+		{
+			glDrawArrays( GL_TRIANGLES, 0, 4 );
 			hr = glGetLastError( "DrawArrays" );
+		}
+
+		if ( m_vao != GL_INVALID_INDEX )
+		{
+			if ( hr == S_OK )
+			{
+				m_pfnBindVertexArray( 0 );
+				hr = glGetLastError( "BindVertexArray" );
+			}
+		}
+		else
+		{
+			if ( hr == S_OK )
+			{
+				m_pfnBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, 0 );
+				hr = glGetLastError( "BindBuffer" );
+			}
 		}
 
 		if ( hr == S_OK )
@@ -977,5 +845,280 @@ namespace GL2D
 			std::cout << toLog.str() << "Severity:Undefined\tMessage:" << message;
 			break;
 		}
+	}
+
+	void CContext::DoLoadFunctions()
+	{
+		m_pfnGenTextures = ::glGenTextures;
+		m_pfnDeleteTextures = ::glDeleteTextures;
+
+		gl_api::GetFunction( "glActiveTexture", "", m_pfnActiveTexture );
+		gl_api::GetFunction( "glDrawBuffers", "ARB", m_pfnDrawBuffers );
+		gl_api::GetFunction( "glBlitFramebuffer", "ARB", m_pfnBlitFramebuffer );
+		gl_api::GetFunction( "glGenRenderbuffers", "ARB", m_pfnGenRenderbuffers );
+		gl_api::GetFunction( "glDeleteRenderbuffers", "ARB", m_pfnDeleteRenderbuffers );
+		gl_api::GetFunction( "glBindRenderbuffer", "ARB", m_pfnBindRenderbuffer );
+		gl_api::GetFunction( "glRenderbufferStorage", "ARB", m_pfnRenderbufferStorage );
+		gl_api::GetFunction( "glRenderbufferStorageMultisample", "ARB", m_pfnRenderbufferStorageMultisample );
+		gl_api::GetFunction( "glGetRenderbufferParameteriv", "ARB", m_pfnGetRenderbufferParameteriv );
+		gl_api::GetFunction( "glFramebufferRenderbuffer", "ARB", m_pfnFramebufferRenderbuffer );
+		gl_api::GetFunction( "glGenFramebuffers", "ARB", m_pfnGenFramebuffers );
+		gl_api::GetFunction( "glDeleteFramebuffers", "ARB", m_pfnDeleteFramebuffers );
+		gl_api::GetFunction( "glBindFramebuffer", "ARB", m_pfnBindFramebuffer );
+		gl_api::GetFunction( "glFramebufferTexture", "ARB", m_pfnFramebufferTexture );
+		gl_api::GetFunction( "glFramebufferTexture1D", "ARB", m_pfnFramebufferTexture1D );
+		gl_api::GetFunction( "glFramebufferTexture2D", "ARB", m_pfnFramebufferTexture2D );
+		gl_api::GetFunction( "glFramebufferTexture3D", "ARB", m_pfnFramebufferTexture3D );
+		gl_api::GetFunction( "glFramebufferTextureLayer", "ARB", m_pfnFramebufferTextureLayer );
+		gl_api::GetFunction( "glCheckFramebufferStatus", "ARB", m_pfnCheckFramebufferStatus );
+		gl_api::GetFunction( "glGenBuffers", "ARB", m_pfnGenBuffers );
+		gl_api::GetFunction( "glDeleteBuffers", "ARB", m_pfnDeleteBuffers );
+		gl_api::GetFunction( "glBindBuffer", "ARB", m_pfnBindBuffer );
+		gl_api::GetFunction( "glBufferData", "ARB", m_pfnBufferData );
+		gl_api::GetFunction( "glCreateShader", "ARB", m_pfnCreateShader );
+		gl_api::GetFunction( "glDeleteShader", "ARB", m_pfnDeleteShader );
+		gl_api::GetFunction( "glShaderSource", "ARB", m_pfnShaderSource );
+		gl_api::GetFunction( "glCompileShader", "ARB", m_pfnCompileShader );
+		gl_api::GetFunction( "glGetShaderiv", "ARB", m_pfnGetShaderiv );
+		gl_api::GetFunction( "glGetShaderInfoLog", "ARB", m_pfnGetShaderInfoLog );
+		gl_api::GetFunction( "glAttachShader", "ARB", m_pfnAttachShader );
+		gl_api::GetFunction( "glCreateProgram", "ARB", m_pfnCreateProgram );
+		gl_api::GetFunction( "glDeleteProgram", "ARB", m_pfnDeleteProgram );
+		gl_api::GetFunction( "glAttachShader", "ARB", m_pfnAttachShader );
+		gl_api::GetFunction( "glLinkProgram", "ARB", m_pfnLinkProgram );
+		gl_api::GetFunction( "glGetProgramiv", "ARB", m_pfnGetProgramiv );
+		gl_api::GetFunction( "glGetProgramInfoLog", "ARB", m_pfnGetProgramInfoLog );
+		gl_api::GetFunction( "glGetUniformLocation", "ARB", m_pfnGetUniformLocation );
+		gl_api::GetFunction( "glUniform1i", "ARB", m_pfnUniform1i );
+		gl_api::GetFunction( "glUniformMatrix4fv", "ARB", m_pfnUniformMatrix4fv );
+		gl_api::GetFunction( "glGetAttribLocation", "ARB", m_pfnGetAttribLocation );
+		gl_api::GetFunction( "glUseProgram", "ARB", m_pfnUseProgram );
+		gl_api::GetFunction( "glVertexAttribPointer", "ARB", m_pfnVertexAttribPointer );
+		gl_api::GetFunction( "glGenVertexArrays", "ARB", m_pfnGenVertexArrays );
+		gl_api::GetFunction( "glDeleteVertexArrays", "ARB", m_pfnDeleteVertexArrays );
+		gl_api::GetFunction( "glBindVertexArray", "ARB", m_pfnBindVertexArray );
+	}
+
+	void CContext::DoLoadContext()
+	{
+		std::string glVersion = ( char const * )glGetString( GL_VERSION	);
+		double dVersion;
+		std::stringstream stream( glVersion );
+		stream >> dVersion;
+		int version = int( dVersion * 10 );
+
+		std::function< HGLRC( HDC hDC, HGLRC hShareContext, int const * attribList ) > glCreateContextAttribs;
+		gl_api::GetFunction( "wglCreateContextAttribs", "ARB", glCreateContextAttribs );
+
+		if ( !glCreateContextAttribs )
+		{
+			gl_api::GetFunction( "wglCreateContextAttribs", "EXT", glCreateContextAttribs );
+		}
+
+		if ( glCreateContextAttribs )
+		{
+			std::vector< int > attribList;
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_MAJOR_VERSION );
+			attribList.push_back( version / 10 );
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_MINOR_VERSION );
+			attribList.push_back( version % 10 );
+#if !defined( NDEBUG )
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FLAGS );
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FORWARD_COMPATIBLE_BIT | GL2D_GL_CREATECONTEXT_ATTRIB_DEBUG_BIT );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_MASK );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_COMPATIBILITY_BIT );
+#else
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FLAGS );
+			attribList.push_back( GL2D_GL_CREATECONTEXT_ATTRIB_FORWARD_COMPATIBLE_BIT );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_MASK );
+			attribList.push_back( GL2D_GL_PROFILE_ATTRIB_CORE_BIT );
+#endif
+			attribList.push_back( 0 );
+			HGLRC context = glCreateContextAttribs( m_dc, NULL, &attribList[0] );
+			EndCurrent();
+			wglDeleteContext( m_context );
+			m_context = context;
+			MakeCurrent();
+		}
+
+		gl_api::GetFunction( "glDebugMessageCallback", "ARB", m_pfnDebugMessageCallback );
+		gl_api::GetFunction( "glDebugMessageCallbackAMD", "ARB", m_pfnDebugMessageCallbackAMD );
+
+		if ( m_pfnDebugMessageCallback )
+		{
+			m_pfnDebugMessageCallback( PFNGLDEBUGPROC( &CContext::StDebugLog ), this );
+			glEnable( GL2D_GL_DEBUG_OUTPUT_SYNCHRONOUS );
+		}
+
+		if ( m_pfnDebugMessageCallbackAMD )
+		{
+			m_pfnDebugMessageCallbackAMD( PFNGLDEBUGAMDPROC( &CContext::StDebugLogAMD ), this );
+			glEnable( GL2D_GL_DEBUG_OUTPUT_SYNCHRONOUS );
+		}
+	}
+
+	HRESULT CContext::DoLoadProgram()
+	{
+		std::string vssrc;
+		vssrc += "#version 130\n";
+		vssrc += "\n";
+		vssrc += "in vec4 vertex;\n";
+		vssrc += "in vec2 texture;\n";
+		vssrc += "out vec2 vtx_texture;\n";
+		vssrc += "uniform mat4 projection;\n";
+		vssrc += "uniform mat4 view;\n";
+		vssrc += "\n";
+		vssrc += "void main()\n";
+		vssrc += "{\n";
+		vssrc += "    gl_Position = ( view * projection ) * vertex;\n";
+		vssrc += "    vtx_texture = texture;\n";
+		vssrc += "}\n";
+		GLuint vs = DoCreateShader( vssrc, GL2D_GL_SHADER_TYPE_VERTEX );
+		
+		std::string fssrc;
+		fssrc += "#version 130\n";
+		fssrc += "\n";
+		fssrc += "uniform sampler2D diffuse;\n";
+		fssrc += "in vec2 vtx_texture;\n";
+		fssrc += "out vec4 pxl_fragColor;\n";
+		fssrc += "\n";
+		fssrc += "void main()\n";
+		fssrc += "{\n";
+		fssrc += "    pxl_fragColor = texture( diffuse, vtx_texture );\n";
+		fssrc += "    pxl_fragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n";
+		fssrc += "}\n";
+		GLuint fs = DoCreateShader( fssrc, GL2D_GL_SHADER_TYPE_FRAGMENT );
+		
+		HRESULT hr = ( fs != GL_INVALID_INDEX && vs != GL_INVALID_INDEX ) ? S_OK : E_FAIL;
+
+		if ( hr == S_OK )
+		{
+			m_program = m_pfnCreateProgram();
+			hr = glGetLastError( "CreateProgram" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_pfnAttachShader( m_program, vs );
+			hr = glGetLastError( "AttachShader" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_pfnAttachShader( m_program, fs );
+			hr = glGetLastError( "AttachShader" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_pfnLinkProgram( m_program );
+			hr = glGetLastError( "LinkProgram" );
+		}
+
+		if ( hr == S_OK )
+		{
+			int linked = 0;
+			m_pfnGetProgramiv( m_program, GL2D_GL_PROGRAM_QUERY_LINK_STATUS, &linked );
+			hr = glGetLastError( "GetProgramiv" );
+			int infologLength = 0;
+			int charsWritten  = 0;
+			m_pfnGetProgramiv( m_program, GL2D_GL_PROGRAM_QUERY_INFO_LOG_LENGTH, &infologLength );
+
+			if ( infologLength > 0 )
+			{
+				char * infoLog = new char[infologLength];
+				m_pfnGetProgramInfoLog( m_program, infologLength, &charsWritten, infoLog );
+
+				if ( strlen( infoLog ) > 0 && strcmp( "No errors.\n", infoLog ) )
+				{
+					hr = glGetLastError( "GetProgramInfoLog" );
+					std::cout << infoLog << std::endl;
+				}
+
+				delete [] infoLog;
+			}
+		}
+
+		if ( hr == S_OK )
+		{
+			m_sampler = m_pfnGetUniformLocation( m_program, "diffuse" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_projection = m_pfnGetUniformLocation( m_program, "projection" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_view = m_pfnGetUniformLocation( m_program, "view" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_vertex = m_pfnGetAttribLocation( m_program, "texture" );
+		}
+
+		if ( hr == S_OK )
+		{
+			m_texture = m_pfnGetAttribLocation( m_program, "vertex" );
+		}
+
+		if ( vs != GL_INVALID_INDEX )
+		{
+			m_pfnDeleteShader( vs );
+		}
+
+		if ( fs != GL_INVALID_INDEX )
+		{
+			m_pfnDeleteShader( fs );
+		}
+
+		return hr;
+	}
+
+	HRESULT CContext::DoLoadBuffer()
+	{
+		HRESULT hr = GenBuffers( 1, &m_buffer );
+
+		if ( hr == S_OK )
+		{
+			m_pfnBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
+			hr = glGetLastError( "BindBuffer" );
+		}
+
+		if ( hr == S_OK )
+		{
+			float quad[] =
+			{
+				0, 0, 0, 0,
+				1, 0, 1, 0,
+				1, 1, 1, 1,
+				0, 0, 0, 0,
+				1, 1, 1, 1,
+				0, 1, 0, 1
+			};
+
+			hr = BufferData( GL2D_GL_BUFFER_TARGET_ARRAY, sizeof( quad ), quad, GL2D_GL_BUFFER_USAGE_STATIC_DRAW );
+			m_pfnBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, 0 );
+		}
+
+		if (hr == S_OK && m_pfnGenVertexArrays )
+		{
+			m_pfnGenVertexArrays( 1, &m_vao );
+			hr = glGetLastError( "GenVertexArrays" );
+
+			if ( hr == S_OK )
+			{
+				m_pfnBindVertexArray( m_vao );
+				m_pfnBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
+				m_pfnVertexAttribPointer( m_vertex, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 0 ) );
+				m_pfnVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
+				m_pfnBindVertexArray( 0 );
+				hr = glGetLastError( "BindVertexArray" );
+			}
+		}
+
+		return hr;
 	}
 }

@@ -1,8 +1,18 @@
 project( OpenGL2D )
 
 find_package( OpenGL )
+find_package( GLM )
+
+if( GLM_FOUND )
+	include_directories( ${GLM_INCLUDE_DIR} )
+	message( STATUS "+ Found GLM" )
+endif()
 
 if( OPENGL_FOUND )
+	message( STATUS "+ Found OpenGL" )
+endif()
+
+if( OPENGL_FOUND AND GLM_FOUND )
 	set( OpenGlLibraries "" )
 	foreach( Lib ${OPENGL_gl_LIBRARY} )
 		if( OpenGlLibraries )

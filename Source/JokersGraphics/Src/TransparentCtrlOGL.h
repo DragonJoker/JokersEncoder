@@ -12,7 +12,8 @@
 
 #include <algorithm>
 
-#include <OpenGL2DPrerequisites.h>
+#include <GL2D.h>
+#include <GLHelper.h>
 
 #ifdef min
 #	undef min

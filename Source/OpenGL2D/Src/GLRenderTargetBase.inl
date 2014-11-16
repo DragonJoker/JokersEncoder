@@ -81,6 +81,7 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	CRenderTargetBase< Object, Interface >::~CRenderTargetBase()
 	{
+		m_frameBuffer.Cleanup();
 	}
 
 	template< typename Object, typename Interface >
@@ -91,7 +92,7 @@ namespace GL2D
 		if ( bitmap )
 		{
 			CBitmap * bmp = reinterpret_cast< CBitmap * >( CBitmap::CreateInstance() );
-			std::shared_ptr< CContext > context = static_cast< Object * >( this )->GetContext();
+			std::shared_ptr< CContext > context = GetContext();
 			static_cast< CObject * >( bmp )->Create(
 				std::bind( &CContext::GenTextures, context.get(), std::placeholders::_1, std::placeholders::_2 ),
 				std::bind( &CContext::DeleteTextures, context.get(), std::placeholders::_1, std::placeholders::_2 )
@@ -293,7 +294,7 @@ namespace GL2D
 		if ( bitmap )
 		{
 			CBitmap * bmp = reinterpret_cast< CBitmap * >( bitmap );
-			static_cast< Object * >( this )->GetContext()->DrawTexture( bmp->GetName(), *destinationRectangle, interpolationMode, *sourceRectangle );
+			GetContext()->DrawTexture( bmp->GetName(), *destinationRectangle, interpolationMode, *sourceRectangle );
 		}
 	}
 
@@ -410,13 +411,11 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	STDMETHODIMP_( void ) CRenderTargetBase< Object, Interface >::BeginDraw()
 	{
-		static_cast< Object * >( this )->GetContext()->MakeCurrent();
+		GetContext()->MakeCurrent();
 		m_frameBuffer.Bind( GL2D_GL_FRAMEBUFFER_MODE_DRAW );
 		glDisable( GL_DEPTH_TEST );
-		glMatrixMode( GL_PROJECTION );
-		glLoadIdentity ();
-		glOrtho( 0, m_size.width, m_size.height, 0, 0, 1 );
-		glMatrixMode( GL_MODELVIEW );
+		GetContext()->Ortho( 0, m_size.width, m_size.height, 0, 0, 1 );
+		GetContext()->LoadIdentity();
 	}
 
 	template< typename Object, typename Interface >
@@ -424,7 +423,7 @@ namespace GL2D
 	{
 		m_frameBuffer.Unbind();
 		HRESULT hr = glGetLastError( "BindFramebuffer" );
-		static_cast< Object * >( this )->GetContext()->EndCurrent();
+		GetContext()->EndCurrent();
 		return hr;
 	}
 
@@ -461,7 +460,7 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	STDMETHODIMP_( uint32_t ) CRenderTargetBase< Object, Interface >::GetMaximumBitmapSize() const
 	{
-		return static_cast< const Object * >( this )->GetContext()->GetInt( GL2D_GL_MAX_TEXTURE_BUFFER_SIZE );
+		return GetContext()->GetInt( GL2D_GL_MAX_TEXTURE_BUFFER_SIZE );
 	}
 
 	template< typename Object, typename Interface >

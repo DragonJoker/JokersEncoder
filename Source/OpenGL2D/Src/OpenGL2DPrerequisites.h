@@ -3,6 +3,7 @@
 
 #include "GL2D.h"
 #include <memory>
+#include <glm/glm.hpp>
 
 namespace GL2D
 {

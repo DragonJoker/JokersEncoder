@@ -6,6 +6,7 @@
 #include <map>
 #include <thread>
 #include <mutex>
+#include <stack>
 
 namespace GL2D
 {
@@ -34,6 +35,12 @@ namespace GL2D
 		HWND GetWindow()const;
 
 		int GetInt( GLenum param );
+		
+		void Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar );
+		void PushMatrix();
+		void PopMatrix();
+		void MultMatrix( glm::mat4x4 const & mtx );
+		void LoadIdentity();
 
 		HRESULT GenFramebuffers( GLsizei n, GLuint* framebuffers );
 		HRESULT DeleteFramebuffers( GLsizei n, GLuint const * framebuffers );
@@ -65,6 +72,27 @@ namespace GL2D
 		HRESULT DrawTexture( GLuint name, const GL2D_RECT_F & destinationRectangle, GL2D_BITMAP_INTERPOLATION_MODE interpolationMode, const GL2D_RECT_F & sourceRectangle );
 
 	private:
+		HGLRC DoCreateContext();
+		bool DoSelectPixelFormat();
+		void DoCleanup();
+		GLuint DoCreateShader( const std::string & source, GL2D_GL_SHADER_TYPE type );
+		void DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
+		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
+		void DoLoadFunctions();
+		void DoLoadContext();
+		HRESULT DoLoadProgram();
+		HRESULT DoLoadBuffer();
+
+		static void StDebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message, void * userParam )
+		{
+			reinterpret_cast< CContext * >( userParam )->DebugLog( source, type, id, severity, length, message );
+		}
+
+		static void StDebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message, void * userParam )
+		{
+			reinterpret_cast< CContext * >( userParam )->DebugLogAMD( id, category, severity, length, message );
+		}
+
 		typedef ptrdiff_t GLintptr;
 		typedef ptrdiff_t GLsizeiptr;
 		typedef char GLchar;
@@ -73,11 +101,18 @@ namespace GL2D
 		HDC m_dc;
 		HGLRC m_context;
 		CContext * m_previous;
+		GLuint m_vao;
 		GLuint m_buffer;
 		GLuint m_program;
 		GLuint m_sampler;
+		GLuint m_projection;
+		GLuint m_view;
 		GLuint m_vertex;
 		GLuint m_texture;
+		typedef glm::mat4x4 mat4x4;
+		mat4x4 m_proj;
+		std::stack< mat4x4 > m_matrices;
+
 
 		static std::recursive_mutex m_mutex;
 		static std::map< std::thread::id, CContext * > m_activeContexts;
@@ -133,13 +168,21 @@ namespace GL2D
 
 		std::function< void ( GLsizei n, GLuint * buffers ) > m_pfnGenBuffers;
 		std::function< void ( GLsizei n, GLuint const * buffers ) > m_pfnDeleteBuffers;
-		std::function< void ( GLenum target, GLuint buffer  ) > m_pfnBindBuffer;
+		std::function< void ( GLenum target, GLuint buffer ) > m_pfnBindBuffer;
 		std::function< void ( GLenum target, GLsizeiptr size, const GLvoid * data, GLenum usage ) > m_pfnBufferData;
 #if DEF_HAS_VARIADIC_TEMPLATES
-		std::function< void ( uint32_t target, int samples, int internalformat, int width, int height, uint8_t fixedsamplelocations ) > m_pfnTexImage2DMultisample;
+		std::function< void ( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer ) > m_pfnVertexAttribPointer;
 #else
 		void ( CALLBACK * m_pfnVertexAttribPointer )( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer );
 #endif
+
+		//@}
+		/**@name VAO */
+		//@{
+
+		std::function< void ( GLsizei n, GLuint * buffers ) > m_pfnGenVertexArrays;
+		std::function< void ( GLsizei n, GLuint const * buffers ) > m_pfnDeleteVertexArrays;
+		std::function< void ( GLuint buffer ) > m_pfnBindVertexArray;
 		
 		//@}
 		/**@name Shader */
@@ -159,6 +202,7 @@ namespace GL2D
 		std::function< void ( GLuint program, GLsizei maxLength, GLsizei * length, GLchar * infoLog ) > m_pfnGetProgramInfoLog;
 		std::function< GLint ( GLuint program, const GLchar * name ) > m_pfnGetUniformLocation;
 		std::function< void ( GLint location, GLint v0 ) > m_pfnUniform1i;
+		std::function< void ( GLint location, GLsizei count, GLboolean transpose, const GLfloat *value ) > m_pfnUniformMatrix4fv;
 		std::function< GLint ( GLuint program, const GLchar * name ) > m_pfnGetAttribLocation;
 		std::function< GLint ( GLuint program ) > m_pfnUseProgram;
 
@@ -172,23 +216,6 @@ namespace GL2D
 		std::function< void	( PFNGLDEBUGAMDPROC callback, void * userParam ) > m_pfnDebugMessageCallbackAMD;
 
 		//@}
-		
-		HGLRC DoCreateContext();
-		bool DoSelectPixelFormat();
-		void DoCleanup();
-		GLuint DoCreateShader( const std::string & source, GL2D_GL_SHADER_TYPE type );
-		void DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
-		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
-
-		static void StDebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message, void * userParam )
-		{
-			reinterpret_cast< CContext * >( userParam )->DebugLog( source, type, id, severity, length, message );
-		}
-
-		static void StDebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message, void * userParam )
-		{
-			reinterpret_cast< CContext * >( userParam )->DebugLogAMD( id, category, severity, length, message );
-		}
 	};
 }
 
