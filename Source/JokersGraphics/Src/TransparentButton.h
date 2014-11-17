@@ -233,27 +233,27 @@ namespace Joker
 		 *\brief		Définit l'alignement du texte du bouton
 		 *\param[in]	dwAlign	L'alignement
 		 */
-		inline void			SetTextAlign	( DWORD dwAlign			)	{ m_dwAlign = dwAlign;		}
+		inline void SetTextAlign( DWORD dwAlign ) { m_dwAlign = dwAlign; }
 		/**
 		 *\brief		Récupère l'état courant
 		 *\return		L'état courant
 		 */
-		inline eBTN_STATE	GetState		()const						{ return m_eState;			}
+		inline eBTN_STATE	GetState()const { return m_eState; }
 		/**
 		 *\brief		Définit les tailles fixes
 		 *\param[in]	Les tailles fixes
 		 */
-		inline void			SetFixedSizes	( CRect const & rcVal	)	{ m_rcFixedSizes = rcVal;	}
+		inline void SetFixedSizes( CRect const & rcVal ) { m_rcFixedSizes = rcVal; }
 		/**
 		 *\brief		Definit si on veut afficher le masque de focus ou pas
 		 *\param[in]	bShow	\p TRUE pour afficher, \p FALSE sinon
 		 */
-		inline void			ShowFocus		( BOOL bShow			)	{ m_bDrawFocus = bShow;		}
+		inline void ShowFocus( BOOL bShow ) { m_bDrawFocus = bShow; }
 		/**
 		 *\brief		Definit si on veut afficher le contour ou pas
 		 *\param[in]	bShow	\p TRUE pour afficher, \p FALSE sinon
 		 */
-		inline void			ShowBorder		( BOOL bShow			)	{ m_bDrawBorder = bShow;	}
+		inline void ShowBorder( BOOL bShow ) { m_bDrawBorder = bShow; }
 
 	private:
 		virtual void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct );
@@ -262,12 +262,12 @@ namespace Joker
 		virtual void DoDrawForeground( CRect const & rcRect );
 
 		DECLARE_MESSAGE_MAP()
-		afx_msg void	OnMouseMove( UINT nFlags, CPoint point );
-		afx_msg LRESULT	OnMouseLeave( WPARAM wParam, LPARAM lParam );
-		afx_msg void	OnLButtonDown( UINT nFlags, CPoint point );
-		afx_msg void	OnLButtonUp( UINT nFlags, CPoint point );
-		afx_msg void	OnSetFocus( CWnd * pOldWnd );
-		afx_msg void	OnKillFocus( CWnd * pNewWnd );
+		afx_msg void OnMouseMove( UINT nFlags, CPoint point );
+		afx_msg LRESULT OnMouseLeave( WPARAM wParam, LPARAM lParam );
+		afx_msg void OnLButtonDown( UINT nFlags, CPoint point );
+		afx_msg void OnLButtonUp( UINT nFlags, CPoint point );
+		afx_msg void OnSetFocus( CWnd * pOldWnd );
+		afx_msg void OnKillFocus( CWnd * pNewWnd );
 	};
 	/*!
 	\author 	Sylvain DOREMUS

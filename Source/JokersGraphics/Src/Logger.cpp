@@ -86,7 +86,7 @@ namespace Joker
 
 		switch( p_eLogType )
 		{
-		case eLOG_TYPE_DEBUG	:	l_wAttributes = FOREGROUND_BLUE | FOREGROUND_INTENSITY;										break;
+		case eLOG_TYPE_DEBUG	:	l_wAttributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;					break;
 		case eLOG_TYPE_MESSAGE	:	l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;	break;
 		case eLOG_TYPE_WARNING	:	l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;					break;
 		case eLOG_TYPE_ERROR	:	l_wAttributes = FOREGROUND_RED | FOREGROUND_INTENSITY;										break;

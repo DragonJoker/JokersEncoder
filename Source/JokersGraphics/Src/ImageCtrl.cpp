@@ -48,13 +48,12 @@ namespace Joker
 	//*************************************************************************************************
 
 	CImageCtrl::CImageCtrl()
-		:	m_crColour			( 0 )
+		:	m_crColour( 0 )
 	{
 	}
 
 	CImageCtrl::~CImageCtrl()
 	{
-		Delete( m_hBrush );
 	}
 
 	void CImageCtrl::SetImage( CString const & p_csImageFilePath )
@@ -71,49 +70,29 @@ namespace Joker
 
 	void CImageCtrl::SetBkColor( COLORREF clrColour )
 	{
-		Delete( m_hBrush );
 		m_crColour = clrColour;
-		m_hBrush = CreateSolidBrush( m_crColour );
+		m_brush.SetSolidBrush( CColour::FromCOLORREF( m_crColour ) );
 		Invalidate();
 	}
 
-	void CImageCtrl::DrawGDI( HDC hDC )
+	void CImageCtrl::DoDrawBackground( CRect const & rcRect )
 	{
-		SetBkMode( hDC, TRANSPARENT );
-		CRect rcRect;
-		GetClientRect( & rcRect );
-
-		if ( m_pImage != NULL && ! m_pImage->IsNull() )
-		{
-			SetStretchBltMode( hDC, HALFTONE );
-			m_pImage->AlphaBlend( hDC, CRect( 0, 0, rcRect.Width(), rcRect.Height() ), CRect( 0, 0, m_pImage->GetWidth(), m_pImage->GetHeight() ) );
-		}
-		else
-		{
-			FillRect( hDC, rcRect, m_hBrush );
-		}
+		BaseType::DrawBitmap( rcRect, m_brush, rcRect );
+		BaseType::DrawBitmap( rcRect, *m_pImage, CRect( 0, 0, m_pImage->GetWidth(), m_pImage->GetHeight() ), FALSE );
 	}
 
-	BEGIN_MESSAGE_MAP( CImageCtrl, CStatic )
+	BEGIN_MESSAGE_MAP( CImageCtrl, CImageCtrl::BaseType )
 		ON_WM_ERASEBKGND()
-		ON_WM_CTLCOLOR()
 		ON_WM_PAINT()
 	END_MESSAGE_MAP()
 
-	HBRUSH CImageCtrl::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiCtlId )
-	{
-		return m_hBrush;
-	}
-
 	BOOL CImageCtrl::OnEraseBkgnd( CDC * pDC )
 	{
-		BOOL bReturn = TRUE;
-		return bReturn;
+		return BaseType::OnEraseBkgnd( pDC );
 	}
 
 	void CImageCtrl::OnPaint()
 	{
-		CPaintDC l_paintDC( this );
-		DrawGDI( l_paintDC.m_hDC );
+		return BaseType::OnPaint();
 	}
 }

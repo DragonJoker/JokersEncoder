@@ -44,13 +44,16 @@ namespace GL2D
 		return hr;
 	}
 
-	void CFrameBuffer::Unbind()
+	HRESULT CFrameBuffer::Unbind()
 	{
 		std::shared_ptr< CContext > context = m_context.lock();
+		HRESULT hr = E_POINTER;
 
 		if ( context )
 		{
-			context->BindFramebuffer( m_mode, 0 );
+			hr = context->BindFramebuffer( m_mode, 0 );
 		}
+
+		return hr;
 	}
 }

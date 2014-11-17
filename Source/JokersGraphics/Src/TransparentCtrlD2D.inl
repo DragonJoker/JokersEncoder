@@ -150,24 +150,27 @@ namespace Joker
 	{
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
+		int result = ::GetDIBits( hDC, hBitmap, 0, 1, NULL, &bmiSrc, DIB_RGB_COLORS );
 
-		if ( ::GetDIBits( hDC, hBitmap, 0, 1, NULL, & bmiSrc, DIB_RGB_COLORS ) )
+		if ( result && result != ERROR_INVALID_PARAMETER )
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, 32, BI_RGB } };
-			arrayBits.resize( bmiSrc.bmiHeader.biSizeImage, 0 );
+            int bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			arrayBits.resize( bmiSrc.bmiHeader.biSizeImage * bitCount / 8, 0 );
 
-			std::vector< BYTE > arrayBitsSrc( bmiSrc.bmiHeader.biSizeImage, 0 );
+			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
+			result = ::GetDIBits( hDC, hBitmap, 0, size.cy, &arrayBitsSrc[0], &bmi, DIB_RGB_COLORS );
 
-			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, & arrayBitsSrc[0], & bmi, DIB_RGB_COLORS ) )
+			if ( result && result != ERROR_INVALID_PARAMETER )
 			{
 				bReturn = true;
-				UINT uiStep = size.cx * 4;
+				UINT uiStep = arrayBits.size() / size.cy;
 
 				for ( int i = 0 ; i < size.cy ; ++i )
 				{
-					memcpy( & arrayBits[i * uiStep], & arrayBitsSrc[bmi.bmiHeader.biSizeImage - uiStep - i * uiStep], uiStep );
+					memcpy( &arrayBits[i * uiStep], &arrayBitsSrc[arrayBits.size() - uiStep - i * uiStep], uiStep );
 				}
 			}
 		}

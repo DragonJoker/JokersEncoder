@@ -20,16 +20,15 @@ namespace GL2D
 	
 	void CComBitmap::Initialise( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props )
 	{
+		CContext * context = CContext::GetActiveContext();
 		m_format = props.pixelFormat;
 		m_size = size;
-		glBindTexture( GL_TEXTURE_2D, m_name );
-		HRESULT hr = glGetLastError( "BindTexture" );
+		HRESULT hr = context->BindTexture( GL_TEXTURE_2D, m_name );
 
 		if ( hr == S_OK )
 		{
-			glTexImage2D( GL_TEXTURE_2D, 0, m_format.internal, size.width, size.height, 0, m_format.format, m_format.type, data );
-			hr = glGetLastError( "TexImage2D" );
-			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = context->TexImage2D( GL_TEXTURE_2D, 0, m_format.internal, size.width, size.height, 0, m_format.format, m_format.type, data );
+			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 	}
 	
@@ -65,29 +64,26 @@ namespace GL2D
 
 	STDMETHODIMP CComBitmap::CopyFromBitmap( const GL2D_POINT_2U * destPoint, IGL2DBitmap * bitmap, const GL2D_RECT_U * srcRect )
 	{
+		CContext * context = CContext::GetActiveContext();
 		GLvoid * srcData = NULL;
 		CComBitmap * bmp = static_cast< CComBitmap * >( bitmap );
-		glBindTexture( GL_TEXTURE_2D, bmp->m_name );
-		HRESULT hr = glGetLastError( "BindTexture" );
+		HRESULT hr = context->BindTexture( GL_TEXTURE_2D, bmp->m_name );
 
 		if ( hr == S_OK )
 		{
-			glGetTexImage( GL_TEXTURE_2D, 0, m_format.format, m_format.type, srcData );
-			hr = glGetLastError( "GetTexImage" );
-			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = context->GetTexImage( GL_TEXTURE_2D, 0, m_format.format, m_format.type, srcData );
+			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 
 		if ( hr == S_OK )
 		{
-			glBindTexture( GL_TEXTURE_2D, m_name );
-			hr = glGetLastError( "BindTexture" );
+			hr = context->BindTexture( GL_TEXTURE_2D, m_name );
 		}
 
 		if ( hr == S_OK )
 		{
-			glTexSubImage2D( GL_TEXTURE_2D, 0, destPoint->x, destPoint->y, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
-			hr = glGetLastError( "TexSubImage2D" );
-			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = context->TexSubImage2D( GL_TEXTURE_2D, 0, destPoint->x, destPoint->y, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
+			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 
 		return hr;
@@ -153,22 +149,19 @@ namespace GL2D
 			}
 
 			srcData = new uint8_t[componentSize * componentCount * std::abs( int( srcRect->right - srcRect->left ) ) * std::abs( int( srcRect->bottom - srcRect->top ) )];
-			glReadPixels( srcRect->left, srcRect->top, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
-			hr = glGetLastError( "ReadPixels" );
-			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = context->ReadPixels( srcRect->left, srcRect->top, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
+			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 
 		if ( hr == S_OK )
 		{
-			glBindTexture( GL_TEXTURE_2D, m_name );
-			hr = glGetLastError( "BindTexture" );
+			hr = context->BindTexture( GL_TEXTURE_2D, m_name );
 		}
 
 		if ( hr == S_OK )
 		{
-			glTexSubImage2D( GL_TEXTURE_2D, 0, destPoint->x, destPoint->y, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
-			hr = glGetLastError( "TexSubImage2D" );
-			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = context->TexSubImage2D( GL_TEXTURE_2D, 0, destPoint->x, destPoint->y, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
+			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 
 		return hr;
@@ -176,14 +169,13 @@ namespace GL2D
 
 	STDMETHODIMP CComBitmap::CopyFromMemory( const GL2D_RECT_U * dstRect, const void * srcData, uint32_t pitch )
 	{
-		glBindTexture( GL_TEXTURE_2D, m_name );
-		HRESULT hr = glGetLastError( "BindTexture" );
+		CContext * context = CContext::GetActiveContext();
+		HRESULT hr = context->BindTexture( GL_TEXTURE_2D, m_name );
 
 		if ( hr == S_OK )
 		{
-			glTexSubImage2D( GL_TEXTURE_2D, 0, dstRect->left, dstRect->top, dstRect->right - dstRect->left, dstRect->bottom - dstRect->top, m_format.format, m_format.type, srcData );
-			hr = glGetLastError( "TexSubImage2D" );
-			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = context->TexSubImage2D( GL_TEXTURE_2D, 0, dstRect->left, dstRect->top, dstRect->right - dstRect->left, dstRect->bottom - dstRect->top, m_format.format, m_format.type, srcData );
+			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 
 		return hr;

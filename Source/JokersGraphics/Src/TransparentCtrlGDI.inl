@@ -131,18 +131,19 @@ namespace Joker
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, 32, BI_RGB } };
-			arrayBits.resize( bmiSrc.bmiHeader.biSizeImage, 0 );
-			std::vector< BYTE > arrayBitsSrc( bmiSrc.bmiHeader.biSizeImage, 0 );
+			int bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
+			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
 
-			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, & arrayBitsSrc[0], & bmi, DIB_RGB_COLORS ) )
+			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, &arrayBitsSrc[0], &bmi, DIB_RGB_COLORS ) )
 			{
 				bReturn = true;
-				memcpy( & arrayBits[0], & arrayBitsSrc[0], bmi.bmiHeader.biSizeImage );
+				memcpy( &arrayBits[0], &arrayBitsSrc[0], arrayBits.size() );
 			}
 		}
 
-		if ( ! bReturn )
+		if ( !bReturn )
 		{
 			arrayBits.clear();
 			size.cx = 0;

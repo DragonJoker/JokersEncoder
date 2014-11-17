@@ -421,8 +421,7 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	STDMETHODIMP CRenderTargetBase< Object, Interface >::EndDraw( GL2D_TAG *tag1, GL2D_TAG *tag2 )
 	{
-		m_frameBuffer.Unbind();
-		HRESULT hr = glGetLastError( "BindFramebuffer" );
+		HRESULT hr = m_frameBuffer.Unbind();
 		GetContext()->EndCurrent();
 		return hr;
 	}

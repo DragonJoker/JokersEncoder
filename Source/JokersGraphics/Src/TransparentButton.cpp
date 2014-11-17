@@ -15,10 +15,10 @@ static char THIS_FILE[] = __FILE__;
 namespace Joker
 {
 	CTransparentButton::CTransparentButton()
-		:	m_eState		( eBTN_STATE_ENABLED		)
-		,	m_dwAlign		( DT_CENTER | DT_VCENTER	)
-		,	m_bDrawBorder	( FALSE						)
-		,	m_bDrawFocus	( FALSE						)
+		: m_eState( eBTN_STATE_ENABLED )
+		, m_dwAlign( DT_CENTER | DT_VCENTER )
+		, m_bDrawBorder( FALSE )
+		, m_bDrawFocus( FALSE )
 	{
 		m_brushMask.SetSolidBrush( CColour( CColour::Transparent ) );
 

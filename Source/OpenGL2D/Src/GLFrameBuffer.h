@@ -37,7 +37,7 @@ namespace GL2D
 
 		/** Désactive le frame buffer
 		*/
-		void Unbind();
+		HRESULT Unbind();
 
 	private:
 		std::weak_ptr< CContext > m_context;
