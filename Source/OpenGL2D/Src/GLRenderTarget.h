@@ -7,18 +7,11 @@ namespace GL2D
 {
 	class CComRenderTarget
 		: public IGL2DRenderTarget
+		, public CComRenderTargetBase
 	{
 	public:
 		GL2D_API CComRenderTarget();
 		GL2D_API virtual ~CComRenderTarget();
-
-		inline const std::shared_ptr< CContext > & GetContext()const
-		{
-			return m_context;
-		}
-
-	protected:
-		std::shared_ptr< CContext > m_context;
 	};
 }
 

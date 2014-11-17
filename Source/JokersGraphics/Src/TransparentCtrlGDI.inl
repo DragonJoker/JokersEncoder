@@ -2,7 +2,7 @@
 
 namespace Joker
 {
-	template <typename T>
+	template< typename T >
 	CTransparentCtrlT<T, eRENDERER_GDI>::CTransparentCtrlT()
 		:	m_bPainting			( false	 )
 		,	m_bHasBackground	( false	 )
@@ -17,27 +17,27 @@ namespace Joker
 	{
 	}
 
-	template <typename T>
+	template< typename T >
 	CTransparentCtrlT<T, eRENDERER_GDI>::~CTransparentCtrlT()
 	{
 		Release();
 	}
 
-	template <typename T>
+	template< typename T >
 	inline void CTransparentCtrlT<T, eRENDERER_GDI>::SetBorderColour( CColour const & clColour )
 	{
 		m_clBorder = clColour;
 		Invalidate();
 	}
 
-	template <typename T>
+	template< typename T >
 	inline void CTransparentCtrlT<T, eRENDERER_GDI>::SetTextColour( CColour const & clColour )
 	{
 		m_clText = clColour;
 		Invalidate();
 	}
 
-	template <typename T>
+	template< typename T >
 	inline void CTransparentCtrlT<T, eRENDERER_GDI>::GetRelativeRect( CRect & rcRect )
 	{
 		CRect l_rcRect1, l_rcRect2;
@@ -55,13 +55,13 @@ namespace Joker
 		rcRect.bottom = rcRect.top + l_rcRect1.Height();
 	}
 
-	template <typename T>
+	template< typename T >
 	inline void CTransparentCtrlT<T, eRENDERER_GDI>::Release()
 	{
 		DoRelease();
 	}
 
-	template <typename T>
+	template< typename T >
 	inline void CTransparentCtrlT<T, eRENDERER_GDI>::Draw()
 	{
 		if ( m_bReinitBackground )
@@ -91,7 +91,7 @@ namespace Joker
 		m_pBackDC = NULL;
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
@@ -100,7 +100,7 @@ namespace Joker
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::DoDrawForeground( CRect const & rcRect )
 	{
 		// On dessine le texte, s'il y en a un
@@ -121,7 +121,7 @@ namespace Joker
 		}
 	}
 
-	template <typename T>
+	template< typename T >
 	bool CTransparentCtrlT<T, eRENDERER_GDI>::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
 	{
 		bool bReturn = false;
@@ -153,7 +153,7 @@ namespace Joker
 		return bReturn;
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::DrawBitmap( CRect const & rcDst, HBITMAP hBitmapp, CRect const & rcSrc, BOOL bSrcAlpha )
 	{
 		CSize size;
@@ -223,7 +223,7 @@ namespace Joker
 		}
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::FrameRect( CRect const & rcRect, CColour const & clColour, int iWidth, UINT uiStyle )
 	{
 		LOGPEN lpLogPen;
@@ -242,7 +242,7 @@ namespace Joker
 		::DeleteObject( hPen );
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::DrawSolidText( HFONT UNUSED( hFont ), LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle )
 	{
 	//	if ( dwStyle & DT_VCENTER )
@@ -262,7 +262,7 @@ namespace Joker
 	// 	}
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::FillSolidRect( CColour const & clColour, CRect rcRect )
 	{
 		HBRUSH hBrush = CreateSolidBrush( clColour.ToBGR() );
@@ -270,13 +270,13 @@ namespace Joker
 		::DeleteObject( hBrush );
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::TransparentBlt( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, CColour const & clTransparent )
 	{
 		::TransparentBlt( *m_pBackDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
 	{
 		if ( ! ::AlphaBlend( *m_pBackDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), blendFunc ) ) 
@@ -285,7 +285,7 @@ namespace Joker
 		}
 	}
 
-	template <typename T>
+	template< typename T >
 	BOOL CTransparentCtrlT<T, eRENDERER_GDI>::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
 	{
 		m_bReinitBackground = true;
@@ -293,7 +293,7 @@ namespace Joker
 		return bReturn;
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_GDI >::DoInitialiseBackground()
 	{
 		CRect		rcRect;
@@ -328,20 +328,20 @@ namespace Joker
 		}
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::PreSubclassWindow()
 	{
 		BaseType::PreSubclassWindow();
 	}
 
 	PTM_WARNING_DISABLE
-	template <typename T>
+	template< typename T >
 	const AFX_MSGMAP * CTransparentCtrlT<T, eRENDERER_GDI>::GetMessageMap() const
 	{
 		return GetThisMessageMap();
 	}
 
-	template <typename T>
+	template< typename T >
 	const AFX_MSGMAP * PASCAL CTransparentCtrlT<T, eRENDERER_GDI>::GetThisMessageMap()
 	{
 		typedef CTransparentCtrlT<T, eRENDERER_GDI> ThisClass;
@@ -364,7 +364,7 @@ namespace Joker
 	}
 	PTM_WARNING_RESTORE
 
-	template <typename T>
+	template< typename T >
 	BOOL CTransparentCtrlT<T, eRENDERER_GDI>::OnEraseBkgnd( CDC * )
 	{
 		BOOL bReturn = TRUE;
@@ -378,14 +378,14 @@ namespace Joker
 		return bReturn;
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::OnSize( UINT type, int cx, int cy )
 	{
 		BaseType::OnSize( type, cx, cy );
 		m_bReinitBackground = true;
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::OnPaint()
 	{
 		m_bPainting = true;
@@ -397,21 +397,21 @@ namespace Joker
 		m_bPainting = false;
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::OnSetFocus( CWnd * pOldWnd )
 	{
 		m_bFocused = true;
 		BaseType::OnSetFocus( pOldWnd );
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::OnKillFocus( CWnd * pNewWnd )
 	{
 		m_bFocused = false;
 		BaseType::OnKillFocus( pNewWnd );
 	}
 
-	template <typename T>
+	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::OnMouseMove( UINT nFlags, CPoint point )
 	{
 		if ( ! m_bMouseOver )
@@ -425,7 +425,7 @@ namespace Joker
 		BaseType::OnMouseMove( nFlags, point );
 	}
 
-	template <typename T>
+	template< typename T >
 	LRESULT CTransparentCtrlT<T, eRENDERER_GDI>::OnMouseLeave( WPARAM UNUSED( wParam ), LPARAM UNUSED( lParam ) )
 	{
 		m_bMouseOver = false;

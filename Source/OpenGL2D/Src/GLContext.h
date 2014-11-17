@@ -39,17 +39,23 @@ namespace GL2D
 		void Cleanup();
 		static CContext * GetActiveContext();
 		
-		HRESULT MakeCurrent();
-		HRESULT EndCurrent();
+		HRESULT MakeCurrent( HDC dc );
+		HRESULT EndCurrent( HDC dc );
+		HRESULT SwapBuffers( HDC dc );
 		HWND GetWindow()const;
-
+		HRESULT Clear( uint32_t param );
+		HRESULT ClearColor( float r, float g, float b, float a );
+		HRESULT Enable( GLenum value );
+		HRESULT Disable( GLenum value );
+		HRESULT Viewport( int x, int y, int width, int height );
+		
 		int GetInt( GLenum param );
 		
-		void Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar );
-		void PushMatrix();
-		void PopMatrix();
-		void MultMatrix( glm::mat4x4 const & mtx );
-		void LoadIdentity();
+		HRESULT Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar );
+		HRESULT PushMatrix();
+		HRESULT PopMatrix();
+		HRESULT MultMatrix( glm::mat4x4 const & mtx );
+		HRESULT LoadIdentity();
 
 		HRESULT GenFramebuffers( GLsizei n, GLuint* framebuffers );
 		HRESULT DeleteFramebuffers( GLsizei n, GLuint const * framebuffers );
@@ -88,6 +94,8 @@ namespace GL2D
 		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
 		
 		HRESULT DrawTexture( GLuint name, const GL2D_RECT_F & destinationRectangle, GL2D_BITMAP_INTERPOLATION_MODE interpolationMode, const GL2D_RECT_F & sourceRectangle );
+
+		inline HDC GetDC()const { return m_dc; }
 
 	private:
 		HGLRC DoCreateContext();
@@ -134,7 +142,7 @@ namespace GL2D
 		GL_FUNCTION( void, glFramebufferTextureLayer, GLenum target,uint32_t attachment, uint32_t texture,int level,int layer );
 
 #if DEF_HAS_VARIADIC_TEMPLATES
-		GL_FUNCTION( void, glFramebufferTexture3D, GLenum target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level, int layer ) > ;
+		GL_FUNCTION( void, glFramebufferTexture3D, GLenum target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level, int layer );
 		GL_FUNCTION( void, glBlitFramebuffer, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, uint32_t mask, uint32_t filter );
 #else
 		void ( CALLBACK * glFramebufferTexture3D )( uint32_t target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level, int layer );

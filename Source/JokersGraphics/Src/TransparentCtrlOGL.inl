@@ -148,19 +148,20 @@ namespace Joker
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
 
-		if ( ::GetDIBits( hDC, hBitmap, 0, 1, NULL, & bmiSrc, DIB_RGB_COLORS ) )
+		if ( ::GetDIBits( hDC, hBitmap, 0, 1, NULL, &bmiSrc, DIB_RGB_COLORS ) )
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, 32, BI_RGB } };
-			arrayBits.resize( bmiSrc.bmiHeader.biSizeImage, 0 );
+			int bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
 
-			std::vector< BYTE > arrayBitsSrc( bmiSrc.bmiHeader.biSizeImage, 0 );
+			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
 
-			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, & arrayBitsSrc[0], & bmi, DIB_RGB_COLORS ) )
+			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, &arrayBitsSrc[0], &bmi, DIB_RGB_COLORS ) )
 			{
 				bReturn = true;
-				UINT uiStep = size.cx * 4;
+				UINT uiStep = arrayBits.size() / size.cy;
 
 				for ( int i = 0 ; i < size.cy ; ++i )
 				{
@@ -169,7 +170,7 @@ namespace Joker
 			}
 		}
 
-		if ( ! bReturn )
+		if ( !bReturn )
 		{
 			arrayBits.clear();
 			size.cx = 0;
@@ -428,6 +429,7 @@ namespace Joker
 		static const AFX_MSGMAP_ENTRY _messageEntries[] =
 		{
 			ON_WM_ERASEBKGND()
+			ON_WM_CTLCOLOR()
 			ON_WM_DESTROY()
 			ON_WM_PAINT()
 			ON_WM_SIZE()
@@ -471,6 +473,12 @@ namespace Joker
 		}
 
 		return bReturn;
+	}
+
+	template< typename T >
+	HBRUSH CTransparentCtrlT< T, eRENDERER_OGL >::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT nCtlColor )
+	{
+		return HBRUSH( ::GetStockObject( HOLLOW_BRUSH ) );
 	}
 
 	template< typename T >

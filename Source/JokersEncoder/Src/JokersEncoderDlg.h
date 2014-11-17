@@ -12,14 +12,14 @@ namespace Joker
 	private:
 		enum { IDD = IDD_JOKERSENCODER_DIALOG };
 
-		HICON				m_hIcon;
-		CTransparentListBox	m_listFiles;
-		CImageCtrl			m_staticBackground;
-		CTransparentButton	m_btnOk;
-		CTransparentButton	m_btnCancel;
-		CTransparentButton	m_btnSettings;
-		CTransparentButton	m_btnAddFile;
-		CTransparentButton	m_btnAddFolder;
+		HICON m_hIcon;
+		CTransparentListBox m_listFiles;
+		CTransparentImageCtrl m_staticBackground;
+		CTransparentButton m_btnOk;
+		CTransparentButton m_btnCancel;
+		CTransparentButton m_btnSettings;
+		CTransparentButton m_btnAddFile;
+		CTransparentButton m_btnAddFolder;
 
 	public:
 		CJokersEncoderDlg( CWnd * pParent = NULL);

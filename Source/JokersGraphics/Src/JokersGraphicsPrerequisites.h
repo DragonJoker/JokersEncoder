@@ -1,7 +1,7 @@
 #pragma once
 
 #define DEF_USING_D2D 1
-#define DEF_USING_OGL 1
+#define DEF_USING_OGL 0
 
 #include <sstream>
 #include <vector>

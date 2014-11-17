@@ -13,10 +13,10 @@ private:
 
 	enum { IDD = IDD_OPTIONS_DIALOG };
 
-	HICON						m_hIcon;
-	Joker::CImageCtrl			m_staticBackground;
-	Joker::CTransparentButton	m_buttonOK;
-	Joker::CTransparentButton	m_buttonCancel;
+	HICON m_hIcon;
+	Joker::CTransparentImageCtrl m_staticBackground;
+	Joker::CTransparentButton m_buttonOK;
+	Joker::CTransparentButton m_buttonCancel;
 
 public:
 	COptionsDlg( CWnd * pParent = NULL );

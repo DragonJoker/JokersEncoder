@@ -231,7 +231,7 @@ namespace GL2D
 
 	HRESULT CContext::Initialise()
 	{
-		MakeCurrent();
+		MakeCurrent( GetDC() );
 		DoLoadContext();
 		HRESULT hr = DoLoadProgram();
 
@@ -240,7 +240,7 @@ namespace GL2D
 			hr = DoLoadBuffer();
 		}
 
-		EndCurrent();
+		EndCurrent( GetDC() );
 		return hr;
 	}
 
@@ -280,9 +280,9 @@ namespace GL2D
 		return result;
 	}
 
-	HRESULT CContext::MakeCurrent()
+	HRESULT CContext::MakeCurrent( HDC dc )
 	{
-		wglMakeCurrent( m_dc, m_context );
+		wglMakeCurrent( dc, m_context );
 
 		m_mutex.lock();
 		std::map< std::thread::id, CContext * >::iterator it = m_activeContexts.find( std::this_thread::get_id() );
@@ -297,28 +297,63 @@ namespace GL2D
 		return glGetLastError( "glMakeCurrent" );
 	}
 
-	HRESULT CContext::EndCurrent()
+	HRESULT CContext::EndCurrent( HDC dc )
 	{
 		m_mutex.lock();
 		m_activeContexts[std::this_thread::get_id()] = m_previous;
 
 		if ( m_previous )
 		{
-			wglMakeCurrent( m_dc, m_previous->m_context );
+			wglMakeCurrent( dc, m_previous->m_context );
 			m_previous = NULL;
 		}
 		else
 		{
-			wglMakeCurrent( m_dc, NULL );
+			wglMakeCurrent( dc, NULL );
 		}
 		
 		m_mutex.unlock();
 		return S_OK;
 	}
 
+	HRESULT CContext::SwapBuffers( HDC dc )
+	{
+		return ::SwapBuffers( dc ) ? S_OK : E_FAIL;
+	}
+
 	HWND CContext::GetWindow()const
 	{
 		return m_window;
+	}
+
+	HRESULT CContext::Clear( uint32_t param )
+	{
+		glClear( param );
+		return glGetLastError( "glClear" );
+	}
+
+	HRESULT CContext::ClearColor( float r, float g, float b, float a )
+	{
+		glClearColor( r, g, b, a );
+		return glGetLastError( "glClearColor" );
+	}
+
+	HRESULT CContext::Enable( GLenum value )
+	{
+		glEnable( value );
+		return glGetLastError( "glEnable" );
+	}
+
+	HRESULT CContext::Disable( GLenum value )
+	{
+		glDisable( value );
+		return glGetLastError( "glDisable" );
+	}
+
+	HRESULT CContext::Viewport( int x, int y, int width, int height )
+	{
+		glViewport( x, y, width, height );
+		return glGetLastError( "glViewport" );
 	}
 
 	int CContext::GetInt( GLenum param )
@@ -328,7 +363,7 @@ namespace GL2D
 
 		if ( it == m_activeContexts.end() )
 		{
-			MakeCurrent();
+			MakeCurrent( GetDC() );
 		}
 
 		GLint value = 0;
@@ -336,36 +371,41 @@ namespace GL2D
 
 		if ( it == m_activeContexts.end() )
 		{
-			EndCurrent();
+			EndCurrent( GetDC() );
 		}
 		
 		m_mutex.unlock();
 		return value;
 	}
 
-	void CContext::Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar )
+	HRESULT CContext::Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar )
 	{
 		m_proj = glm::ortho( left, right, bottom, top, zNear, zFar );
+		return S_OK;
 	}
 
-	void CContext::PushMatrix()
+	HRESULT CContext::PushMatrix()
 	{
 		m_matrices.push( m_matrices.top() );
+		return S_OK;
 	}
 
-	void CContext::PopMatrix()
+	HRESULT CContext::PopMatrix()
 	{
 		m_matrices.pop();
+		return S_OK;
 	}
 
-	void CContext::MultMatrix( glm::mat4x4 const & mtx )
+	HRESULT CContext::MultMatrix( glm::mat4x4 const & mtx )
 	{
 		m_matrices.top() = m_matrices.top() * mtx;
+		return S_OK;
 	}
 
-	void CContext::LoadIdentity()
+	HRESULT CContext::LoadIdentity()
 	{
 		m_matrices.top() = glm::mat4x4( 1.0 );
+		return S_OK;
 	}
 
 	HRESULT CContext::GenFramebuffers( GLsizei n, GLuint* framebuffers )
@@ -604,12 +644,6 @@ namespace GL2D
 
 		if ( hr == S_OK )
 		{
-			glBindTexture( GL_TEXTURE_2D, 0 );
-			hr = glGetLastError( "glBindTexture" );
-		}
-
-		if ( hr == S_OK )
-		{
 			glUniform1i( m_sampler, 0 );
 			hr = glGetLastError( "glUniform1i" );
 		}
@@ -657,8 +691,14 @@ namespace GL2D
 
 		if ( hr == S_OK )
 		{
-			glDrawArrays( GL_TRIANGLES, 0, 4 );
+			glDrawArrays( GL_TRIANGLES, 0, 6 );
 			hr = glGetLastError( "glDrawArrays" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = glGetLastError( "glBindTexture" );
 		}
 
 		if ( m_vao != GL_INVALID_INDEX )
@@ -984,10 +1024,10 @@ namespace GL2D
 #endif
 			attribList.push_back( 0 );
 			HGLRC context = glCreateContextAttribs( m_dc, NULL, &attribList[0] );
-			EndCurrent();
+			EndCurrent( GetDC() );
 			wglDeleteContext( m_context );
 			m_context = context;
-			MakeCurrent();
+			MakeCurrent( GetDC() );
 		}
 
 		gl_api::GetFunction( "glDebugMessageCallback", "ARB", glDebugMessageCallback );
@@ -1053,6 +1093,10 @@ namespace GL2D
 		gl_api::GetFunction( "glGenVertexArrays", "ARB", glGenVertexArrays );
 		gl_api::GetFunction( "glDeleteVertexArrays", "ARB", glDeleteVertexArrays );
 		gl_api::GetFunction( "glBindVertexArray", "ARB", glBindVertexArray );
+
+		glFrontFace( GL_CCW );
+		glCullFace( GL_BACK );
+		glEnable( GL_CULL_FACE );
 	}
 
 	HRESULT CContext::DoLoadProgram()
@@ -1083,7 +1127,7 @@ namespace GL2D
 		fssrc += "void main()\n";
 		fssrc += "{\n";
 		fssrc += "    pxl_fragColor = texture( diffuse, vtx_texture );\n";
-		fssrc += "    pxl_fragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n";
+		fssrc += "    pxl_fragColor = vec4( 1, 0, 0, 1 );\n";
 		fssrc += "}\n";
 		GLuint fs = DoCreateShader( fssrc, GL2D_GL_SHADER_TYPE_FRAGMENT );
 		
@@ -1194,12 +1238,12 @@ namespace GL2D
 		{
 			float quad[] =
 			{
-				0, 0, 0, 0,
-				1, 0, 1, 0,
-				1, 1, 1, 1,
-				0, 0, 0, 0,
-				1, 1, 1, 1,
-				0, 1, 0, 1
+				0, 0, 0, 0, 0,
+				1, 0, 0, 1, 0,
+				1, 1, 0, 1, 1,
+				0, 0, 0, 0, 0,
+				1, 1, 0, 1, 1,
+				0, 1, 0, 0, 1,
 			};
 
 			hr = BufferData( GL2D_GL_BUFFER_TARGET_ARRAY, sizeof( quad ), quad, GL2D_GL_BUFFER_USAGE_STATIC_DRAW );
@@ -1214,20 +1258,20 @@ namespace GL2D
 			if ( hr == S_OK )
 			{
 				glBindVertexArray( m_vao );
-				hr = glGetLastError( "glBindVertexArray" );
+//				hr = glGetLastError( "glBindVertexArray" );
 				glBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
-				hr = glGetLastError( "glBindBuffer" );
+//				hr = glGetLastError( "glBindBuffer" );
 
 				if ( m_vertex != GL_INVALID_INDEX )
 				{
-					glVertexAttribPointer( m_vertex, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 0 ) );
-					hr = glGetLastError( "glVertexAttribPointer" );
+					glVertexAttribPointer( m_vertex, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 0 ) );
+//					hr = glGetLastError( "glVertexAttribPointer" );
 				}
 
 				if ( m_texture != GL_INVALID_INDEX )
 				{
-					glVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
-					hr = glGetLastError( "glVertexAttribPointer" );
+					glVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 3 * sizeof( float ) ) );
+//					hr = glGetLastError( "glVertexAttribPointer" );
 				}
 
 				glBindVertexArray( 0 );

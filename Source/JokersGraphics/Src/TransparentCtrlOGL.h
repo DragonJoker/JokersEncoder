@@ -221,15 +221,16 @@ namespace Joker
 		virtual void	PreSubclassWindow	();
 
 		DECLARE_MESSAGE_MAP()
-		afx_msg BOOL	OnEraseBkgnd		( CDC * pDC );
-		afx_msg void	OnDestroy			();
-		afx_msg void	OnPaint				();
-		afx_msg void	OnSize				( UINT type, int cx, int cy );
-		afx_msg LRESULT	OnDisplayChange		( WPARAM, LPARAM );
-		afx_msg void	OnSetFocus			( CWnd * pOldWnd );
-		afx_msg void	OnKillFocus			( CWnd * pNewWnd );
-		afx_msg void	OnMouseMove			( UINT nFlags, CPoint point );
-		afx_msg LRESULT	OnMouseLeave		( WPARAM wParam, LPARAM lParam );
+		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
+		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT nCtlColor );
+		afx_msg void OnDestroy();
+		afx_msg void OnPaint();
+		afx_msg void OnSize( UINT type, int cx, int cy );
+		afx_msg LRESULT OnDisplayChange( WPARAM, LPARAM );
+		afx_msg void OnSetFocus( CWnd * pOldWnd );
+		afx_msg void OnKillFocus( CWnd * pNewWnd );
+		afx_msg void OnMouseMove( UINT nFlags, CPoint point );
+		afx_msg LRESULT OnMouseLeave( WPARAM wParam, LPARAM lParam );
 
 	protected:
 		/**

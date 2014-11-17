@@ -8,15 +8,15 @@ namespace Joker
 {
 	class CImage;
 
-	class JGRA_API CImageCtrl
+	class JGRA_API CTransparentImageCtrl
 		: public CTransparentCtrlT< CStatic, eDEFAULT_RENDERER >
 	{
 	public:
 		typedef CTransparentCtrlT< CStatic, eDEFAULT_RENDERER > BaseType;
 
 	public:
-		CImageCtrl();
-		~CImageCtrl();
+		CTransparentImageCtrl();
+		~CTransparentImageCtrl();
 
 		void SetImage( CString const & p_csImageFilePath );
 		void SetImage( UINT uiResourceId );

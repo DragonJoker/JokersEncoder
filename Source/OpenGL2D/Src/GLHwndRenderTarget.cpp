@@ -45,6 +45,7 @@ namespace GL2D
 
 		if ( pixelSize )
 		{
+			m_size = *pixelSize;
 			hr = S_OK;
 		}
 

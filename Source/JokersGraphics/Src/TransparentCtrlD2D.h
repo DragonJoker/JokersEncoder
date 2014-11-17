@@ -46,9 +46,7 @@ namespace Joker
 		bool						m_bMouseOver;			//!< Dit si la souris est au-dessus de ce contrôle
 		bool						m_bFocused;				//!< Dit si ce contrôle a le focus
 		ID2D1Bitmap *				m_pBitmap;				//!< Le bitmap contenant le dessin
-		ID2D1HwndRenderTarget *		m_pHwndRenderTarget;	//!< La cible du rendu
-		ID2D1BitmapRenderTarget *	m_pBmpRenderTarget;		//!< La cible du rendu temporaire
-		ID2D1RenderTarget *			m_pRenderTarget;		//!< Le contenu du backbuffer
+		ID2D1HwndRenderTarget *		m_pRenderTarget;		//!< La cible du rendu
 		eRENDERER					m_eRenderer;			//!< Le type de rendu (GDI ou D2D)
 		bool						m_bReinitBackground;	//!< Dit s'il faut réinitialiser l'arrière plan
 		HDC							m_hDC;					//!< Le HDC du contrôle
@@ -215,18 +213,18 @@ namespace Joker
 		/**
 		 *\brief		Fonction appelée par le framework pour faire les sous-classements nécessaire avant de sous-classer le contrôle
 		 */
-		virtual void	PreSubclassWindow	();
+		virtual void PreSubclassWindow();
 
 		DECLARE_MESSAGE_MAP()
-		afx_msg BOOL	OnEraseBkgnd		( CDC * pDC );
-		afx_msg void	OnDestroy			();
-		afx_msg void	OnPaint				();
-		afx_msg void	OnSize				( UINT type, int cx, int cy );
-		afx_msg LRESULT	OnDisplayChange		( WPARAM, LPARAM );
-		afx_msg void	OnSetFocus			( CWnd * pOldWnd );
-		afx_msg void	OnKillFocus			( CWnd * pNewWnd );
-		afx_msg void	OnMouseMove			( UINT nFlags, CPoint point );
-		afx_msg LRESULT	OnMouseLeave		( WPARAM wParam, LPARAM lParam );
+		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
+		afx_msg void OnDestroy();
+		afx_msg void OnPaint();
+		afx_msg void OnSize( UINT type, int cx, int cy );
+		afx_msg LRESULT OnDisplayChange( WPARAM, LPARAM );
+		afx_msg void OnSetFocus( CWnd * pOldWnd );
+		afx_msg void OnKillFocus( CWnd * pNewWnd );
+		afx_msg void OnMouseMove( UINT nFlags, CPoint point );
+		afx_msg LRESULT OnMouseLeave( WPARAM wParam, LPARAM lParam );
 
 	protected:
 		/**

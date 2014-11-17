@@ -38,7 +38,7 @@ namespace Joker
 		}
 	};
 
-	template <typename T>
+	template< typename T >
 	void Delete( T pPointer )
 	{
 		Deleter< T > deleter;
@@ -47,51 +47,51 @@ namespace Joker
 
 	//*************************************************************************************************
 
-	CImageCtrl::CImageCtrl()
+	CTransparentImageCtrl::CTransparentImageCtrl()
 		:	m_crColour( 0 )
 	{
 	}
 
-	CImageCtrl::~CImageCtrl()
+	CTransparentImageCtrl::~CTransparentImageCtrl()
 	{
 	}
 
-	void CImageCtrl::SetImage( CString const & p_csImageFilePath )
+	void CTransparentImageCtrl::SetImage( CString const & p_csImageFilePath )
 	{
 		m_pImage = CImageManager::GetSingleton().AddImage( CString::PCXSTR( p_csImageFilePath ) );
 		Invalidate();
 	}
 
-	void CImageCtrl::SetImage( UINT uiResourceId )
+	void CTransparentImageCtrl::SetImage( UINT uiResourceId )
 	{
 		m_pImage = CImageManager::GetSingleton().AddImage( uiResourceId );
 		Invalidate();
 	}
 
-	void CImageCtrl::SetBkColor( COLORREF clrColour )
+	void CTransparentImageCtrl::SetBkColor( COLORREF clrColour )
 	{
 		m_crColour = clrColour;
 		m_brush.SetSolidBrush( CColour::FromCOLORREF( m_crColour ) );
 		Invalidate();
 	}
 
-	void CImageCtrl::DoDrawBackground( CRect const & rcRect )
+	void CTransparentImageCtrl::DoDrawBackground( CRect const & rcRect )
 	{
 		BaseType::DrawBitmap( rcRect, m_brush, rcRect );
 		BaseType::DrawBitmap( rcRect, *m_pImage, CRect( 0, 0, m_pImage->GetWidth(), m_pImage->GetHeight() ), FALSE );
 	}
 
-	BEGIN_MESSAGE_MAP( CImageCtrl, CImageCtrl::BaseType )
+	BEGIN_MESSAGE_MAP( CTransparentImageCtrl, CTransparentImageCtrl::BaseType )
 		ON_WM_ERASEBKGND()
 		ON_WM_PAINT()
 	END_MESSAGE_MAP()
 
-	BOOL CImageCtrl::OnEraseBkgnd( CDC * pDC )
+	BOOL CTransparentImageCtrl::OnEraseBkgnd( CDC * pDC )
 	{
 		return BaseType::OnEraseBkgnd( pDC );
 	}
 
-	void CImageCtrl::OnPaint()
+	void CTransparentImageCtrl::OnPaint()
 	{
 		return BaseType::OnPaint();
 	}

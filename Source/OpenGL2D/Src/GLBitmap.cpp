@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
 #include "GLBitmap.h"
+#include "GLRenderTargetInterface.h"
 #include "GLRenderTarget.h"
+#include "GLContext.h"
 #include "GLHelper.h"
 
 #include <cmath>
@@ -31,16 +33,12 @@ namespace GL2D
 			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 	}
-	
-	void CComBitmap::Draw( const GL2D_RECT_F & rcDst, GL2D_BITMAP_INTERPOLATION_MODE mode, const GL2D_RECT_F & rcSrc )
-	{
-	}
 
 	STDMETHODIMP_( GL2D_SIZE_F ) CComBitmap::GetSize()const
 	{
 		float x, y;
 		GetDpi( &x, &y );
-        return SizeF( m_size.width / x, m_size.height / y );
+		return SizeF( m_size.width / x, m_size.height / y );
 	}
 
 	STDMETHODIMP_( GL2D_SIZE_U ) CComBitmap::GetPixelSize()const

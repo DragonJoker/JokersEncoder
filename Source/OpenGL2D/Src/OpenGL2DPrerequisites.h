@@ -14,8 +14,9 @@ namespace GL2D
 	template< typename Object, typename Interface >
 	class CImage;
 	template< typename Object, typename Interface >
-	class CRenderTargetBase;
-
+	class CRenderTargetInterface;
+	
+	class CComRenderTargetBase;
 	class CComBitmap;
 	class CComStrokeStyle;
 	class CComBrush;
@@ -46,9 +47,9 @@ namespace GL2D
 	typedef CResource< CComGeometry, IGL2DGeometry > CGeometry;
 	typedef CResource< CComDrawingStateBlock, IGL2DDrawingStateBlock > CDrawingStateBlock;
 	typedef CResource< CComGradientStopCollection, IGL2DGradientStopCollection > CGradientStopCollection;
-	typedef CRenderTargetBase< CComRenderTarget, IGL2DRenderTarget > CRenderTarget;
-	typedef CRenderTargetBase< CComHwndRenderTarget, IGL2DHwndRenderTarget > CHwndRenderTarget;
-	typedef CRenderTargetBase< CComBitmapRenderTarget, IGL2DBitmapRenderTarget > CBitmapRenderTarget;
+	typedef CRenderTargetInterface< CComRenderTarget, IGL2DRenderTarget > CRenderTarget;
+	typedef CRenderTargetInterface< CComHwndRenderTarget, IGL2DHwndRenderTarget > CHwndRenderTarget;
+	typedef CRenderTargetInterface< CComBitmapRenderTarget, IGL2DBitmapRenderTarget > CBitmapRenderTarget;
 
 	class CContext;
 

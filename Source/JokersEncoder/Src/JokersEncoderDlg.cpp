@@ -121,6 +121,7 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 	m_listFiles.AddString( _T( "28 - dfsdgjsqsdgsfhdgbfuilsvfqdfgqsdcvqlzerggergzsugfugv" ) );
 	m_listFiles.AddString( _T( "29 - dfsdgjsqsdgsfhdgbfuilsvfqdfgqsdcvqlszergqsfssjsjgfugv" ) );
 	m_listFiles.AddString( _T( "30 - dfsdgjsqsdgsfhdgbfuilsvfqdfgqsdcvqlzeggfugdqsfslkkflhbqFGVv" ) );
+	m_listFiles.GetMaskBrush().SetSolidBrush( CColour( CColour::MediumAlphaWhite ) );
 	m_listFiles.SetItemTextColour( eLB_ITEM_STATUS_NORMAL, CColour( CColour::FullAlphaBlack ) );
 	return TRUE;
 }

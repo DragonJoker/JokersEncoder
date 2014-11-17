@@ -2,6 +2,7 @@
 
 #include "GLFactory.h"
 #include "GLResource.h"
+#include "GLRenderTargetInterface.h"
 #include "GLRenderTarget.h"
 #include "GLHwndRenderTarget.h"
 
@@ -162,12 +163,14 @@ namespace GL2D
 
 			if ( hr == S_OK )
 			{
-				rt->GetContext()->MakeCurrent();
+				std::shared_ptr< CContext > context = rt->GetContext();
+				context->MakeCurrent( context->GetDC() );
 				hr = rt->GetFrameBuffer()->Create(
 					std::bind( &CContext::GenFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 ),
 					std::bind( &CContext::DeleteFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 )
 					);
-				rt->GetContext()->EndCurrent();
+				rt->Resize( &hwndRenderTargetProperties->pixelSize );
+				context->EndCurrent( context->GetDC() );
 				*hwndRenderTarget = rt;
 			}
 		}
