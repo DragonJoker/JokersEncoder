@@ -311,7 +311,7 @@ namespace GL2D
 		{
 			wglMakeCurrent( dc, NULL );
 		}
-		
+
 		m_mutex.unlock();
 		return S_OK;
 	}
@@ -373,7 +373,7 @@ namespace GL2D
 		{
 			EndCurrent( GetDC() );
 		}
-		
+
 		m_mutex.unlock();
 		return value;
 	}
@@ -408,7 +408,7 @@ namespace GL2D
 		return S_OK;
 	}
 
-	HRESULT CContext::GenFramebuffers( GLsizei n, GLuint* framebuffers )
+	HRESULT CContext::GenFramebuffers( GLsizei n, GLuint * framebuffers )
 	{
 		glGenFramebuffers( n, framebuffers );
 		return glGetLastError( "glGenFramebuffers" );
@@ -449,7 +449,7 @@ namespace GL2D
 		return glGetLastError( "glFramebufferTexture2D" );
 	}
 
-	HRESULT CContext::FramebufferTextureLayer( uint32_t target,uint32_t attachment, uint32_t texture,int level,int layer )
+	HRESULT CContext::FramebufferTextureLayer( uint32_t target, uint32_t attachment, uint32_t texture, int level, int layer )
 	{
 		glFramebufferTextureLayer( target, attachment, texture, level, layer );
 		return glGetLastError( "glFramebufferTextureLayer" );
@@ -473,13 +473,13 @@ namespace GL2D
 		return glGetLastError( "glDrawBuffers" );
 	}
 
-	HRESULT CContext::GenTextures( GLsizei n, GLuint* textures  )
+	HRESULT CContext::GenTextures( GLsizei n, GLuint * textures )
 	{
 		glGenTextures( n, textures );
 		return glGetLastError( "glGenTextures" );
 	}
 
-	HRESULT CContext::DeleteTextures( GLsizei n, GLuint const * textures  )
+	HRESULT CContext::DeleteTextures( GLsizei n, GLuint const * textures )
 	{
 		glDeleteTextures( n, textures );
 		return glGetLastError( "glDeleteTextures" );
@@ -563,13 +563,13 @@ namespace GL2D
 		return glGetLastError( "glTexImage2DMultisample" );
 	}
 
-	HRESULT CContext::GetRenderbufferParameteriv( uint32_t target, uint32_t param, int* value )
+	HRESULT CContext::GetRenderbufferParameteriv( uint32_t target, uint32_t param, int * value )
 	{
 		glGetRenderbufferParameteriv( target, param, value );
 		return glGetLastError( "glGetRenderbufferParameteriv" );
 	}
 
-	HRESULT CContext::GenBuffers( GLsizei n, GLuint* buffers )
+	HRESULT CContext::GenBuffers( GLsizei n, GLuint * buffers )
 	{
 		glGenBuffers( n, buffers );
 		return glGetLastError( "glGenBuffers" );
@@ -618,7 +618,7 @@ namespace GL2D
 
 		glUseProgram( m_program );
 		HRESULT hr = glGetLastError( "glUseProgram" );
-		
+
 		if ( hr == S_OK )
 		{
 			hr = ActiveTexture( GL_TEXTURE0 );
@@ -770,7 +770,7 @@ namespace GL2D
 	{
 		GLuint shader = glCreateShader( type );
 		HRESULT hr = glGetLastError( "glCreateShader" );
-		
+
 		if ( hr == S_OK )
 		{
 			int l_iLength = int( source.size() );
@@ -818,12 +818,12 @@ namespace GL2D
 
 		return shader;
 	}
-	
+
 	void CContext::DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message )
 	{
 		std::stringstream toLog;
 		toLog << "OpenGl Debug - ";
-	
+
 		switch ( source )
 		{
 		case GL2D_GL_DEBUG_SOURCE_API:
@@ -850,7 +850,7 @@ namespace GL2D
 			toLog << "Source:Other\t";
 			break;
 		}
-	
+
 		switch ( type )
 		{
 		case GL2D_GL_DEBUG_TYPE_ERROR:
@@ -877,9 +877,9 @@ namespace GL2D
 			toLog << "Type:Other\t";
 			break;
 		}
-	
+
 		toLog << "ID:" << id << "\t";
-	
+
 		switch ( severity )
 		{
 		case GL2D_GL_DEBUG_SEVERITY_HIGH:
@@ -899,7 +899,7 @@ namespace GL2D
 			break;
 		}
 	}
-	
+
 	void CContext::DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message )
 	{
 		std::stringstream toLog;
@@ -964,7 +964,7 @@ namespace GL2D
 
 	void CContext::DoLoadContext()
 	{
-		const char * ( CALLBACK *glGetExtensionsString )();
+		const char * ( CALLBACK * glGetExtensionsString )();
 		gl_api::GetFunction( "wglGetExtensionsString", "EXT", glGetExtensionsString );
 		std::string strExt;
 
@@ -973,13 +973,14 @@ namespace GL2D
 			strExt = glGetExtensionsString();
 		}
 
-		strExt += (char const * )glGetString( GL_EXTENSIONS );
+		strExt += ( char const * )glGetString( GL_EXTENSIONS );
 
 		std::string vendor = ( char const * )glGetString( GL_VENDOR );
 		std::string renderer = ( char const * )glGetString( GL_RENDERER );
 		std::string glVersion = ( char const * )glGetString( GL_VERSION );
 		std::stringstream streamExt( strExt );
 		std::set< std::string > extensions;
+
 		while ( !streamExt.eof() )
 		{
 			std::string tmp;
@@ -1116,7 +1117,7 @@ namespace GL2D
 		vssrc += "    vtx_texture = texture;\n";
 		vssrc += "}\n";
 		GLuint vs = DoCreateShader( vssrc, GL2D_GL_SHADER_TYPE_VERTEX );
-		
+
 		std::string fssrc;
 		fssrc += "#version 130\n";
 		fssrc += "\n";
@@ -1130,7 +1131,7 @@ namespace GL2D
 		fssrc += "    pxl_fragColor = vec4( 1, 0, 0, 1 );\n";
 		fssrc += "}\n";
 		GLuint fs = DoCreateShader( fssrc, GL2D_GL_SHADER_TYPE_FRAGMENT );
-		
+
 		HRESULT hr = ( fs != GL_INVALID_INDEX && vs != GL_INVALID_INDEX ) ? S_OK : E_FAIL;
 
 		if ( hr == S_OK )
@@ -1250,7 +1251,7 @@ namespace GL2D
 			BindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, 0 );
 		}
 
-		if (hr == S_OK && glGenVertexArrays )
+		if ( hr == S_OK && glGenVertexArrays )
 		{
 			glGenVertexArrays( 1, &m_vao );
 			hr = glGetLastError( "glGenVertexArrays" );

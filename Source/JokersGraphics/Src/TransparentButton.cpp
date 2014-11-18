@@ -86,7 +86,7 @@ namespace Joker
 		if ( eState >= eBTN_STATE_COUNT )
 		{
 			for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < eBTN_STATE_COUNT ; GL2D_SIZE_I++ )
-			{ 
+			{
 				m_brushes[GL2D_SIZE_I].SetGradientBrush( iType, clDebut, clMilieu, clFin, iSteps );
 			}
 		}
@@ -112,14 +112,14 @@ namespace Joker
 		{
 			pImgEnable = CImageManager::AddImage( iEnabled	);
 			pImgHighlt = CImageManager::AddImage( iHighlight	);
-			pImgPushed = CImageManager::AddImage( iPush		);
+			pImgPushed = CImageManager::AddImage( iPush	);
 			pImgDisabl = CImageManager::AddImage( iDisabled	);
 		}
 		else
 		{
 			pImgEnable = CImageManager::GetImageByIndex( iEnabled	);
 			pImgHighlt = CImageManager::GetImageByIndex( iHighlight	);
-			pImgPushed = CImageManager::GetImageByIndex( iPush		);
+			pImgPushed = CImageManager::GetImageByIndex( iPush	);
 			pImgDisabl = CImageManager::GetImageByIndex( iDisabled	);
 		}
 
@@ -135,7 +135,7 @@ namespace Joker
 		if ( eState >= eBTN_STATE_COUNT )
 		{
 			for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < eBTN_STATE_COUNT ; GL2D_SIZE_I++ )
-			{ 
+			{
 				m_textColours[GL2D_SIZE_I] = clColour;
 			}
 		}
@@ -167,11 +167,11 @@ namespace Joker
 	{
 		if ( bFromResources )
 		{
-			SetTextColours(  CColour::FromCOLORREF( uiEnable ), CColour::FromCOLORREF( uiHighlt ), CColour::FromCOLORREF( uiPushed ), CColour::FromCOLORREF( uiDisabl )	);
+			SetTextColours( CColour::FromCOLORREF( uiEnable ), CColour::FromCOLORREF( uiHighlt ), CColour::FromCOLORREF( uiPushed ), CColour::FromCOLORREF( uiDisabl )	);
 		}
 		else
 		{
-			SetTextColours(  CColour::FromCOLORREF( CColourManager::GetColour( uiEnable ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiHighlt ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiPushed ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiDisabl ) ) );
+			SetTextColours( CColour::FromCOLORREF( CColourManager::GetColour( uiEnable ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiHighlt ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiPushed ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiDisabl ) ) );
 		}
 	}
 
@@ -180,7 +180,7 @@ namespace Joker
 		if ( eState >= eBTN_STATE_COUNT )
 		{
 			for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < eBTN_STATE_COUNT ; GL2D_SIZE_I++ )
-			{ 
+			{
 				m_pFonts[GL2D_SIZE_I] = pFont;
 			}
 		}
@@ -297,7 +297,7 @@ namespace Joker
 			int iOffset = rcRect.Height() / 10;
 			rcText.DeflateRect( iOffset, iOffset, iOffset, iOffset ); // Pour que le texte ne soit pas collé au bord du bouton
 			pFont->GetLogFont( & logFont );
-			BaseType::DrawSolidText( (*pFont), logFont, m_textColours[m_eState], csText, rcText, m_dwAlign );
+			BaseType::DrawSolidText( ( *pFont ), logFont, m_textColours[m_eState], csText, rcText, m_dwAlign );
 		}
 
 		if ( m_bDrawBorder )
@@ -315,9 +315,9 @@ namespace Joker
 
 	void CTransparentButton::DrawItem( LPDRAWITEMSTRUCT UNUSED( lpDrawItemStruct ) )
 	{
-	// 	m_hDC = lpDrawItemStruct->hDC;
-	// 	Draw();
-	// 	m_hDC = NULL;
+		// 	m_hDC = lpDrawItemStruct->hDC;
+		// 	Draw();
+		// 	m_hDC = NULL;
 	}
 
 	BEGIN_MESSAGE_MAP( CTransparentButton, CTransparentButton::BaseType )
@@ -346,9 +346,9 @@ namespace Joker
 
 			CRect rRect;
 			BaseType::GetClientRect( & rRect );
-			BOOL bMouseOverMe =( point.x >= 0 && point.x <= rRect.Width() && point.y >= 0 && point.y <= rRect.Height() );
+			BOOL bMouseOverMe = ( point.x >= 0 && point.x <= rRect.Width() && point.y >= 0 && point.y <= rRect.Height() );
 
-			if (  ! m_bMouseOver && bMouseOverMe )
+			if ( !m_bMouseOver && bMouseOverMe )
 			{
 				TRACKMOUSEEVENT mouseEvent;
 				mouseEvent.cbSize = sizeof( TRACKMOUSEEVENT );
@@ -360,7 +360,7 @@ namespace Joker
 
 				BaseType::Invalidate();
 			}
-			else if ( m_bMouseOver && ! bMouseOverMe )
+			else if ( m_bMouseOver && !bMouseOverMe )
 			{
 				m_eState = eBTN_STATE_ENABLED;
 				m_bMouseOver = false;
@@ -385,7 +385,7 @@ namespace Joker
 		}
 
 		BaseType::Invalidate();
-	
+
 		return 0;
 	}
 
@@ -433,8 +433,8 @@ namespace Joker
 
 	CTransparentRadioCheck::CTransparentRadioCheck()
 	{
-		m_brushesCheck[eBTN_STATE_DISABLED		].SetSolidBrush( CColour( CColour::Transparent			) );
-		m_brushesCheck[eBTN_STATE_ENABLED		].SetSolidBrush( CColour( CColour::Transparent			) );
+		m_brushesCheck[eBTN_STATE_DISABLED		].SetSolidBrush( CColour( CColour::Transparent	) );
+		m_brushesCheck[eBTN_STATE_ENABLED		].SetSolidBrush( CColour( CColour::Transparent	) );
 		m_brushesCheck[eBTN_STATE_HIGHLIGHTED	].SetSolidBrush( CColour( CColour::LowAlphaLightBlue	) );
 		m_brushesCheck[eBTN_STATE_PUSHED		].SetSolidBrush( CColour( CColour::MediumAlphaLightBlue	) );
 	}
@@ -462,7 +462,7 @@ namespace Joker
 		int iOffset = 3;
 		int iWidth	= std::min< int >( rcRect.Width(),	12 );
 		int iHeight	= std::min< int >( rcRect.Height(),	12 );
-		int iTop = (rcRect.Height() - iHeight) / 2;
+		int iTop = ( rcRect.Height() - iHeight ) / 2;
 		CRect rcRectCheck;
 		CRect rcRectText;
 		CString csText;
@@ -473,12 +473,12 @@ namespace Joker
 
 		if ( BaseType::GetStyle() & BS_LEFTTEXT )
 		{
-			rcRectText = CRect( CPoint( rcRect.left, rcRect.top ), CSize( rcRect.Width() - (iWidth + iOffset), rcRect.Height() ) );
+			rcRectText = CRect( CPoint( rcRect.left, rcRect.top ), CSize( rcRect.Width() - ( iWidth + iOffset ), rcRect.Height() ) );
 			rcRectCheck = CRect( CPoint( rcRect.right - iWidth, iTop ), CSize( iWidth, iHeight ) );
 		}
 		else
 		{
-			rcRectText = CRect( CPoint( rcRect.left + iWidth + iOffset, rcRect.top ), CSize( rcRect.Width() - (iWidth + iOffset), rcRect.Height() ) );
+			rcRectText = CRect( CPoint( rcRect.left + iWidth + iOffset, rcRect.top ), CSize( rcRect.Width() - ( iWidth + iOffset ), rcRect.Height() ) );
 			rcRectCheck = CRect( CPoint( rcRect.left, iTop ), CSize( iWidth, iHeight ) );
 		}
 
@@ -487,18 +487,19 @@ namespace Joker
 			dwAlign |= DT_CENTER;
 		}
 
-		if ( (BaseType::GetStyle() & BS_MULTILINE) == 0 )
+		if ( ( BaseType::GetStyle() & BS_MULTILINE ) == 0 )
 		{
 			dwAlign |= DT_SINGLELINE;
 			dwAlign |= DT_VCENTER;
 		}
 
-		if ( ! csText.IsEmpty() )
+		if ( !csText.IsEmpty() )
 		{
 			pFont = new Joker::CFont( GetFont() );
 			pFont->GetLogFont( & logFont );
 
 #if DEF_USING_D2D
+
 			if ( logFont.lfHeight > 0 )
 			{
 				logFont.lfHeight += 3;
@@ -507,15 +508,16 @@ namespace Joker
 			{
 				logFont.lfHeight -= 3;
 			}
+
 #endif
 
 			if ( IsWindowEnabled() )
 			{
-				BaseType::DrawSolidText( (*pFont), logFont, m_clText, csText, rcRectText, dwAlign );
+				BaseType::DrawSolidText( ( *pFont ), logFont, m_clText, csText, rcRectText, dwAlign );
 			}
 			else
 			{
-				BaseType::DrawSolidText( (*pFont), logFont, m_clText + CColour::FromComponents( 127, 127, 127, 255 ), csText, rcRectText, dwAlign );
+				BaseType::DrawSolidText( ( *pFont ), logFont, m_clText + CColour::FromComponents( 127, 127, 127, 255 ), csText, rcRectText, dwAlign );
 			}
 		}
 
@@ -537,9 +539,9 @@ namespace Joker
 
 		if ( pImage )
 		{
-			BaseType::DrawBitmap( rcRectCheck, (*pImage), CRect( 0, 0, pImage->GetWidth(), pImage->GetHeight() ) );
+			BaseType::DrawBitmap( rcRectCheck, ( *pImage ), CRect( 0, 0, pImage->GetWidth(), pImage->GetHeight() ) );
 		}
- 
- 		BaseType::DrawBitmap( rcRectCheck, m_brushesCheck[GetState()].GetDC(), m_brushesCheck[GetState()].GetRect() );
+
+		BaseType::DrawBitmap( rcRectCheck, m_brushesCheck[GetState()].GetDC(), m_brushesCheck[GetState()].GetRect() );
 	}
 }

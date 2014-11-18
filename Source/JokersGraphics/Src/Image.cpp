@@ -21,17 +21,17 @@ namespace Joker
 
 	CImage::CImage( unsigned int uiIndex, unsigned int uiResourceID )
 		:	CResource( uiIndex )
-		,	m_eType			( DoRetrieveType( uiResourceID ) )
-		,	m_uiResourceID	( uiResourceID )
+		,	m_eType( DoRetrieveType( uiResourceID ) )
+		,	m_uiResourceID( uiResourceID )
 	{
 		DoLoadImage();
 	}
 
 	CImage::CImage( unsigned int uiIndex, String const & strFilePath )
 		:	CResource( uiIndex )
-		,	m_strFilePath	( strFilePath )
-		,	m_eType			( eIMAGE_TYPE_BITMAP )
-		,	m_uiResourceID	( 0xFFFFFFFF )
+		,	m_strFilePath( strFilePath )
+		,	m_eType( eIMAGE_TYPE_BITMAP )
+		,	m_uiResourceID( 0xFFFFFFFF )
 	{
 		CStrUtils::ToLong( m_strFilePath );
 
@@ -45,8 +45,8 @@ namespace Joker
 
 	CImage::CImage( unsigned int uiIndex, int iWidth, int iHeight, int iBPP )
 		:	CResource( uiIndex )
-		,	m_eType			( eIMAGE_TYPE_BITMAP )
-		,	m_uiResourceID	( 0xFFFFFFFF )
+		,	m_eType( eIMAGE_TYPE_BITMAP )
+		,	m_uiResourceID( 0xFFFFFFFF )
 	{
 		ATL::CImage::CreateEx( iWidth, iHeight, iBPP, BI_RGB, NULL, ( iBPP == 32 ? createAlphaChannel : 0 ) );
 	}
@@ -111,7 +111,7 @@ namespace Joker
 
 	void CImage::CopyFrom( HDC hdcSrc, int xSrc, int ySrc, int cxSrc, int cySrc, int xDest, int yDest, int cxDest, int cyDest, DWORD dwROP )
 	{
-		if (  ! IsNull() )
+		if ( !IsNull() )
 		{
 			HDC hDC = GetDC();
 
@@ -138,7 +138,7 @@ namespace Joker
 
 	void CImage::StretchBlt( HDC hdcDest, int xDest, int yDest, int cxDest, int cyDest, int xOrigin, int yOrigin, int cxOrigin, int cyOrigin, DWORD dwROP, double dRatio )
 	{
-		if (  ! IsNull() )
+		if ( !IsNull() )
 		{
 			ATL::CImage::StretchBlt( hdcDest, int( xDest * dRatio ), int( yDest * dRatio ), int( cxDest * dRatio ), int( cyDest * dRatio ), xOrigin, yOrigin, cxOrigin, cyOrigin, dwROP );
 		}
@@ -161,7 +161,7 @@ namespace Joker
 
 	void CImage::TransparentBlt( HDC hdcDest, int xDest, int yDest, int cxDest, int cyDest, int xOrigin, int yOrigin, int cxOrigin, int cyOrigin, COLORREF crTransparent, double dRatio )
 	{
-		if (  ! IsNull() )
+		if ( !IsNull() )
 		{
 			ATL::CImage::TransparentBlt( hdcDest, int( xDest * dRatio ), int( yDest * dRatio ), int( cxDest * dRatio ), int( cyDest * dRatio ), xOrigin, yOrigin, cxOrigin, cyOrigin, crTransparent );
 		}
@@ -184,7 +184,7 @@ namespace Joker
 
 	void CImage::AlphaBlend( HDC hdcDest, int xDest, int yDest, int cxDest, int cyDest, int xOrigin, int yOrigin, int cxOrigin, int cyOrigin, double dRatio )
 	{
-		if (  ! IsNull() )
+		if ( !IsNull() )
 		{
 			ATL::CImage::AlphaBlend( hdcDest, int( xDest * dRatio ), int( yDest * dRatio ), int( cxDest * dRatio ), int( cyDest * dRatio ), xOrigin, yOrigin, cxOrigin, cyOrigin );
 		}
@@ -193,16 +193,17 @@ namespace Joker
 	void CImage::DoLoadImage()
 	{
 		HandlerMap::iterator l_it = s_handlers.find( m_eType );
+
 		if ( l_it != s_handlers.end() )
 		{
-			if ( ! l_it->second->Load( * this ) )
+			if ( !l_it->second->Load( * this ) )
 			{
 				Destroy();
 			}
 		}
 	}
 
-	void CImage::AddHandler( eIMAGE_TYPE p_eType, CImageHandler * p_pHandler)
+	void CImage::AddHandler( eIMAGE_TYPE p_eType, CImageHandler * p_pHandler )
 	{
 		HandlerMap::iterator l_it = s_handlers.find( p_eType );
 
@@ -218,7 +219,10 @@ namespace Joker
 
 	void CImage::DeleteHandlers()
 	{
-		std::for_each( s_handlers.begin(), s_handlers.end(), []( HandlerMap::value_type it ) { delete it.second; } );
+		std::for_each( s_handlers.begin(), s_handlers.end(), []( HandlerMap::value_type it )
+		{
+			delete it.second;
+		} );
 	}
 
 	eIMAGE_TYPE CImage::DoRetrieveType( int iResourceID )

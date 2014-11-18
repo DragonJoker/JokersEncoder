@@ -1,25 +1,30 @@
+#include <iostream>
+
 namespace Joker
 {
 #if DEF_USING_OGL
-	template< typename T > int CTransparentCtrlT< T, eRENDERER_OGL >::m_iReferences = 0;
-	template< typename T > IDWriteFactory * CTransparentCtrlT< T, eRENDERER_OGL >::m_pWriteFactory = NULL;
-	template< typename T > IGL2DFactory * CTransparentCtrlT< T, eRENDERER_OGL >::m_pFactory = NULL;
+	template< typename T >
+	int CTransparentCtrlT< T, eRENDERER_OGL >:: m_iReferences = 0;
+	template< typename T >
+	IDWriteFactory * CTransparentCtrlT< T, eRENDERER_OGL >:: m_pWriteFactory = NULL;
+	template< typename T >
+	IGL2DFactory * CTransparentCtrlT< T, eRENDERER_OGL >:: m_pFactory = NULL;
+	template< typename T >
+	std::map< HBITMAP, IGL2DBitmap * > CTransparentCtrlT< T, eRENDERER_OGL >:: m_bitmaps;
 
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_OGL >::CTransparentCtrlT()
-		:	m_bPainting			( false	 )
-		,	m_bHasBackground	( false	 )
-		,	m_brushMask			( CColour( CColour::Transparent ) )
-		,	m_clText			( CColour( CColour::FullAlphaBlack ) )
-		,	m_clBorder			( CColour( CColour::FullAlphaBlack ) )
-		,	m_bHasBorder		( true	)
-		,	m_bFocused			( false	 )
-		,	m_bMouseOver		( false )
-		,	m_pHwndRenderTarget	( NULL )
-		,	m_pBmpRenderTarget	( NULL )
-		,	m_pRenderTarget		( NULL )
-		,	m_eRenderer			( eRENDERER_OGL )
-		,	m_bReinitBackground	( false )
+		: m_bPainting( false )
+		, m_bHasBackground( false )
+		, m_brushMask( CColour( CColour::Transparent ) )
+		, m_clText( CColour( CColour::FullAlphaBlack ) )
+		, m_clBorder( CColour( CColour::FullAlphaBlack ) )
+		, m_bHasBorder( true )
+		, m_bFocused( false )
+		, m_bMouseOver( false )
+		, m_pRenderTarget( NULL )
+		, m_eRenderer( eRENDERER_OGL )
+		, m_bReinitBackground( false )
 	{
 		DoInitDeviceIndependent();
 	}
@@ -86,7 +91,7 @@ namespace Joker
 			if ( m_pRenderTarget )
 			{
 				m_pRenderTarget->BeginDraw();
-				m_pRenderTarget->Clear( CColour( CColour::Transparent ).ToGL2DColor() );
+				m_pRenderTarget->Clear( GL2D::ColorF( GL2D::ColorF::Enum::Black, 0.0F ) );
 
 				// On dessine l'arrière plan
 				DoDrawBackground( rcRect );
@@ -95,50 +100,7 @@ namespace Joker
 				DoDrawForeground( rcRect );
 
 				m_pRenderTarget->EndDraw();
-
-				if ( m_pRenderTarget == m_pBmpRenderTarget )
-				{
-					IGL2DBitmap * pBitmap = NULL;
-					HRESULT hr = m_pBmpRenderTarget->GetBitmap( & pBitmap );
-
-					if ( hr == S_OK )
-					{
-						m_pHwndRenderTarget->BeginDraw();
-						m_pHwndRenderTarget->DrawBitmap( pBitmap, GL2D::RectF( FLOAT( rcRect.left ), FLOAT( rcRect.top ), FLOAT( rcRect.right ), FLOAT( rcRect.bottom ) ) ); 
-						m_pHwndRenderTarget->EndDraw();
-					}
-				}
 			}
-		}
-	}
-
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawBackground( CRect const & rcRect )
-	{
-		// On met l'image d'arrière plan dans le backbuffer
-		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
-		// on blende le backbuffer et le masque
-		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
-	}
-
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawForeground( CRect const & rcRect )
-	{
-		// On dessine le texte, s'il y en a un
-		CString csText;
-		GetWindowText( csText );
-
-		if ( ! csText.IsEmpty() )
-		{
-			LOGFONT logFont;
-			GetFont()->GetLogFont( & logFont );
-			DrawSolidText( ( * GetFont() ), logFont, m_clText, csText, rcRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER );
-		}
-
- 		// On dessine le contour
-		if ( m_bHasBorder )
-		{
- 			FrameRect( rcRect, m_clBorder );
 		}
 	}
 
@@ -147,8 +109,9 @@ namespace Joker
 	{
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
+		int result = ::GetDIBits( hDC, hBitmap, 0, 1, NULL, &bmiSrc, DIB_RGB_COLORS );
 
-		if ( ::GetDIBits( hDC, hBitmap, 0, 1, NULL, &bmiSrc, DIB_RGB_COLORS ) )
+		if ( result && result != ERROR_INVALID_PARAMETER )
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
@@ -157,15 +120,16 @@ namespace Joker
 			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
 
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
+			result = ::GetDIBits( hDC, hBitmap, 0, size.cy, &arrayBitsSrc[0], &bmi, DIB_RGB_COLORS );
 
-			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, &arrayBitsSrc[0], &bmi, DIB_RGB_COLORS ) )
+			if ( result && result != ERROR_INVALID_PARAMETER )
 			{
 				bReturn = true;
 				UINT uiStep = arrayBits.size() / size.cy;
 
 				for ( int i = 0 ; i < size.cy ; ++i )
 				{
-					memcpy( & arrayBits[i * uiStep], & arrayBitsSrc[bmi.bmiHeader.biSizeImage - uiStep - i * uiStep], uiStep );
+					memcpy( &arrayBits[i * uiStep], &arrayBitsSrc[arrayBits.size() - uiStep - i * uiStep], uiStep );
 				}
 			}
 		}
@@ -183,46 +147,50 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL UNUSED( bSrcAlpha ) )
 	{
+		std::map< HBITMAP, IGL2DBitmap * >::iterator it = m_bitmaps.find( hBitmap );
 		IGL2DBitmap * pBmp = NULL;
-		CSize size;
-		std::vector< BYTE > arrayBits;
 
-		if ( GetBitmapInfos( m_hDC, hBitmap, size, arrayBits ) )
+		if ( it == m_bitmaps.end() )
 		{
-			GL2D_BITMAP_PROPERTIES props = GL2D::BitmapProperties( GL2D::PixelFormat( GL2D_GL_FORMAT_BGRA, GL2D_GL_INTERNAL_RGBA8, GL2D_GL_TYPE_BYTE ) );
-			m_pRenderTarget->CreateBitmap( GL2D::SizeU( size.cx, size.cy ), & arrayBits[0], size.cx * 4, props, & pBmp );
+			CSize size;
+			std::vector< BYTE > arrayBits;
 
-			if ( pBmp )
+			if ( GetBitmapInfos( m_hDC, hBitmap, size, arrayBits ) )
 			{
-				GL2D_RECT_F rcfSrc = GL2D::RectF( float( rcSrc.left ), float( rcSrc.top ), float( rcSrc.right ), float( rcSrc.bottom ) );
-				GL2D_RECT_F rcfDst = GL2D::RectF( float( rcDst.left ), float( rcDst.top ), float( rcDst.right ), float( rcDst.bottom ) );
-				m_pRenderTarget->DrawBitmap( pBmp, rcfDst, 1.0f, GL2D_BITMAP_INTERPOLATION_MODE_LINEAR, rcfSrc );
-				SafeRelease( pBmp );
+				GL2D_BITMAP_PROPERTIES props = GL2D::BitmapProperties( GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_RGBA8, GL2D_GL_TYPE_BYTE ) );
+				m_pRenderTarget->CreateBitmap( GL2D::SizeU( size.cx, size.cy ), & arrayBits[0], size.cx * 4, props, & pBmp );
+
+				if ( pBmp )
+				{
+					m_bitmaps.insert( std::make_pair( hBitmap, pBmp ) );
+				}
 			}
+		}
+		else
+		{
+			pBmp = it->second;
+		}
+
+		if ( pBmp )
+		{
+			GL2D_RECT_F rcfSrc = GL2D::RectF( float( rcSrc.left ), float( rcSrc.top ), float( rcSrc.right ), float( rcSrc.bottom ) );
+			GL2D_RECT_F rcfDst = GL2D::RectF( float( rcDst.left ), float( rcDst.top ), float( rcDst.right ), float( rcDst.bottom ) );
+			m_pRenderTarget->DrawBitmap( pBmp, rcfDst, 1.0f, GL2D_BITMAP_INTERPOLATION_MODE_LINEAR, rcfSrc );
 		}
 	}
 
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::FrameRect( CRect const & rcRect, CColour const & clColour, int iWidth, UINT uiStyle )
 	{
-		IGL2DStrokeStyle * pStroke = NULL;
-		IGL2DSolidColorBrush * pBrush = NULL;
+		IGL2DStrokeStyle * pStroke;
+		IGL2DSolidColorBrush * pBrush;
 		float tmp[2] = { 50, 50 };
-		HRESULT hr = m_pFactory->CreateStrokeStyle( GL2D::StrokeStyleProperties( GL2D_CAP_STYLE_SQUARE, GL2D_CAP_STYLE_SQUARE, GL2D_CAP_STYLE_SQUARE, GL2D_LINE_JOIN_MITER, FLOAT( iWidth ), GL2D_DASH_STYLE( uiStyle ), FLOAT( iWidth ) ), tmp, 2, & pStroke );
-
-		if ( hr == S_OK )
-		{
-			hr = m_pRenderTarget->CreateSolidColorBrush( clColour.ToGL2DColor(), &pBrush );
-		}
-
-		if ( hr == S_OK )
-		{
-			m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.left			 ),	FLOAT( rcRect.top				 ) ), GL2D::Point2F( FLOAT( rcRect.right - iWidth	 ),	FLOAT( rcRect.top				 ) ), pBrush, FLOAT( iWidth ), pStroke );
-			m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.right - iWidth	 ),	FLOAT( rcRect.top				 ) ), GL2D::Point2F( FLOAT( rcRect.right - iWidth	 ),	FLOAT( rcRect.bottom - iWidth	 ) ), pBrush, FLOAT( iWidth ), pStroke );
-			m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.right - iWidth	 ),	FLOAT( rcRect.bottom - iWidth	 ) ), GL2D::Point2F( FLOAT( rcRect.left				 ),	FLOAT( rcRect.bottom - iWidth	 ) ), pBrush, FLOAT( iWidth ), pStroke );
-			m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.left			 ),	FLOAT( rcRect.bottom - iWidth	 ) ), GL2D::Point2F( FLOAT( rcRect.left				 ),	FLOAT( rcRect.top				 ) ), pBrush, FLOAT( iWidth ), pStroke );
-		}
-
+		m_pFactory->CreateStrokeStyle( GL2D::StrokeStyleProperties( GL2D_CAP_STYLE_SQUARE, GL2D_CAP_STYLE_SQUARE, GL2D_CAP_STYLE_SQUARE, GL2D_LINE_JOIN_MITER, FLOAT( iWidth ), GL2D_DASH_STYLE( uiStyle ), FLOAT( iWidth ) ), tmp, 2, & pStroke );
+		m_pRenderTarget->CreateSolidColorBrush( clColour.ToGL2DColor(), & pBrush );
+		m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.left ),	FLOAT( rcRect.top ) ), GL2D::Point2F( FLOAT( rcRect.right - iWidth ),	FLOAT( rcRect.top ) ), pBrush, FLOAT( iWidth ), pStroke );
+		m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.right - iWidth ),	FLOAT( rcRect.top ) ), GL2D::Point2F( FLOAT( rcRect.right - iWidth ),	FLOAT( rcRect.bottom - iWidth ) ), pBrush, FLOAT( iWidth ), pStroke );
+		m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.right - iWidth ),	FLOAT( rcRect.bottom - iWidth ) ), GL2D::Point2F( FLOAT( rcRect.left ),	FLOAT( rcRect.bottom - iWidth ) ), pBrush, FLOAT( iWidth ), pStroke );
+		m_pRenderTarget->DrawLine( GL2D::Point2F( FLOAT( rcRect.left ),	FLOAT( rcRect.bottom - iWidth ) ), GL2D::Point2F( FLOAT( rcRect.left ),	FLOAT( rcRect.top ) ), pBrush, FLOAT( iWidth ), pStroke );
 		SafeRelease( pStroke );
 		SafeRelease( pBrush );
 	}
@@ -298,15 +266,15 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::TransparentBlt( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, CColour const & clTransparent )
 	{
-	//	::TransparentBlt( hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
+		//	::TransparentBlt( hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
 	}
 
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
 	{
-		HBITMAP hBitmap = HBITMAP( SelectObject( srcDC, NULL ) );
+		HBITMAP hBitmap = HBITMAP( ::SelectObject( srcDC, NULL ) );
 		DrawBitmap( rcDest, hBitmap, rcSrc );
-		SelectObject( srcDC, hBitmap );
+		::SelectObject( srcDC, hBitmap );
 	}
 
 	template< typename T >
@@ -324,12 +292,12 @@ namespace Joker
 
 		if ( !m_pFactory )
 		{
-			GL2DCreateFactory( GL2D_FACTORY_TYPE_SINGLE_THREADED, &m_pFactory );
+			::GL2DCreateFactory( GL2D_FACTORY_TYPE_SINGLE_THREADED, & m_pFactory );
 		}
 
 		if ( !m_pWriteFactory )
 		{
-			DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory ), reinterpret_cast< IUnknown ** >( &m_pWriteFactory ) );
+			::DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory ), reinterpret_cast< IUnknown ** >( & m_pWriteFactory ) );
 		}
 	}
 
@@ -340,6 +308,13 @@ namespace Joker
 
 		if ( m_iReferences <= 0 )
 		{
+			std::for_each( m_bitmaps.begin(), m_bitmaps.end(), [&]( std::pair< HBITMAP, IGL2DBitmap * > pair )
+			{
+				SafeRelease( pair.second );
+			} );
+
+			m_bitmaps.clear();
+
 			SafeRelease( m_pFactory );
 			SafeRelease( m_pWriteFactory );
 		}
@@ -351,13 +326,10 @@ namespace Joker
 		CRect rcRect;
 		T::GetClientRect( rcRect );
 		GL2D_SIZE_U size = GL2D::SizeU( rcRect.Width(), rcRect.Height() );
-		HRESULT hr = m_pFactory->CreateHwndRenderTarget( GL2D::RenderTargetProperties(), GL2D::HwndRenderTargetProperties( m_hWnd, size ), &m_pHwndRenderTarget );
+		GL2D_RENDER_TARGET_PROPERTIES props = GL2D::RenderTargetProperties( GL2D_RENDER_TARGET_TYPE_DEFAULT, GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_RGBA8, GL2D_GL_TYPE_BYTE ) );
+		HRESULT hr = m_pFactory->CreateHwndRenderTarget( props, GL2D::HwndRenderTargetProperties( m_hWnd, size ), &m_pRenderTarget );
 
-		if ( hr == S_OK )
-		{
-			m_pRenderTarget = m_pHwndRenderTarget;
-		}
-		else
+		if ( hr != S_OK )
 		{
 			CLogger::LogError( String( _T( "CreateHwndRenderTarget failed" ) ), false );
 		}
@@ -368,9 +340,66 @@ namespace Joker
 	{
 		if ( m_pRenderTarget )
 		{
-			SafeRelease( m_pBmpRenderTarget );
-			SafeRelease( m_pHwndRenderTarget );
+			SafeRelease( m_pRenderTarget );
 			m_pRenderTarget = NULL;
+		}
+	}
+
+	template< typename T >
+	void CTransparentCtrlT< T, eRENDERER_OGL >::DoInitialiseBackground()
+	{
+		CWnd * pParent = BaseType::GetParent();
+
+		if ( pParent )
+		{
+			CRect rcRect;
+			T::GetWindowRect( &rcRect );
+			pParent->ScreenToClient( &rcRect );
+
+			CDC * pDC = pParent->GetDC();
+			int iWidth = rcRect.Width();
+			int iHeight = rcRect.Height();
+
+			m_bmpBackground.DeleteObject();
+			m_bmpBackground.CreateCompatibleBitmap( pDC, rcRect.Width(), rcRect.Height() );
+			CDC memdc;
+			memdc.CreateCompatibleDC( pDC );
+
+			CBitmap * pOldbmp = memdc.SelectObject( & m_bmpBackground );
+			memdc.BitBlt( 0, 0, iWidth, iHeight, pDC, rcRect.left, rcRect.top, SRCCOPY );
+			memdc.SelectObject( pOldbmp );
+			pParent->ReleaseDC( pDC );
+			m_bReinitBackground = false;
+		}
+	}
+
+	template< typename T >
+	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawBackground( CRect const & rcRect )
+	{
+		// On met l'image d'arrière plan dans le backbuffer
+		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
+		// on blende le backbuffer et le masque
+		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
+	}
+
+	template< typename T >
+	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawForeground( CRect const & rcRect )
+	{
+		// On dessine le texte, s'il y en a un
+		CString csText;
+		GetWindowText( csText );
+
+		if ( !csText.IsEmpty() )
+		{
+			LOGFONT logFont;
+			GetFont()->GetLogFont( & logFont );
+			DrawSolidText( ( * GetFont() ), logFont, m_clText, csText, rcRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER );
+		}
+
+		// On dessine le contour
+		if ( m_bHasBorder )
+		{
+			FrameRect( rcRect, m_clBorder );
 		}
 	}
 
@@ -378,40 +407,6 @@ namespace Joker
 	void CTransparentCtrlT< T, eRENDERER_OGL >::PreSubclassWindow()
 	{
 		BaseType::PreSubclassWindow();
-	}
-
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoInitialiseBackground()
-	{
-		CRect		rcRect;
-		CDC *		pDC;
-		int			iWidth;
-		int			iHeight;
-		CDC			memdc;
-		CBitmap *	pOldbmp;
-		CWnd *		pParent;
-
-		pParent = BaseType::GetParent();
-
-		if ( pParent )
-		{
-			GetWindowRect( &rcRect );
-			pParent->ScreenToClient( &rcRect );
-
-			pDC = pParent->GetDC();
-			iWidth = rcRect.Width();
-			iHeight = rcRect.Height();
-
-			m_bmpBackground.DeleteObject();
-			m_bmpBackground.CreateCompatibleBitmap( pDC, rcRect.Width(), rcRect.Height() );
-			memdc.CreateCompatibleDC( pDC );
-
-			pOldbmp = memdc.SelectObject( & m_bmpBackground );
-			memdc.BitBlt( 0, 0, iWidth, iHeight, pDC, rcRect.left, rcRect.top, SRCCOPY );
-			memdc.SelectObject( pOldbmp );
-			pParent->ReleaseDC( pDC );
-			m_bReinitBackground = false;
-		}
 	}
 
 	PTM_WARNING_DISABLE
@@ -438,7 +433,9 @@ namespace Joker
 			ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
 			ON_WM_SETFOCUS()
 			ON_WM_KILLFOCUS()
-			{0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0 }
+			{
+				0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0
+			}
 		};
 		static const AFX_MSGMAP messageMap =
 		{
@@ -455,12 +452,11 @@ namespace Joker
 
 		if ( m_bHasBackground )
 		{
-			if ( ! m_pHwndRenderTarget || m_hWnd != m_pHwndRenderTarget->GetHwnd() )
+			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
 				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
 				m_pRenderTarget = NULL;
-				SafeRelease( m_pBmpRenderTarget );
-				SafeRelease( m_pHwndRenderTarget );
+				SafeRelease( m_pRenderTarget );
 				DoInitDeviceDependent();
 			}
 		}
@@ -476,9 +472,10 @@ namespace Joker
 	}
 
 	template< typename T >
-	HBRUSH CTransparentCtrlT< T, eRENDERER_OGL >::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT nCtlColor )
+	HBRUSH CTransparentCtrlT< T, eRENDERER_OGL >::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
 	{
-		return HBRUSH( ::GetStockObject( HOLLOW_BRUSH ) );
+		pDC->SetBkMode( TRANSPARENT );
+		return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
 	}
 
 	template< typename T >
@@ -490,9 +487,10 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::OnPaint()
 	{
-		if ( IsWindowVisible() )
+		if ( T::IsWindowVisible() )
 		{
 			CPaintDC l_paintDC( this );
+			l_paintDC.SetBkMode( TRANSPARENT );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			Draw();
@@ -506,20 +504,9 @@ namespace Joker
 	{
 		BaseType::OnSize( type, cx, cy );
 
-		if ( m_pHwndRenderTarget )
+		if ( m_pRenderTarget )
 		{
-			SafeRelease( m_pBmpRenderTarget );
-			m_pHwndRenderTarget->Resize( GL2D::SizeU( cx, cy ) );
-
-			if ( m_pHwndRenderTarget->CreateCompatibleRenderTarget( & m_pBmpRenderTarget ) == S_OK )
-			{
-				m_pRenderTarget = m_pBmpRenderTarget;
-			}
-			else
-			{
-				ASSERT( FALSE );
-				m_pRenderTarget = m_pHwndRenderTarget;
-			}
+			m_pRenderTarget->Resize( GL2D::SizeU( cx, cy ) );
 		}
 
 		m_bReinitBackground = true;

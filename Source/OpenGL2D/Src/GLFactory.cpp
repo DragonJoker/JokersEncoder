@@ -25,7 +25,7 @@ namespace GL2D
 		return hr;
 	}
 
-	void CComFactory::GetDesktopDpi( float *dpiX, float *dpiY )
+	void CComFactory::GetDesktopDpi( float * dpiX, float * dpiY )
 	{
 		HDC screen = GetDC( 0 );
 
@@ -36,7 +36,7 @@ namespace GL2D
 		}
 	}
 
-	STDMETHODIMP CComFactory::CreateRectangleGeometry( const GL2D_RECT_F *rectangle, IGL2DRectangleGeometry **rectangleGeometry )
+	STDMETHODIMP CComFactory::CreateRectangleGeometry( const GL2D_RECT_F * rectangle, IGL2DRectangleGeometry ** rectangleGeometry )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -49,7 +49,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateRoundedRectangleGeometry( const GL2D_ROUNDED_RECT *roundedRectangle, IGL2DRoundedRectangleGeometry **roundedRectangleGeometry )
+	STDMETHODIMP CComFactory::CreateRoundedRectangleGeometry( const GL2D_ROUNDED_RECT * roundedRectangle, IGL2DRoundedRectangleGeometry ** roundedRectangleGeometry )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -62,7 +62,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateEllipseGeometry( const GL2D_ELLIPSE *ellipse, IGL2DEllipseGeometry **ellipseGeometry )
+	STDMETHODIMP CComFactory::CreateEllipseGeometry( const GL2D_ELLIPSE * ellipse, IGL2DEllipseGeometry ** ellipseGeometry )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -75,7 +75,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateGeometryGroup( GL2D_FILL_MODE fillMode, IGL2DGeometry **geometries, uint32_t geometriesCount, IGL2DGeometryGroup **geometryGroup )
+	STDMETHODIMP CComFactory::CreateGeometryGroup( GL2D_FILL_MODE fillMode, IGL2DGeometry ** geometries, uint32_t geometriesCount, IGL2DGeometryGroup ** geometryGroup )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -88,7 +88,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateTransformedGeometry( IGL2DGeometry *sourceGeometry, const GL2D_MATRIX_3X2_F *transform, IGL2DTransformedGeometry **transformedGeometry )
+	STDMETHODIMP CComFactory::CreateTransformedGeometry( IGL2DGeometry * sourceGeometry, const GL2D_MATRIX_3X2_F * transform, IGL2DTransformedGeometry ** transformedGeometry )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -101,7 +101,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreatePathGeometry( IGL2DPathGeometry **pathGeometry )
+	STDMETHODIMP CComFactory::CreatePathGeometry( IGL2DPathGeometry ** pathGeometry )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -114,7 +114,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateStrokeStyle( const GL2D_STROKE_STYLE_PROPERTIES *strokeStyleProperties, const float *dashes, uint32_t dashesCount, IGL2DStrokeStyle **strokeStyle )
+	STDMETHODIMP CComFactory::CreateStrokeStyle( const GL2D_STROKE_STYLE_PROPERTIES * strokeStyleProperties, const float * dashes, uint32_t dashesCount, IGL2DStrokeStyle ** strokeStyle )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -127,7 +127,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateDrawingStateBlock( const GL2D_DRAWING_STATE_DESCRIPTION *drawingStateDescription, IDWriteRenderingParams *textRenderingParams, IGL2DDrawingStateBlock **drawingStateBlock )
+	STDMETHODIMP CComFactory::CreateDrawingStateBlock( const GL2D_DRAWING_STATE_DESCRIPTION * drawingStateDescription, IDWriteRenderingParams * textRenderingParams, IGL2DDrawingStateBlock ** drawingStateBlock )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -140,7 +140,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateWicBitmapRenderTarget( IWICBitmap *target, const GL2D_RENDER_TARGET_PROPERTIES *renderTargetProperties, IGL2DRenderTarget **renderTarget )
+	STDMETHODIMP CComFactory::CreateWicBitmapRenderTarget( IWICBitmap * target, const GL2D_RENDER_TARGET_PROPERTIES * renderTargetProperties, IGL2DRenderTarget ** renderTarget )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -152,7 +152,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateHwndRenderTarget( const GL2D_RENDER_TARGET_PROPERTIES *renderTargetProperties, const GL2D_HWND_RENDER_TARGET_PROPERTIES *hwndRenderTargetProperties, IGL2DHwndRenderTarget **hwndRenderTarget )
+	STDMETHODIMP CComFactory::CreateHwndRenderTarget( const GL2D_RENDER_TARGET_PROPERTIES * renderTargetProperties, const GL2D_HWND_RENDER_TARGET_PROPERTIES * hwndRenderTargetProperties, IGL2DHwndRenderTarget ** hwndRenderTarget )
 	{
 		HRESULT hr = E_POINTER;
 
@@ -165,10 +165,6 @@ namespace GL2D
 			{
 				std::shared_ptr< CContext > context = rt->GetContext();
 				context->MakeCurrent( context->GetDC() );
-				hr = rt->GetFrameBuffer()->Create(
-					std::bind( &CContext::GenFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 ),
-					std::bind( &CContext::DeleteFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 )
-					);
 				rt->Resize( &hwndRenderTargetProperties->pixelSize );
 				context->EndCurrent( context->GetDC() );
 				*hwndRenderTarget = rt;
@@ -178,12 +174,16 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateDxgiSurfaceRenderTarget( IDXGISurface *dxgiSurface, const GL2D_RENDER_TARGET_PROPERTIES *renderTargetProperties, IGL2DRenderTarget **renderTarget )
+	STDMETHODIMP CComFactory::CreateDxgiSurfaceRenderTarget( IDXGISurface * dxgiSurface, const GL2D_RENDER_TARGET_PROPERTIES * renderTargetProperties, IGL2DRenderTarget ** renderTarget )
 	{
 		HRESULT hr = E_POINTER;
 
 		if ( renderTarget )
 		{
+			//hr = rt->GetFrameBuffer()->Create(
+			//	std::bind( &CContext::GenFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 ),
+			//	std::bind( &CContext::DeleteFramebuffers, rt->GetContext().get(), std::placeholders::_1, std::placeholders::_2 )
+			//	);
 			*renderTarget = NULL;
 			hr = E_NOTIMPL;
 		}
@@ -191,7 +191,7 @@ namespace GL2D
 		return hr;
 	}
 
-	STDMETHODIMP CComFactory::CreateDCRenderTarget( const GL2D_RENDER_TARGET_PROPERTIES *renderTargetProperties, IGL2DDCRenderTarget **dcRenderTarget )
+	STDMETHODIMP CComFactory::CreateDCRenderTarget( const GL2D_RENDER_TARGET_PROPERTIES * renderTargetProperties, IGL2DDCRenderTarget ** dcRenderTarget )
 	{
 		HRESULT hr = E_POINTER;
 

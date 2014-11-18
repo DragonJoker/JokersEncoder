@@ -16,7 +16,7 @@ namespace Joker
 		int iNbLines = 1;
 		int iWordWidth = 0;
 		int iLineWidth = 0;
-		int iLineHeight = int( (iFontHeight + 4) * dRatio );
+		int iLineHeight = int( ( iFontHeight + 4 ) * dRatio );
 		int iTotalHeight = iLineHeight;
 		String strUnformatted = strUnformattedp;
 		StringArray aLines;
@@ -54,16 +54,18 @@ namespace Joker
 
 				if ( iLineWidth + iWordWidth > iMaxWidth * dRatio )
 				{
-					if (  ! strFormatted.empty() )
+					if ( !strFormatted.empty() )
 					{
 						iNbLines++;
 						strFormatted += _T( "\n" );
 					}
+
 					strFormatted += strLine;
 					strLine.clear();
 					iLineWidth = 0;
 					iTotalHeight += iLineHeight;
 				}
+
 				if ( uiFormat & DT_WORDBREAK )
 				{
 					strLine += strWord + _T( ' ' );
@@ -72,16 +74,18 @@ namespace Joker
 				{
 					strLine += strWord;
 				}
+
 				iLineWidth += iWordWidth;
 			}
 
-			if (  ! strLine.empty() )
+			if ( !strLine.empty() )
 			{
-				if (  ! strFormatted.empty() )
+				if ( !strFormatted.empty() )
 				{
 					iNbLines++;
 					strFormatted += _T( "\n" );
 				}
+
 				strFormatted += strLine;
 				strLine.clear();
 			}
@@ -109,7 +113,7 @@ namespace Joker
 	{
 		CRect rcRect( 0, 0, 10000, 10000 );
 
-		if (  ! strText.empty() )
+		if ( !strText.empty() )
 		{
 			DrawText( strText, & rcRect, DT_CALCRECT );
 		}
@@ -134,7 +138,7 @@ namespace Joker
 
 		while ( sizeText.cx > iTmpWidth )
 		{
-			iTmpWidth -= (iMaxWidth / 10 );
+			iTmpWidth -= ( iMaxWidth / 10 );
 			CRect rcRect( CPoint( 0, 0 ), CSize( iTmpWidth, 10000 ) );
 			FormatText( rcRect, iTmpWidth, strText, strTextTmp, cFont, 1.0, 0 );
 			SetFont( cFont );
@@ -158,9 +162,9 @@ namespace Joker
 		SetFont( cFont );
 		DoGetFormattedTextExtent( strText, rcTextRect.Width(), sizeText );
 
-		if (( uiFormat & DT_VCENTER ) != 0 )
+		if ( ( uiFormat & DT_VCENTER ) != 0 )
 		{
-			rcTextRect.top = rcTextRect.top +( rcTextRect.Height() - sizeText.cy ) / 2;
+			rcTextRect.top = rcTextRect.top + ( rcTextRect.Height() - sizeText.cy ) / 2;
 			rcTextRect.bottom = rcTextRect.top + sizeText.cy;
 		}
 
@@ -212,7 +216,7 @@ namespace Joker
 	{
 		CRect rcRect( 0, 0, iMaxWidth, 10000 );
 
-		if (  ! strText.empty() )
+		if ( !strText.empty() )
 		{
 			DrawText( strText, &rcRect, DT_CALCRECT | DT_WORDBREAK );
 		}

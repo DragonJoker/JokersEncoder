@@ -10,7 +10,7 @@ namespace GL2D
 	//
 	// Forward declared IdentityMatrix function to allow matrix class to use
 	// these constructors.
-	// 
+	//
 	COM_DECLSPEC_NOTHROW
 	GL2DFORCEINLINE
 	GL2D_MATRIX_3X2_F
@@ -41,9 +41,9 @@ namespace GL2D
 	float FloatMax()
 	{
 #ifdef FLT_MAX
-			return FLT_MAX;
+		return FLT_MAX;
 #else
-			return 3.402823466e+38F;
+		return 3.402823466e+38F;
 #endif
 	}
 
@@ -57,7 +57,7 @@ namespace GL2D
 	Point2(
 		Type x,
 		Type y
-		)
+	)
 	{
 		typename TypeTraits< Type >::Point point = { x, y };
 
@@ -70,9 +70,9 @@ namespace GL2D
 	Point2F(
 		float x = 0.f,
 		float y = 0.f
-		)
+	)
 	{
-		return Point2< float >(x, y);
+		return Point2< float >( x, y );
 	}
 
 	COM_DECLSPEC_NOTHROW
@@ -81,9 +81,9 @@ namespace GL2D
 	Point2U(
 		uint32_t x = 0,
 		uint32_t y = 0
-		)
+	)
 	{
-		return Point2< uint32_t >(x, y);
+		return Point2< uint32_t >( x, y );
 	}
 
 	template< typename Type >
@@ -93,7 +93,7 @@ namespace GL2D
 	Size(
 		Type width,
 		Type height
-		)
+	)
 	{
 		typename TypeTraits< Type >::Size size = { width, height };
 
@@ -106,9 +106,9 @@ namespace GL2D
 	SizeF(
 		float width = 0.f,
 		float height = 0.f
-		)
+	)
 	{
-		return Size< float >(width, height);
+		return Size< float >( width, height );
 	}
 
 	COM_DECLSPEC_NOTHROW
@@ -117,9 +117,9 @@ namespace GL2D
 	SizeU(
 		uint32_t width = 0,
 		uint32_t height = 0
-		)
+	)
 	{
-		return Size< uint32_t >(width, height);
+		return Size< uint32_t >( width, height );
 	}
 
 	template< typename Type >
@@ -131,7 +131,7 @@ namespace GL2D
 		Type top,
 		Type right,
 		Type bottom
-		)
+	)
 	{
 		typename TypeTraits< Type >::Rect rect = { left, top, right, bottom };
 
@@ -146,9 +146,9 @@ namespace GL2D
 		float top = 0.f,
 		float right = 0.f,
 		float bottom = 0.f
-		)
+	)
 	{
-		return Rect< float >(left, top, right, bottom);
+		return Rect< float >( left, top, right, bottom );
 	}
 
 	COM_DECLSPEC_NOTHROW
@@ -159,9 +159,9 @@ namespace GL2D
 		uint32_t top = 0,
 		uint32_t right = 0,
 		uint32_t bottom = 0
-		)
+	)
 	{
-		return Rect< uint32_t >(left, top, right, bottom);
+		return Rect< uint32_t >( left, top, right, bottom );
 	}
 
 	COM_DECLSPEC_NOTHROW
@@ -178,12 +178,12 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_ARC_SEGMENT
 	ArcSegment(
-		const GL2D_POINT_2F &point,
-		const GL2D_SIZE_F &size,
+		const GL2D_POINT_2F & point,
+		const GL2D_SIZE_F & size,
 		float rotationAngle,
 		GL2D_SWEEP_DIRECTION sweepDirection,
 		GL2D_ARC_SIZE arcSize
-		)
+	)
 	{
 		GL2D_ARC_SEGMENT arcSegment = { point, size, rotationAngle, sweepDirection, arcSize };
 
@@ -194,10 +194,10 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_BEZIER_SEGMENT
 	BezierSegment(
-		const GL2D_POINT_2F &point1,
-		const GL2D_POINT_2F &point2,
-		const GL2D_POINT_2F &point3
-		)
+		const GL2D_POINT_2F & point1,
+		const GL2D_POINT_2F & point2,
+		const GL2D_POINT_2F & point3
+	)
 	{
 		GL2D_BEZIER_SEGMENT bezierSegment = { point1, point2, point3 };
 
@@ -208,10 +208,10 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_ELLIPSE
 	Ellipse(
-		const GL2D_POINT_2F &center,
+		const GL2D_POINT_2F & center,
 		float radiusX,
 		float radiusY
-		)
+	)
 	{
 		GL2D_ELLIPSE ellipse;
 
@@ -226,10 +226,10 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_ROUNDED_RECT
 	RoundedRect(
-		const GL2D_RECT_F &rect,
+		const GL2D_RECT_F & rect,
 		float radiusX,
 		float radiusY
-		)
+	)
 	{
 		GL2D_ROUNDED_RECT roundedRect;
 
@@ -245,8 +245,8 @@ namespace GL2D
 	GL2D_BRUSH_PROPERTIES
 	BrushProperties(
 		float opacity = 1.0,
-		const GL2D_MATRIX_3X2_F &transform = GL2D::IdentityMatrix()
-		)
+		const GL2D_MATRIX_3X2_F & transform = GL2D::IdentityMatrix()
+	)
 	{
 		GL2D_BRUSH_PROPERTIES brushProperties;
 
@@ -261,8 +261,8 @@ namespace GL2D
 	GL2D_GRADIENT_STOP
 	GradientStop(
 		float position,
-		const GL2D_COLOR_F &color
-		)
+		const GL2D_COLOR_F & color
+	)
 	{
 		GL2D_GRADIENT_STOP gradientStop = { position, color };
 
@@ -273,9 +273,9 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_QUADRATIC_BEZIER_SEGMENT
 	QuadraticBezierSegment(
-		const GL2D_POINT_2F &point1,
-		const GL2D_POINT_2F &point2
-		)
+		const GL2D_POINT_2F & point1,
+		const GL2D_POINT_2F & point2
+	)
 	{
 		GL2D_QUADRATIC_BEZIER_SEGMENT quadraticBezier = { point1, point2 };
 
@@ -293,7 +293,7 @@ namespace GL2D
 		float miterLimit = 10.0f,
 		GL2D_DASH_STYLE dashStyle = GL2D_DASH_STYLE_SOLID,
 		float dashOffset = 0.0f
-		)
+	)
 	{
 		GL2D_STROKE_STYLE_PROPERTIES strokeStyleProperties;
 
@@ -315,7 +315,7 @@ namespace GL2D
 		GL2D_EXTEND_MODE extendModeX = GL2D_EXTEND_MODE_CLAMP,
 		GL2D_EXTEND_MODE extendModeY = GL2D_EXTEND_MODE_CLAMP,
 		GL2D_BITMAP_INTERPOLATION_MODE interpolationMode = GL2D_BITMAP_INTERPOLATION_MODE_LINEAR
-		)
+	)
 	{
 		GL2D_BITMAP_BRUSH_PROPERTIES bitmapBrushProperties;
 
@@ -330,9 +330,9 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_LINEAR_GRADIENT_BRUSH_PROPERTIES
 	LinearGradientBrushProperties(
-		const GL2D_POINT_2F &startPoint,
-		const GL2D_POINT_2F &endPoint
-		)
+		const GL2D_POINT_2F & startPoint,
+		const GL2D_POINT_2F & endPoint
+	)
 	{
 		GL2D_LINEAR_GRADIENT_BRUSH_PROPERTIES linearGradientBrushProperties;
 
@@ -346,11 +346,11 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_RADIAL_GRADIENT_BRUSH_PROPERTIES
 	RadialGradientBrushProperties(
-		const GL2D_POINT_2F &center,
-		const GL2D_POINT_2F &gradientOriginOffset,
+		const GL2D_POINT_2F & center,
+		const GL2D_POINT_2F & gradientOriginOffset,
 		float radiusX,
 		float radiusY
-		)
+	)
 	{
 		GL2D_RADIAL_GRADIENT_BRUSH_PROPERTIES radialGradientBrushProperties;
 
@@ -364,7 +364,7 @@ namespace GL2D
 
 	//
 	// PixelFormat
-	// 
+	//
 	COM_DECLSPEC_NOTHROW
 	GL2DFORCEINLINE
 	GL2D_PIXEL_FORMAT
@@ -372,7 +372,7 @@ namespace GL2D
 		GL2D_GL_FORMAT format = GL2D_GL_FORMAT_RGBA,
 		GL2D_GL_INTERNAL internal = GL2D_GL_INTERNAL_RGBA8,
 		GL2D_GL_TYPE type = GL2D_GL_TYPE_BYTE
-		)
+	)
 	{
 		GL2D_PIXEL_FORMAT pixelFormat;
 
@@ -385,15 +385,15 @@ namespace GL2D
 
 	//
 	// Bitmaps
-	// 
+	//
 	COM_DECLSPEC_NOTHROW
 	GL2DFORCEINLINE
 	GL2D_BITMAP_PROPERTIES
 	BitmapProperties(
-		const GL2D_PIXEL_FORMAT &pixelFormat = GL2D::PixelFormat(),
+		const GL2D_PIXEL_FORMAT & pixelFormat = GL2D::PixelFormat(),
 		float dpiX = 96.0f,
 		float dpiY = 96.0f
-		)
+	)
 	{
 		GL2D_BITMAP_PROPERTIES bitmapProperties;
 
@@ -406,18 +406,18 @@ namespace GL2D
 
 	//
 	// Render Targets
-	// 
+	//
 	COM_DECLSPEC_NOTHROW
 	GL2DFORCEINLINE
 	GL2D_RENDER_TARGET_PROPERTIES
 	RenderTargetProperties(
 		GL2D_RENDER_TARGET_TYPE type =  GL2D_RENDER_TARGET_TYPE_DEFAULT,
-		const GL2D_PIXEL_FORMAT &pixelFormat = GL2D::PixelFormat(),
+		const GL2D_PIXEL_FORMAT & pixelFormat = GL2D::PixelFormat(),
 		float dpiX = 0.0,
 		float dpiY = 0.0,
 		GL2D_RENDER_TARGET_USAGE usage = GL2D_RENDER_TARGET_USAGE_NONE,
 		GL2D_FEATURE_LEVEL  minLevel = GL2D_FEATURE_LEVEL_DEFAULT
-		)
+	)
 	{
 		GL2D_RENDER_TARGET_PROPERTIES renderTargetProperties;
 
@@ -438,7 +438,7 @@ namespace GL2D
 		HWND hwnd,
 		GL2D_SIZE_U pixelSize = GL2D::Size( static_cast< uint32_t >( 0 ), static_cast< uint32_t >( 0 ) ),
 		GL2D_PRESENT_OPTIONS presentOptions = GL2D_PRESENT_OPTIONS_NONE
-		)
+	)
 	{
 		GL2D_HWND_RENDER_TARGET_PROPERTIES hwndRenderTargetProperties;
 
@@ -453,14 +453,14 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_LAYER_PARAMETERS
 	LayerParameters(
-		const GL2D_RECT_F &contentBounds = GL2D::InfiniteRect(),
-		IGL2DGeometry *geometricMask = NULL,
+		const GL2D_RECT_F & contentBounds = GL2D::InfiniteRect(),
+		IGL2DGeometry * geometricMask = NULL,
 		GL2D_ANTIALIAS_MODE maskAntialiasMode = GL2D_ANTIALIAS_MODE_PER_PRIMITIVE,
 		GL2D_MATRIX_3X2_F maskTransform = GL2D::IdentityMatrix(),
 		float opacity = 1.0,
-		IGL2DBrush *opacityBrush = NULL,
+		IGL2DBrush * opacityBrush = NULL,
 		GL2D_LAYER_OPTIONS layerOptions = GL2D_LAYER_OPTIONS_NONE
-		)
+	)
 	{
 		GL2D_LAYER_PARAMETERS layerParameters = { 0 };
 
@@ -483,8 +483,8 @@ namespace GL2D
 		GL2D_TEXT_ANTIALIAS_MODE textAntialiasMode = GL2D_TEXT_ANTIALIAS_MODE_DEFAULT,
 		GL2D_TAG tag1 = 0,
 		GL2D_TAG tag2 = 0,
-		const GL2D_MATRIX_3X2_F &transform = GL2D::IdentityMatrix()
-		)
+		const GL2D_MATRIX_3X2_F & transform = GL2D::IdentityMatrix()
+	)
 	{
 		GL2D_DRAWING_STATE_DESCRIPTION drawingStateDescription;
 
@@ -651,15 +651,15 @@ namespace GL2D
 		//
 		// Construct a color, note that the alpha value from the "rgb" component
 		// is never used.
-		// 
+		//
 		COM_DECLSPEC_NOTHROW
 		GL2DFORCEINLINE
 		ColorF(
 			uint32_t rgb,
 			float a = 1.0
-			)
+		)
 		{
-			Init(rgb, a);
+			Init( rgb, a );
 		}
 
 		COM_DECLSPEC_NOTHROW
@@ -667,9 +667,9 @@ namespace GL2D
 		ColorF(
 			Enum knownColor,
 			float a = 1.0
-			)
+		)
 		{
-			Init(knownColor, a);
+			Init( knownColor, a );
 		}
 
 		COM_DECLSPEC_NOTHROW
@@ -679,7 +679,7 @@ namespace GL2D
 			float g,
 			float b,
 			float a = 1.0
-			)
+		)
 		{
 			this->r = r;
 			this->g = g;
@@ -695,11 +695,11 @@ namespace GL2D
 		Init(
 			uint32_t rgb,
 			float a
-			)
+		)
 		{
-			this->r = static_cast<float>((rgb & sc_redMask) >> sc_redShift) / 255.f;
-			this->g = static_cast<float>((rgb & sc_greenMask) >> sc_greenShift) / 255.f;
-			this->b = static_cast<float>((rgb & sc_blueMask) >> sc_blueShift) / 255.f;
+			this->r = static_cast<float>( ( rgb & sc_redMask ) >> sc_redShift ) / 255.f;
+			this->g = static_cast<float>( ( rgb & sc_greenMask ) >> sc_greenShift ) / 255.f;
+			this->b = static_cast<float>( ( rgb & sc_blueMask ) >> sc_blueShift ) / 255.f;
 			this->a = a;
 		}
 
@@ -725,7 +725,7 @@ namespace GL2D
 			float _22,
 			float _31,
 			float _32
-			)
+		)
 		{
 			this->_11 = _11;
 			this->_12 = _12;
@@ -737,11 +737,11 @@ namespace GL2D
 
 		//
 		// Creates an identity matrix
-		// 
+		//
 		COM_DECLSPEC_NOTHROW
 		GL2DFORCEINLINE
 		Matrix3x2F(
-			)
+		)
 		{
 		}
 
@@ -772,13 +772,16 @@ namespace GL2D
 		Matrix3x2F
 		Translation(
 			GL2D_SIZE_F size
-			)
+		)
 		{
 			Matrix3x2F translation;
 
-			translation._11 = 1.0; translation._12 = 0.0;
-			translation._21 = 0.0; translation._22 = 1.0;
-			translation._31 = size.width; translation._32 = size.height;
+			translation._11 = 1.0;
+			translation._12 = 0.0;
+			translation._21 = 0.0;
+			translation._22 = 1.0;
+			translation._31 = size.width;
+			translation._32 = size.height;
 
 			return translation;
 		}
@@ -790,9 +793,9 @@ namespace GL2D
 		Translation(
 			float x,
 			float y
-			)
+		)
 		{
-			return Translation(SizeF(x, y));
+			return Translation( SizeF( x, y ) );
 		}
 
 
@@ -803,12 +806,14 @@ namespace GL2D
 		Scale(
 			GL2D_SIZE_F size,
 			GL2D_POINT_2F center = GL2D::Point2F()
-			)
+		)
 		{
 			Matrix3x2F scale;
 
-			scale._11 = size.width; scale._12 = 0.0;
-			scale._21 = 0.0; scale._22 = size.height;
+			scale._11 = size.width;
+			scale._12 = 0.0;
+			scale._21 = 0.0;
+			scale._22 = size.height;
 			scale._31 = center.x - size.width * center.x;
 			scale._32 = center.y - size.height * center.y;
 
@@ -823,9 +828,9 @@ namespace GL2D
 			float x,
 			float y,
 			GL2D_POINT_2F center = GL2D::Point2F()
-			)
+		)
 		{
-			return Scale(SizeF(x, y), center);
+			return Scale( SizeF( x, y ), center );
 		}
 
 		static
@@ -835,11 +840,11 @@ namespace GL2D
 		Rotation(
 			float angle,
 			GL2D_POINT_2F center = GL2D::Point2F()
-			)
+		)
 		{
 			Matrix3x2F rotation;
 
-			GL2DMakeRotateMatrix(angle, center, &rotation);
+			GL2DMakeRotateMatrix( angle, center, &rotation );
 
 			return rotation;
 		}
@@ -852,11 +857,11 @@ namespace GL2D
 			float angleX,
 			float angleY,
 			GL2D_POINT_2F center = GL2D::Point2F()
-			)
+		)
 		{
 			Matrix3x2F skew;
 
-			GL2DMakeSkewMatrix(angleX, angleY, center, &skew);
+			GL2DMakeSkewMatrix( angleX, angleY, center, &skew );
 
 			return skew;
 		}
@@ -868,19 +873,19 @@ namespace GL2D
 		static
 		COM_DECLSPEC_NOTHROW
 		inline
-		const Matrix3x2F*
-		ReinterpretBaseType(const GL2D_MATRIX_3X2_F *pMatrix)
+		const Matrix3x2F *
+		ReinterpretBaseType( const GL2D_MATRIX_3X2_F * pMatrix )
 		{
-			return static_cast<const Matrix3x2F *>(pMatrix);
+			return static_cast<const Matrix3x2F *>( pMatrix );
 		}
 
 		static
 		COM_DECLSPEC_NOTHROW
 		inline
-		Matrix3x2F*
-		ReinterpretBaseType(GL2D_MATRIX_3X2_F *pMatrix)
+		Matrix3x2F *
+		ReinterpretBaseType( GL2D_MATRIX_3X2_F * pMatrix )
 		{
-			return static_cast<Matrix3x2F *>(pMatrix);
+			return static_cast<Matrix3x2F *>( pMatrix );
 		}
 
 		COM_DECLSPEC_NOTHROW
@@ -888,7 +893,7 @@ namespace GL2D
 		float
 		Determinant() const
 		{
-			return (_11 * _22) - (_12 * _21);
+			return ( _11 * _22 ) - ( _12 * _21 );
 		}
 
 		COM_DECLSPEC_NOTHROW
@@ -896,7 +901,7 @@ namespace GL2D
 		bool
 		IsInvertible() const
 		{
-			return !!GL2DIsMatrixInvertible(this);
+			return !!GL2DIsMatrixInvertible( this );
 		}
 
 		COM_DECLSPEC_NOTHROW
@@ -904,7 +909,7 @@ namespace GL2D
 		bool
 		Invert()
 		{
-			return !!GL2DInvertMatrix(this);
+			return !!GL2DInvertMatrix( this );
 		}
 
 		COM_DECLSPEC_NOTHROW
@@ -913,16 +918,16 @@ namespace GL2D
 		IsIdentity() const
 		{
 			return     _11 == 1.f && _12 == 0.f
-					&& _21 == 0.f && _22 == 1.f
-					&& _31 == 0.f && _32 == 0.f;
+					   && _21 == 0.f && _22 == 1.f
+					   && _31 == 0.f && _32 == 0.f;
 		}
 
 		COM_DECLSPEC_NOTHROW
 		inline
 		void SetProduct(
-			const Matrix3x2F &a,
-			const Matrix3x2F &b
-			)
+			const Matrix3x2F & a,
+			const Matrix3x2F & b
+		)
 		{
 			_11 = a._11 * b._11 + a._12 * b._21;
 			_12 = a._11 * b._12 + a._12 * b._22;
@@ -936,12 +941,12 @@ namespace GL2D
 		GL2DFORCEINLINE
 		Matrix3x2F
 		operator*(
-			const Matrix3x2F &matrix
-			) const
+			const Matrix3x2F & matrix
+		) const
 		{
 			Matrix3x2F result;
 
-			result.SetProduct(*this, matrix);
+			result.SetProduct( *this, matrix );
 
 			return result;
 		}
@@ -951,7 +956,7 @@ namespace GL2D
 		GL2D_POINT_2F
 		TransformPoint(
 			GL2D_POINT_2F point
-			) const
+		) const
 		{
 			GL2D_POINT_2F result =
 			{
@@ -967,11 +972,11 @@ namespace GL2D
 	GL2DFORCEINLINE
 	GL2D_POINT_2F
 	operator*(
-		const GL2D_POINT_2F &point,
-		const GL2D_MATRIX_3X2_F &matrix
-		)
+		const GL2D_POINT_2F & point,
+		const GL2D_MATRIX_3X2_F & matrix
+	)
 	{
-		return Matrix3x2F::ReinterpretBaseType(&matrix)->TransformPoint(point);
+		return Matrix3x2F::ReinterpretBaseType( &matrix )->TransformPoint( point );
 	}
 
 	COM_DECLSPEC_NOTHROW
@@ -987,30 +992,30 @@ COM_DECLSPEC_NOTHROW
 GL2DFORCEINLINE
 GL2D_MATRIX_3X2_F
 operator*(
-	const GL2D_MATRIX_3X2_F &matrix1,
-	const GL2D_MATRIX_3X2_F &matrix2
-	)
+	const GL2D_MATRIX_3X2_F & matrix1,
+	const GL2D_MATRIX_3X2_F & matrix2
+)
 {
 	return
-		(*GL2D::Matrix3x2F::ReinterpretBaseType(&matrix1)) *
-		(*GL2D::Matrix3x2F::ReinterpretBaseType(&matrix2));
+		( *GL2D::Matrix3x2F::ReinterpretBaseType( &matrix1 ) ) *
+		( *GL2D::Matrix3x2F::ReinterpretBaseType( &matrix2 ) );
 }
 
 COM_DECLSPEC_NOTHROW
 inline
 bool
-operator==(const GL2D_SIZE_U &size1, const GL2D_SIZE_U &size2)
+operator==( const GL2D_SIZE_U & size1, const GL2D_SIZE_U & size2 )
 {
-	return (size1.width == size2.width) && (size1.height == size2.height);
+	return ( size1.width == size2.width ) && ( size1.height == size2.height );
 }
 
 COM_DECLSPEC_NOTHROW
 inline
 bool
-operator==(const GL2D_RECT_U &rect1, const GL2D_RECT_U &rect2)
+operator==( const GL2D_RECT_U & rect1, const GL2D_RECT_U & rect2 )
 {
-	return (rect1.left  == rect2.left)  && (rect1.top     == rect2.top) &&
-			(rect1.right == rect2.right) && (rect1.bottom  == rect2.bottom);
+	return ( rect1.left  == rect2.left )  && ( rect1.top     == rect2.top ) &&
+		   ( rect1.right == rect2.right ) && ( rect1.bottom  == rect2.bottom );
 }
 
 #endif // #ifndef _GL2D_HELPER_H_

@@ -23,7 +23,7 @@ namespace Joker
 		 *\param[in]	bUnderlined	Dit si la police est soulignée
 		 *\param[in]	dRatio		Le ratio d'affichage
 		 */
-		CFont( LPCTSTR szFace=_T( "Arial" ), int iHeight=20, int iWeight=FW_NORMAL, BOOL bItalic=FALSE, BOOL bUnderlined=FALSE, double dRatio=1 );
+		CFont( LPCTSTR szFace = _T( "Arial" ), int iHeight = 20, int iWeight = FW_NORMAL, BOOL bItalic = FALSE, BOOL bUnderlined = FALSE, double dRatio = 1 );
 		/**
 		 *\brief		Constructeur par copie
 		 *\param[in]	font	La police à copier
@@ -63,7 +63,7 @@ namespace Joker
 		 *\param[in]	bUnderlined	Dit si la police est soulignée
 		 *\param[in]	dRatio		Le ratio d'affichage
 		 */
-		void Load( LPCTSTR szFace=_T( "Arial" ), int iHeight=20, int iWeight=FW_NORMAL, BOOL bItalic=FALSE, BOOL bUnderlined=FALSE, double dRatio=1 );
+		void Load( LPCTSTR szFace = _T( "Arial" ), int iHeight = 20, int iWeight = FW_NORMAL, BOOL bItalic = FALSE, BOOL bUnderlined = FALSE, double dRatio = 1 );
 		/**
 		 *\brief		Définit cette police comme police courante du DC donné
 		 *\param[in]	hDC	Le DC pour lequel cette police devient la courant
@@ -85,58 +85,92 @@ namespace Joker
 		operator HFONT();
 		/**
 		 *\brief		Récupère la hauteur de la police
-		 *\return		La hauteur de la police 
+		 *\return		La hauteur de la police
 		 */
-		inline int		GetHeight		(			)const	{ return m_lfLogFont.lfHeight;					}
+		inline int		GetHeight(	)const
+		{
+			return m_lfLogFont.lfHeight;
+		}
 		/**
 		 *\brief		Récupère si la police est en italique
 		 *\return		\p FALSE si pas italique
 		 */
-		inline BOOL		IsItalic		(			)const	{ return m_lfLogFont.lfItalic;					}
+		inline BOOL		IsItalic(	)const
+		{
+			return m_lfLogFont.lfItalic;
+		}
 		/**
 		 *\brief		Récupère si la police est soulignée
 		 *\return		\p FALSE si pas soulignée
 		 */
-		inline BOOL		IsUnderlined	(			)const	{ return m_lfLogFont.lfUnderline;				}
+		inline BOOL		IsUnderlined(	)const
+		{
+			return m_lfLogFont.lfUnderline;
+		}
 		/**
 		 *\brief		Récupère le poids de la police
-		 *\return		Le poids de la police 
+		 *\return		Le poids de la police
 		 */
-		inline int		GetWeight		(			)const	{ return m_lfLogFont.lfWeight;					}
+		inline int		GetWeight(	)const
+		{
+			return m_lfLogFont.lfWeight;
+		}
 		/**
 		 *\brief		Récupère le nom de la police
-		 *\return		Le nom de la police 
+		 *\return		Le nom de la police
 		 */
-		inline String	GetFaceName		(			)const	{ return m_lfLogFont.lfFaceName;				}
+		inline String	GetFaceName(	)const
+		{
+			return m_lfLogFont.lfFaceName;
+		}
 		/**
 		 *\brief		Définit la hauteur de la police
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	iVal	La nouvelle valeur
 		 */
-		inline void		SetHeight		( int iVal	)		{ m_lfLogFont.lfHeight = iVal;DoCreate();		}
+		inline void		SetHeight( int iVal	)
+		{
+			m_lfLogFont.lfHeight = iVal;
+			DoCreate();
+		}
 		/**
 		 *\brief		Définit le poids de la police
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	iVal	La nouvelle valeur
 		 */
-		inline void		SetWeight		( int iVal	)		{ m_lfLogFont.lfWeight = iVal;DoCreate();		}
+		inline void		SetWeight( int iVal	)
+		{
+			m_lfLogFont.lfWeight = iVal;
+			DoCreate();
+		}
 		/**
 		 *\brief		Définit si la police est italique
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	bVal	La nouvelle valeur
 		 */
-		inline void		SetItalic		( BOOL bVal	)		{ m_lfLogFont.lfItalic = BYTE( bVal );DoCreate();		}
+		inline void		SetItalic( BOOL bVal	)
+		{
+			m_lfLogFont.lfItalic = BYTE( bVal );
+			DoCreate();
+		}
 		/**
 		 *\brief		Définit si la police est soulignée
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	bVal	La nouvelle valeur
 		 */
-		inline void		SetUnderlined	( BOOL bVal	)		{ m_lfLogFont.lfUnderline = BYTE( bVal );DoCreate();	}
+		inline void		SetUnderlined( BOOL bVal	)
+		{
+			m_lfLogFont.lfUnderline = BYTE( bVal );
+			DoCreate();
+		}
 		/**
 		 *\brief		Dit si la police est chargée
 		 *\return		\p FALSE si la police n'est pas initialisée
 		 */
-		inline BOOL		IsLoaded	()		{ return m_hFont != NULL ? TRUE : FALSE;	}
+		inline BOOL		IsLoaded()
+		{
+			return m_hFont != NULL ? TRUE : FALSE;
+		}
 
 	protected:
 		void DoDelete();

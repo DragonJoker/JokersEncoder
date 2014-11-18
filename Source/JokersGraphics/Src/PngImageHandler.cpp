@@ -14,11 +14,12 @@ namespace Joker
 	void Joker::CPngImageHandler::Load( CImage & p_image, String const & p_csFile )
 	{
 		std::basic_fstream< CString::XCHAR > l_file( p_image.GetFilePath(), std::ios_base::in | std::ios_base::binary );
+
 		if ( l_file )
 		{
 			long long llSize = p_image.GetSize();
 			HGLOBAL hImg = ::GlobalAlloc( GHND, SIZE_T( llSize ) );
-			BYTE * pbyImg =( BYTE* )::GlobalLock( hImg );
+			BYTE * pbyImg = ( BYTE * )::GlobalLock( hImg );
 			l_file.read( ( CString::XCHAR * ) pbyImg, llSize / sizeof( CString::XCHAR ) );
 			LoadPNGFromHGlobal( hImg, llSize, p_image );
 			::GlobalFree( hImg );
@@ -29,14 +30,15 @@ namespace Joker
 	{
 		HINSTANCE hResourceModule = ::AfxGetResourceHandle();
 		HRSRC hRes = ::FindResource( hResourceModule, MAKEINTRESOURCE( p_image.GetResourceId() ), _T( "PNG" ) );
+
 		if ( hRes != NULL )
 		{
 			unsigned long ulSizeResource = ::SizeofResource( hResourceModule, hRes );
 			HGLOBAL hMem = ::LoadResource( hResourceModule, hRes );
 
-			BYTE * pbyRes =( BYTE* )::LockResource( hMem );
+			BYTE * pbyRes = ( BYTE * )::LockResource( hMem );
 			HGLOBAL hImg = ::GlobalAlloc( GHND, ulSizeResource );
-			BYTE * pbyImg =( BYTE* )::GlobalLock( hImg );
+			BYTE * pbyImg = ( BYTE * )::GlobalLock( hImg );
 			memcpy_s( pbyImg, ulSizeResource, pbyRes, ulSizeResource );
 			::GlobalUnlock( pbyImg );
 			LoadPNGFromHGlobal( hImg, ulSizeResource, p_image );
@@ -59,9 +61,9 @@ namespace Joker
 
 				if ( ucAlpha < 255 )
 				{
-					pCol[0] =( (pCol[0] * ucAlpha ) + 127 ) / 255;
-					pCol[1] =( (pCol[1] * ucAlpha ) + 127 ) / 255;
-					pCol[2] =( (pCol[2] * ucAlpha ) + 127 ) / 255;
+					pCol[0] = ( ( pCol[0] * ucAlpha ) + 127 ) / 255;
+					pCol[1] = ( ( pCol[1] * ucAlpha ) + 127 ) / 255;
+					pCol[2] = ( ( pCol[2] * ucAlpha ) + 127 ) / 255;
 				}
 			}
 		}

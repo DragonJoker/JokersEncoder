@@ -14,7 +14,7 @@ struct GL2D_SIZE
 typedef GL2D_SIZE< uint32_t > GL2D_SIZE_U;
 typedef GL2D_SIZE< int32_t > GL2D_SIZE_I;
 typedef GL2D_SIZE< float > GL2D_SIZE_F;
-	
+
 template< typename T >
 struct GL2D_POINT2
 {
@@ -25,7 +25,7 @@ struct GL2D_POINT2
 typedef GL2D_POINT2< uint32_t > GL2D_POINT_2U;
 typedef GL2D_POINT2< int32_t > GL2D_POINT_2I;
 typedef GL2D_POINT2< float > GL2D_POINT_2F;
-	
+
 template< typename T >
 struct GL2D_RECT
 {
@@ -51,13 +51,13 @@ struct GL2D_COLOR
 typedef GL2D_COLOR< uint32_t > GL2D_COLOR_U;
 typedef GL2D_COLOR< int32_t > GL2D_COLOR_I;
 typedef GL2D_COLOR< float > GL2D_COLOR_F;
-	
+
 template< typename T >
 struct GL2D_MATRIX_3X2
 {
 	union
 	{
-		struct 
+		struct
 		{
 			T _11, _12;
 			T _21, _22;
@@ -71,13 +71,13 @@ struct GL2D_MATRIX_3X2
 typedef GL2D_MATRIX_3X2< uint32_t > GL2D_MATRIX_3X2_U;
 typedef GL2D_MATRIX_3X2< int32_t > GL2D_MATRIX_3X2_I;
 typedef GL2D_MATRIX_3X2< float > GL2D_MATRIX_3X2_F;
-	
+
 template< typename T >
 struct GL2D_MATRIX_4X3
 {
 	union
 	{
-		struct 
+		struct
 		{
 			T _11, _12, _13;
 			T _21, _22, _23;
@@ -92,13 +92,13 @@ struct GL2D_MATRIX_4X3
 typedef GL2D_MATRIX_4X3< uint32_t > GL2D_MATRIX_4x3_U;
 typedef GL2D_MATRIX_4X3< int32_t > GL2D_MATRIX_4x3_I;
 typedef GL2D_MATRIX_4X3< float > GL2D_MATRIX_4x3_F;
-	
+
 template< typename T >
 struct GL2D_MATRIX_4X4
 {
 	union
 	{
-		struct 
+		struct
 		{
 			T _11, _12, _13, _14;
 			T _21, _22, _23, _24;
@@ -109,13 +109,13 @@ struct GL2D_MATRIX_4X4
 		T m[4][4];
 	};
 };
-	
+
 template< typename T >
 struct GL2D_MATRIX_5X4
 {
 	union
 	{
-		struct 
+		struct
 		{
 			T _11, _12, _13, _14;
 			T _21, _22, _23, _24;

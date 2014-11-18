@@ -13,20 +13,20 @@ static char THIS_FILE[] = __FILE__;
 namespace Joker
 {
 	CAlphaLBItem::CAlphaLBItem( CColour const & clMaskColour, CColour const & clText, bool bHasLine, CColour const & clLineColour, int iLineStyle )
-		:	m_brushMask		( clMaskColour )
-		,	m_clLine		( clLineColour )
-		,	m_clText		( clText )
-		,	m_bHasLine		( bHasLine )
-		,	m_iLineStyle	( iLineStyle )
+		:	m_brushMask( clMaskColour )
+		,	m_clLine( clLineColour )
+		,	m_clText( clText )
+		,	m_bHasLine( bHasLine )
+		,	m_iLineStyle( iLineStyle )
 	{
 	}
 
 	CAlphaLBItem::CAlphaLBItem( CAlphaLBItem const & item )
-		:	m_brushMask		( item.m_brushMask )
-		,	m_clLine		( item.m_clLine )
-		,	m_clText		( item.m_clText )
-		,	m_bHasLine		( item.m_bHasLine )
-		,	m_iLineStyle	( item.m_iLineStyle )
+		:	m_brushMask( item.m_brushMask )
+		,	m_clLine( item.m_clLine )
+		,	m_clText( item.m_clText )
+		,	m_bHasLine( item.m_bHasLine )
+		,	m_iLineStyle( item.m_iLineStyle )
 	{
 	}
 
@@ -53,16 +53,16 @@ namespace Joker
 	//*************************************************************************************************
 
 	CTransparentListBox::CTransparentListBox()
-		:	m_sItemHeight		( 18	 )
-		,	m_iFocusedItem		( -1	 )
-		,	m_clFocusBorder		( CColour( CColour::FullAlphaGrey ) )
-		,	m_iFocusBorderStyle	( PS_DOT )
-		,	m_brushMouse		( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ), 64 ) )
-		,	m_clMouseLine		( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ) ) )
-		,	m_iMouseLineStyle	( PS_SOLID )
+		:	m_sItemHeight( 18 )
+		,	m_iFocusedItem( -1 )
+		,	m_clFocusBorder( CColour( CColour::FullAlphaGrey ) )
+		,	m_iFocusBorderStyle( PS_DOT )
+		,	m_brushMouse( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ), 64 ) )
+		,	m_clMouseLine( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ) ) )
+		,	m_iMouseLineStyle( PS_SOLID )
 	{
 		m_itemColours[eLB_ITEM_STATUS_NORMAL] = CAlphaLBItem( CColour( CColour::Transparent ), CColour::FromCOLORREF( ::GetSysColor( COLOR_CAPTIONTEXT ), 255 ) );
-		m_itemColours[eLB_ITEM_STATUS_SELECTED] = CAlphaLBItem( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ), 127 ),	CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHTTEXT  ), 255 ) );
+		m_itemColours[eLB_ITEM_STATUS_SELECTED] = CAlphaLBItem( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ), 127 ),	CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHTTEXT ), 255 ) );
 	}
 
 	CTransparentListBox::~CTransparentListBox()
@@ -101,12 +101,12 @@ namespace Joker
 		SCROLLBARINFO sbi = { 0 };
 		sbi.cbSize = sizeof( SCROLLBARINFO );
 		GetScrollBarInfo( OBJID_VSCROLL, & sbi );
-		rcRect.right +=( sbi.rcScrollBar.right - sbi.rcScrollBar.left );
+		rcRect.right += ( sbi.rcScrollBar.right - sbi.rcScrollBar.left );
 #endif
 
 		BaseType::DoDrawBackground( rcRect );
 
- 		ScrollList();
+		ScrollList();
 
 		// On récupère les items sélectionnés
 		std::vector< int > arraySelected( GetCount(), 0 );
@@ -115,6 +115,7 @@ namespace Joker
 		if ( iCount == LB_ERR )
 		{
 			int iSelected = GetCurSel();
+
 			// Single Selection Listbox
 			if ( iSelected != LB_ERR )
 			{
@@ -168,7 +169,7 @@ namespace Joker
 		SCROLLBARINFO sbi = { 0 };
 		sbi.cbSize = sizeof( SCROLLBARINFO );
 		GetScrollBarInfo( OBJID_VSCROLL, & sbi );
-		rcRect.right +=( sbi.rcScrollBar.right - sbi.rcScrollBar.left );
+		rcRect.right += ( sbi.rcScrollBar.right - sbi.rcScrollBar.left );
 #endif
 
 		BaseType::DoDrawForeground( rcRect );
@@ -194,15 +195,15 @@ namespace Joker
 
 		// On vérifie si l'item courant est sélectionné ou pas
 
-		while ( GL2D_SIZE_I < arraySelected.size() && ! bSelected )
+		while ( GL2D_SIZE_I < arraySelected.size() && !bSelected )
 		{
-			bSelected =( arraySelected[GL2D_SIZE_I] == iItem );
+			bSelected = ( arraySelected[GL2D_SIZE_I] == iItem );
 			GL2D_SIZE_I++;
 		}
 
 		// On définit le statut de l'item courant
 		bFocused = iItem == m_iFocusedItem;
-	
+
 		if ( bSelected )
 		{
 			eStatus = eLB_ITEM_STATUS_SELECTED;
@@ -219,7 +220,7 @@ namespace Joker
 		LOGFONT logFont;
 		GetFont()->GetLogFont( & logFont );
 		DrawSolidText( ( * GetFont() ), logFont, m_itemColours[eStatus].GetTextColour(), csItem, rcRect + CRect( -5, 0, 0, 0 ), DT_SINGLELINE | DT_VCENTER );
-	
+
 		// On dessine le rectangle de contour, si besoin est
 		if ( bFocused && m_bFocused )
 		{
@@ -235,16 +236,16 @@ namespace Joker
 
 	void CTransparentListBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 	{
-		if (( lpDrawItemStruct->itemAction & ODA_FOCUS ) &&( lpDrawItemStruct->itemState & ODS_FOCUS ) )
+		if ( ( lpDrawItemStruct->itemAction & ODA_FOCUS ) && ( lpDrawItemStruct->itemState & ODS_FOCUS ) )
 		{
 			m_iFocusedItem = lpDrawItemStruct->itemID;
 		}
-		else if (( lpDrawItemStruct->itemAction & ODA_FOCUS ) && !( lpDrawItemStruct->itemState & ODS_FOCUS ) ) 
+		else if ( ( lpDrawItemStruct->itemAction & ODA_FOCUS ) && !( lpDrawItemStruct->itemState & ODS_FOCUS ) )
 		{
 			m_iFocusedItem = lpDrawItemStruct->itemID;
 		}
 
-		if ( ! IsPainting() )
+		if ( !IsPainting() )
 		{
 			Invalidate();
 		}

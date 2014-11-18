@@ -82,9 +82,9 @@ namespace Joker
 
 				String strFace		= arrayInfos[0];
 				int iFontHeight		= CStrUtils::ToInt( arrayInfos[1] );
-				int iWeight			= (arrayInfos[2] == _T( "bold" ) ? FW_BOLD : FW_NORMAL);
-				BOOL bItalic		= (arrayInfos[3] == _T( "true" ));
-				BOOL bUnderlined	= (arrayInfos[4] == _T( "true" ));
+				int iWeight			= ( arrayInfos[2] == _T( "bold" ) ? FW_BOLD : FW_NORMAL );
+				BOOL bItalic		= ( arrayInfos[3] == _T( "true" ) );
+				BOOL bUnderlined	= ( arrayInfos[4] == _T( "true" ) );
 
 				pFont = std::make_shared< CFont >( strFace.c_str(), iFontHeight, iWeight, bItalic, bUnderlined );
 				m_mapFonts.insert( std::make_pair( uiIndex, pFont ) );

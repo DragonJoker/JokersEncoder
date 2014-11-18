@@ -14,5 +14,5 @@ namespace Joker
 #if DEF_USING_D2D
 #	include "TransparentCtrlD2D.h"
 #endif
-	
+
 #include "TransparentCtrlGDI.h"

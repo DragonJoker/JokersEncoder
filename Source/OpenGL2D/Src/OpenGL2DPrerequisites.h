@@ -15,7 +15,7 @@ namespace GL2D
 	class CImage;
 	template< typename Object, typename Interface >
 	class CRenderTargetInterface;
-	
+
 	class CComRenderTargetBase;
 	class CComBitmap;
 	class CComStrokeStyle;

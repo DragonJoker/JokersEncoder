@@ -1,7 +1,7 @@
 #pragma once
 
 #define DEF_USING_D2D 1
-#define DEF_USING_OGL 0
+#define DEF_USING_OGL 1
 
 #include <sstream>
 #include <vector>
@@ -55,15 +55,16 @@ namespace Joker
 {
 	class CImage;
 	typedef std::shared_ptr< CImage > ImagePtr;
-	
+
 	class CFont;
 	typedef std::shared_ptr< CFont > FontPtr;
 
 	typedef enum
-	{	eRENDERER_GDI
-	,	eRENDERER_D2D
-	,	eRENDERER_OGL
-	,	eRENDERER_COUNT
+	{
+		eRENDERER_GDI
+		,	eRENDERER_D2D
+		,	eRENDERER_OGL
+		,	eRENDERER_COUNT
 	}	eRENDERER;
 
 	JGRA_API COLORREF MakeRGBA( DWORD dwR, DWORD dwG, DWORD dwB, DWORD dwA );
@@ -79,7 +80,7 @@ namespace Joker
 	JGRA_API int GetB( COLORREF crColour );
 	JGRA_API int GetA( COLORREF crColour );
 
-	#define GetAValue( argb ) ( LOBYTE( ( argb ) >>24 ) )
+#define GetAValue( argb ) ( LOBYTE( ( argb ) >>24 ) )
 
 	template< class T >
 	inline void SafeRelease( T *& pPointer, bool bDelete = true )

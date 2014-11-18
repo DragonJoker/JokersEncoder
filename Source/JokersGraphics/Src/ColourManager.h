@@ -32,7 +32,7 @@ namespace Joker
 		/**
 		 *\brief		Supprime les couleurs gérées
 		 */
-		static void DeleteColours	();
+		static void DeleteColours();
 		/**
 		 *\brief		Ajoute une couleur
 		 *\param[in]	uiIndex		L'index de la couleur

@@ -12,7 +12,7 @@ namespace Joker
 				m_uiID( uiID )
 		{
 		}
-		virtual ~CResource(){}
+		virtual ~CResource() {}
 
 	public:
 		void Ref()
@@ -32,7 +32,10 @@ namespace Joker
 			return iReturn;
 		}
 
-		inline unsigned int GetId()const { return m_uiID; }
+		inline unsigned int GetId()const
+		{
+			return m_uiID;
+		}
 
 	protected:
 		int m_iRef;				//!< The number of times this resource is used

@@ -10,7 +10,7 @@
 namespace Joker
 {
 #if DEF_USING_D2D
-	ID2D1Factory *		CDrawer< eRENDERER_D2D >:: m_pFactory		= NULL;
+	ID2D1Factory 	*	CDrawer< eRENDERER_D2D >:: m_pFactory		= NULL;
 	IDWriteFactory *	CDrawer< eRENDERER_D2D >:: m_pWriteFactory	= NULL;
 	int					CDrawer< eRENDERER_D2D >:: m_iReferences	= 0;
 
@@ -95,7 +95,7 @@ namespace Joker
 				if ( hr == S_OK )
 				{
 					m_pDcRenderTarget->BeginDraw();
-					m_pDcRenderTarget->DrawBitmap( pBitmap, D2D1::RectF( FLOAT( m_rcRect.left ), FLOAT( m_rcRect.top ), FLOAT( m_rcRect.right ), FLOAT( m_rcRect.bottom ) ) ); 
+					m_pDcRenderTarget->DrawBitmap( pBitmap, D2D1::RectF( FLOAT( m_rcRect.left ), FLOAT( m_rcRect.top ), FLOAT( m_rcRect.right ), FLOAT( m_rcRect.bottom ) ) );
 					m_pDcRenderTarget->EndDraw();
 				}
 			}
@@ -149,7 +149,7 @@ namespace Joker
 		ID2D1Brush * pBrush = DoCreateSolidBrush( cBrushColour );
 		m_pRenderTarget->FillRectangle( D2D1::RectF( float( rcRect.left * dRatio ), float( rcRect.top * dRatio ), float( rcRect.right * dRatio ), float( rcRect.bottom * dRatio ) ), pBrush );
 		SafeRelease( pBrush );
-	
+
 		DrawVoidRect( iPenHeight, cPenColour, rcRect, dRatio );
 	}
 
@@ -162,10 +162,10 @@ namespace Joker
 
 		m_pFactory->CreateStrokeStyle( D2D1::StrokeStyleProperties( D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE, D2D1_LINE_JOIN_MITER, fWidth, D2D1_DASH_STYLE_SOLID, fWidth ), tmp, 2, & pStroke );
 		pBrush = DoCreateSolidBrush( cPenColour );
-		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.left			 ),	FLOAT( dRatio * rcRect.top				 ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth	 ),	FLOAT( dRatio * rcRect.top				 ) ), pBrush, fWidth, pStroke );
-		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth	 ),	FLOAT( dRatio * rcRect.top				 ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth	 ),	FLOAT( dRatio * rcRect.bottom - fWidth	 ) ), pBrush, fWidth, pStroke );
-		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth	 ),	FLOAT( dRatio * rcRect.bottom - fWidth	 ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.left			 ),	FLOAT( dRatio * rcRect.bottom - fWidth	 ) ), pBrush, fWidth, pStroke );
-		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.left			 ),	FLOAT( dRatio * rcRect.bottom - fWidth	 ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.left			 ),	FLOAT( dRatio * rcRect.top				 ) ), pBrush, fWidth, pStroke );
+		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.left ),	FLOAT( dRatio * rcRect.top ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth ),	FLOAT( dRatio * rcRect.top ) ), pBrush, fWidth, pStroke );
+		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth ),	FLOAT( dRatio * rcRect.top ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth ),	FLOAT( dRatio * rcRect.bottom - fWidth ) ), pBrush, fWidth, pStroke );
+		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.right - fWidth ),	FLOAT( dRatio * rcRect.bottom - fWidth ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.left ),	FLOAT( dRatio * rcRect.bottom - fWidth ) ), pBrush, fWidth, pStroke );
+		m_pRenderTarget->DrawLine( D2D1::Point2F( FLOAT( dRatio * rcRect.left ),	FLOAT( dRatio * rcRect.bottom - fWidth ) ), D2D1::Point2F( FLOAT( dRatio * rcRect.left ),	FLOAT( dRatio * rcRect.top ) ), pBrush, fWidth, pStroke );
 
 		SafeRelease( pStroke );
 		SafeRelease( pBrush );
@@ -263,7 +263,7 @@ namespace Joker
 
 	void CDrawer< eRENDERER_D2D >::BitBlt( int xDest, int yDest, int cxDest, int cyDest, CDrawerBase * pDrawer, int xOrigin, int yOrigin, DWORD dwRop )
 	{
-		DoDrawBitmap( *static_cast< CDrawerDC * >( pDrawer ), CRect( CPoint( xDest, yDest ), CSize( cxDest, cyDest ) ), *static_cast< CDrawerDC * >( pDrawer ), CRect( CPoint( xOrigin, yOrigin ), CSize( m_rcRect.Width() - (xOrigin - m_rcRect.left), m_rcRect.Height() - (yOrigin - m_rcRect.top) ) ), dwRop & SRCCOPY );
+		DoDrawBitmap( *static_cast< CDrawerDC * >( pDrawer ), CRect( CPoint( xDest, yDest ), CSize( cxDest, cyDest ) ), *static_cast< CDrawerDC * >( pDrawer ), CRect( CPoint( xOrigin, yOrigin ), CSize( m_rcRect.Width() - ( xOrigin - m_rcRect.left ), m_rcRect.Height() - ( yOrigin - m_rcRect.top ) ) ), dwRop & SRCCOPY );
 	}
 
 	void CDrawer< eRENDERER_D2D >::StretchBlt( int xDest, int yDest, int cxDest, int cyDest, CDrawerBase * pDrawer, int xOrigin, int yOrigin, int cxOrigin, int cyOrigin, DWORD dwRop )
@@ -423,12 +423,12 @@ namespace Joker
 	{
 		HRESULT hr = S_OK;
 
-		if ( ! m_pFactory )
+		if ( !m_pFactory )
 		{
 			hr = D2D1CreateFactory( D2D1_FACTORY_TYPE_SINGLE_THREADED, & m_pFactory );
 		}
 
-		if ( ! m_pWriteFactory && hr == S_OK )
+		if ( !m_pWriteFactory && hr == S_OK )
 		{
 			hr = DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory ), reinterpret_cast< IUnknown ** >( & m_pWriteFactory ) );
 		}
@@ -436,13 +436,13 @@ namespace Joker
 		m_iReferences++;
 
 		D2D1_RENDER_TARGET_PROPERTIES d2d1Props = D2D1::RenderTargetProperties(
-			D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			D2D1::PixelFormat( DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED ),
-			0,
-			0,
-			D2D1_RENDER_TARGET_USAGE_NONE,
-			D2D1_FEATURE_LEVEL_DEFAULT
-			);
+					D2D1_RENDER_TARGET_TYPE_DEFAULT,
+					D2D1::PixelFormat( DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED ),
+					0,
+					0,
+					D2D1_RENDER_TARGET_USAGE_NONE,
+					D2D1_FEATURE_LEVEL_DEFAULT
+				);
 
 		if ( hr == S_OK )
 		{
@@ -452,7 +452,7 @@ namespace Joker
 		{
 			throw std::exception( "Impossible d'initialiser Direct2D" );
 		}
-	
+
 		if ( hr != S_OK )
 		{
 			throw std::exception( "Impossible d'initialiser ID2D1DCRenderTarget" );
@@ -496,6 +496,7 @@ namespace Joker
 	{
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
+
 		// On récupère tout d'abord les infos du HBITMAP (dimensions, bpp, taille en bytes)
 		if ( ::GetDIBits( hDC, hBitmap, 0, 1, NULL, & bmiSrc, DIB_RGB_COLORS ) )
 		{
@@ -505,11 +506,13 @@ namespace Joker
 			arrayBits.resize( bmiSrc.bmiHeader.biSizeImage * 32 / bmiSrc.bmiHeader.biBitCount, 0 );// Ici 32/bmiSrc.bmiHeader.biBitCount pour avoir la taille une fois convertie en 32 bpp (RGB 24 bits + alpha 8 bits)
 
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
+
 			// ON récupère maintenant le contenu de l'image que l'on met dans notre buffer à nous
 			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, & arrayBitsSrc[0], & bmi, DIB_RGB_COLORS ) )
 			{
 				bReturn = true;
 				UINT uiStep = size.cx * 4;
+
 				// Pour Direct2D il faut inverser les lignes
 				for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < size.cy ; ++GL2D_SIZE_I )
 				{
@@ -526,7 +529,7 @@ namespace Joker
 			CLogger::LogLastError( String( _T( "DoGetBitmapInfos - GetDIBits" ) ), false );
 		}
 
-		if ( ! bReturn )
+		if ( !bReturn )
 		{
 			arrayBits.clear();
 			size.cx = 0;
@@ -584,7 +587,7 @@ namespace Joker
 
 		if ( hBrush == ::GetStockObject( HOLLOW_BRUSH ) )
 		{
-			m_pRenderTarget->CreateSolidColorBrush( D2D1::ColorF( 0, 0.0f ), reinterpret_cast< ID2D1SolidColorBrush** >( & pReturn ) );
+			m_pRenderTarget->CreateSolidColorBrush( D2D1::ColorF( 0, 0.0f ), reinterpret_cast< ID2D1SolidColorBrush ** >( & pReturn ) );
 		}
 		else
 		{

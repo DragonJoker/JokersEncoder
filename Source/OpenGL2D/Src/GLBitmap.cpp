@@ -19,7 +19,7 @@ namespace GL2D
 	{
 		CObject::Destroy();
 	}
-	
+
 	void CComBitmap::Initialise( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props )
 	{
 		CContext * context = CContext::GetActiveContext();
@@ -51,7 +51,7 @@ namespace GL2D
 		return m_format;
 	}
 
-	STDMETHODIMP_( void ) CComBitmap::GetDpi( float * dpiX, float * dpiY  )const
+	STDMETHODIMP_( void ) CComBitmap::GetDpi( float * dpiX, float * dpiY )const
 	{
 		if ( dpiX && dpiY )
 		{
@@ -98,21 +98,24 @@ namespace GL2D
 		{
 			int componentSize = 0;
 
-			switch( m_format.type )
+			switch ( m_format.type )
 			{
 			case GL2D_GL_TYPE_BYTE:
 			case GL2D_GL_TYPE_UNSIGNED_BYTE:
 				componentSize = 1;
 				break;
+
 			case GL2D_GL_TYPE_SHORT:
 			case GL2D_GL_TYPE_UNSIGNED_SHORT:
 				componentSize = 2;
 				break;
+
 			case GL2D_GL_TYPE_INT:
 			case GL2D_GL_TYPE_UNSIGNED_INT:
 			case GL2D_GL_TYPE_FLOAT:
 				componentSize = 4;
 				break;
+
 			case GL2D_GL_TYPE_DOUBLE:
 				componentSize = 8;
 				break;
@@ -120,7 +123,7 @@ namespace GL2D
 
 			int componentCount = 0;
 
-			switch( m_format.format )
+			switch ( m_format.format )
 			{
 			case GL2D_GL_FORMAT_STENCIL:
 			case GL2D_GL_FORMAT_DEPTH:
@@ -131,15 +134,18 @@ namespace GL2D
 			case GL2D_GL_FORMAT_LUMINANCE:
 				componentCount = 1;
 				break;
+
 			case GL2D_GL_FORMAT_LUMINANCE_ALPHA:
 			case GL2D_GL_FORMAT_RG:
 			case GL2D_GL_FORMAT_DEPTH_STENCIL:
 				componentCount = 2;
 				break;
+
 			case GL2D_GL_FORMAT_RGB:
 			case GL2D_GL_FORMAT_BGR:
 				componentCount = 3;
 				break;
+
 			case GL2D_GL_FORMAT_RGBA:
 			case GL2D_GL_FORMAT_BGRA:
 				componentCount = 4;

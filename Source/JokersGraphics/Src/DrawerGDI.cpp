@@ -61,8 +61,8 @@ namespace Joker
 
 			::AlphaBlend( m_hDcSaved, m_rcRect.left, m_rcRect.top, m_rcRect.right, m_rcRect.bottom,
 						  m_hDC, m_rcBack.left, m_rcBack.top, m_rcBack.right, m_rcBack.bottom,
-						  blendFunction);
-	//		::BitBlt( m_hDcSaved, rcRect.left, rcRect.top, m_rcBack.Width(), m_rcBack.Height(), m_hDC, m_rcBack.left, m_rcBack.top, SRCCOPY );
+						  blendFunction );
+			//		::BitBlt( m_hDcSaved, rcRect.left, rcRect.top, m_rcBack.Width(), m_rcBack.Height(), m_hDC, m_rcBack.left, m_rcBack.top, SRCCOPY );
 			::DeleteDC( m_hDC );
 			::DeleteObject( m_hBitmap );
 			m_hDC = m_hDcSaved;
@@ -106,7 +106,7 @@ namespace Joker
 
 		HPEN hPen = DoCreateCustomPen( iPenHeight, cPenColour, 1 );
 		HPEN hOldPen = NULL;
-	
+
 		if ( iPenHeight != 0 )
 		{
 			hOldPen = HPEN( SelectObject( m_hDC, hPen ) );
@@ -118,11 +118,11 @@ namespace Joker
 
 		if ( hOldPen )
 		{
-			::MoveToEx(	m_hDC,	rcTmpRect.left,					rcTmpRect.top, NULL				);
-			::LineTo(	m_hDC,	rcTmpRect.right - iPenHeight,	rcTmpRect.top					);
+			::MoveToEx(	m_hDC,	rcTmpRect.left,					rcTmpRect.top, NULL	);
+			::LineTo(	m_hDC,	rcTmpRect.right - iPenHeight,	rcTmpRect.top	);
 			::LineTo(	m_hDC,	rcTmpRect.right - iPenHeight,	rcTmpRect.bottom - iPenHeight	);
 			::LineTo(	m_hDC,	rcTmpRect.left,					rcTmpRect.bottom - iPenHeight	);
-			::LineTo(	m_hDC,	rcTmpRect.left,					rcTmpRect.top					);
+			::LineTo(	m_hDC,	rcTmpRect.left,					rcTmpRect.top	);
 		}
 
 		if ( hOldPen )
@@ -141,11 +141,11 @@ namespace Joker
 
 		CRect rcTmpRect( int( rcRect.left * dRatio ), int( rcRect.top * dRatio ), int( rcRect.right * dRatio ), int( rcRect.bottom * dRatio ) );
 
-		::MoveToEx(	m_hDC, rcTmpRect.left,					rcTmpRect.top, NULL				);
-		::LineTo(	m_hDC, rcTmpRect.right - iPenHeight,	rcTmpRect.top					);
+		::MoveToEx(	m_hDC, rcTmpRect.left,					rcTmpRect.top, NULL	);
+		::LineTo(	m_hDC, rcTmpRect.right - iPenHeight,	rcTmpRect.top	);
 		::LineTo(	m_hDC, rcTmpRect.right - iPenHeight,	rcTmpRect.bottom - iPenHeight	);
 		::LineTo(	m_hDC, rcTmpRect.left,					rcTmpRect.bottom - iPenHeight	);
-		::LineTo(	m_hDC, rcTmpRect.left,					rcTmpRect.top					);
+		::LineTo(	m_hDC, rcTmpRect.left,					rcTmpRect.top	);
 
 		::SelectObject( m_hDC, hOldPen );
 		::DeleteObject( hPen );
@@ -156,7 +156,7 @@ namespace Joker
 		CRect rcTextRect( pRect );
 		rcTextRect.left		= LONG( dRatio * rcTextRect.left	);
 		rcTextRect.right	= LONG( dRatio * rcTextRect.right	);
-		rcTextRect.top		= LONG( dRatio * rcTextRect.top		);
+		rcTextRect.top		= LONG( dRatio * rcTextRect.top	);
 		rcTextRect.bottom	= LONG( dRatio * rcTextRect.bottom	);
 
 #if defined( _UNICODE )

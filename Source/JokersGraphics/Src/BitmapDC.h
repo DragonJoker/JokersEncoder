@@ -97,8 +97,14 @@ namespace Joker
 		void DrawBitmap( CRect const & rcDest, HBITMAP hBitmap, CRect const & rcBitmap );
 		/**@name Opérateurs de conversion */
 		//@{
-		inline operator HDC		()const { return m_hDC; }
-		inline operator HBITMAP	()const { return m_hBitmap; }
+		inline operator HDC()const
+		{
+			return m_hDC;
+		}
+		inline operator HBITMAP()const
+		{
+			return m_hBitmap;
+		}
 		//@}
 
 	protected:

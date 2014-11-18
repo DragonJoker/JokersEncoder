@@ -71,45 +71,72 @@ namespace Joker
 		/**
 		 *\return		La hauteur des items
 		 */
-		virtual short GetItemHeight()const { return m_sItemHeight; }
+		virtual short GetItemHeight()const
+		{
+			return m_sItemHeight;
+		}
 		/**
 		 *\param[in]	eStatus	Le type d'item affecté
 		 *\return		La couleur du texte des items du type demandé
 		 */
-		virtual CColour GetItemTextColour( eLB_ITEM_STATUS eStatus )const { return m_itemColours[eStatus].GetTextColour(); }
+		virtual CColour GetItemTextColour( eLB_ITEM_STATUS eStatus )const
+		{
+			return m_itemColours[eStatus].GetTextColour();
+		}
 		/**
 		 *\param[in]	eStatus	Le type d'item affecté
 		 *\return		La couleur du contour des items du type demandé
 		 */
-		virtual CColour GetItemLineColour( eLB_ITEM_STATUS eStatus )const { return m_itemColours[eStatus].GetLineColour(); }
+		virtual CColour GetItemLineColour( eLB_ITEM_STATUS eStatus )const
+		{
+			return m_itemColours[eStatus].GetLineColour();
+		}
 		/**
 		 *\param[in]	eStatus	Le type d'item affecté
 		 *\return		Le brush des items du type demandé
 		 */
-		virtual CTransparentBrush & GetItemBrush( eLB_ITEM_STATUS eStatus ) { return m_itemColours[eStatus].GetBrush(); }
+		virtual CTransparentBrush & GetItemBrush( eLB_ITEM_STATUS eStatus )
+		{
+			return m_itemColours[eStatus].GetBrush();
+		}
 		/**
 		 *\param[in]	eStatus	Le type d'item affecté
 		 *\return		Le brush des items du type demandé
 		 */
-		virtual CTransparentBrush const & GetItemBrush( eLB_ITEM_STATUS eStatus )const { return m_itemColours[eStatus].GetBrush(); }
+		virtual CTransparentBrush const & GetItemBrush( eLB_ITEM_STATUS eStatus )const
+		{
+			return m_itemColours[eStatus].GetBrush();
+		}
 		/**
 		 *\return		La couleur du contour de l'item ayant le focus
 		 */
-		inline CColour GetFocusBorderColour()const { return m_clFocusBorder; }
+		inline CColour GetFocusBorderColour()const
+		{
+			return m_clFocusBorder;
+		}
 		/**
 		 *\return		Le style du contour de l'item ayant le focus
 		 */
-		inline int GetFocusBorderStyle()const { return m_iFocusBorderStyle; }
+		inline int GetFocusBorderStyle()const
+		{
+			return m_iFocusBorderStyle;
+		}
 		/**
 		 *\brief		Définit le style du contour de l'item ayant le focus
 		 *\param[in]	val	Le style du contour
 		 */
-		inline void SetFocusBorderStyle( int val ) { m_iFocusBorderStyle = val; }
+		inline void SetFocusBorderStyle( int val )
+		{
+			m_iFocusBorderStyle = val;
+		}
 		/**
 		 *\brief		Définit la couleur du contour de l'item ayant le focus
 		 *\param[in]	val	La couleur du contour
 		 */
-		inline void SetFocusBorderColour( CColour const & val ) { m_clFocusBorder = val; }
+		inline void SetFocusBorderColour( CColour const & val )
+		{
+			m_clFocusBorder = val;
+		}
 		//@}
 	protected:
 		/**
@@ -118,20 +145,26 @@ namespace Joker
 		 *\param[in]	eStatus	L'état de l'item voulu
 		 *\return		Une référence non constante sur l'item
 		 */
-		inline CAlphaLBItem	&		GetItem			( eLB_ITEM_STATUS eStatus )			{ return m_itemColours[eStatus]; }
+		inline CAlphaLBItem		&	GetItem( eLB_ITEM_STATUS eStatus )
+		{
+			return m_itemColours[eStatus];
+		}
 		/**
 		 *\brief		Récupère l'item à l'état donné
 		 *\remark		Pour les utilisateurs voulant dériver cette classe
 		 *\param[in]	eStatus	L'état de l'item voulu
 		 *\return		Une référence constante sur l'item
 		 */
-		inline CAlphaLBItem	const &	GetItem			( eLB_ITEM_STATUS eStatus )const	{ return m_itemColours[eStatus]; }
+		inline CAlphaLBItem	const &	GetItem( eLB_ITEM_STATUS eStatus )const
+		{
+			return m_itemColours[eStatus];
+		}
 
 	protected:
 		/**
 		 *\brief		Fonction de nettoyage
 		 */
-		virtual void DoRelease(){}
+		virtual void DoRelease() {}
 		/**
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin

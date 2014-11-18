@@ -23,7 +23,10 @@ namespace Joker
 		void SetBkColor( COLORREF clrColour );
 		void DrawGDI( HDC hDC );
 
-		inline Joker::ImagePtr GetImage()const { return m_pImage; }
+		inline Joker::ImagePtr GetImage()const
+		{
+			return m_pImage;
+		}
 
 	protected:
 		void DoDrawBackground( CRect const & rcRect );

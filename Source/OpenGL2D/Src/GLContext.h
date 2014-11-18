@@ -38,7 +38,7 @@ namespace GL2D
 		HRESULT Initialise();
 		void Cleanup();
 		static CContext * GetActiveContext();
-		
+
 		HRESULT MakeCurrent( HDC dc );
 		HRESULT EndCurrent( HDC dc );
 		HRESULT SwapBuffers( HDC dc );
@@ -48,27 +48,27 @@ namespace GL2D
 		HRESULT Enable( GLenum value );
 		HRESULT Disable( GLenum value );
 		HRESULT Viewport( int x, int y, int width, int height );
-		
+
 		int GetInt( GLenum param );
-		
+
 		HRESULT Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar );
 		HRESULT PushMatrix();
 		HRESULT PopMatrix();
 		HRESULT MultMatrix( glm::mat4x4 const & mtx );
 		HRESULT LoadIdentity();
 
-		HRESULT GenFramebuffers( GLsizei n, GLuint* framebuffers );
+		HRESULT GenFramebuffers( GLsizei n, GLuint * framebuffers );
 		HRESULT DeleteFramebuffers( GLsizei n, GLuint const * framebuffers );
 		HRESULT BindFramebuffer( GL2D_GL_FRAMEBUFFER_MODE target, uint32_t framebuffer );
 		uint32_t CheckFramebufferStatus( uint32_t target );
 		HRESULT FramebufferTexture( uint32_t target, uint32_t attachment, uint32_t texture, int level );
 		HRESULT FramebufferTexture1D( uint32_t target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level );
 		HRESULT FramebufferTexture2D( uint32_t target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level );
-		HRESULT FramebufferTextureLayer( uint32_t target,uint32_t attachment, uint32_t texture,int level,int layer );
+		HRESULT FramebufferTextureLayer( uint32_t target, uint32_t attachment, uint32_t texture, int level, int layer );
 		HRESULT FramebufferTexture3D( uint32_t target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level, int layer );
 		HRESULT BlitFramebuffer( int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, uint32_t mask, uint32_t filter );
 		HRESULT DrawBuffers( int n, uint32_t const * bufs );
-		HRESULT GenTextures( GLsizei n, GLuint* textures );
+		HRESULT GenTextures( GLsizei n, GLuint * textures );
 		HRESULT DeleteTextures( GLsizei n, GLuint const * textures );
 		HRESULT ActiveTexture( uint32_t texture );
 		HRESULT BindTexture( uint32_t target, uint32_t texture );
@@ -83,8 +83,8 @@ namespace GL2D
 		HRESULT RenderbufferStorage( uint32_t target, uint32_t internalFormat, int width, int height );
 		HRESULT RenderbufferStorageMultisample( uint32_t target, int isamples, uint32_t internalFormat, int width, int height );
 		HRESULT TexImage2DMultisample( uint32_t target, int samples, int internalformat, int width, int height, uint8_t fixedsamplelocations );
-		HRESULT GetRenderbufferParameteriv( uint32_t target, uint32_t param, int* value );
-		HRESULT GenBuffers( GLsizei n, GLuint* buffers );
+		HRESULT GetRenderbufferParameteriv( uint32_t target, uint32_t param, int * value );
+		HRESULT GenBuffers( GLsizei n, GLuint * buffers );
 		HRESULT DeleteBuffers( GLsizei n, GLuint const * buffers );
 		HRESULT BindBuffer( GL2D_GL_BUFFER_TARGET target, uint32_t buffer );
 		HRESULT BufferData( GL2D_GL_BUFFER_TARGET target, ptrdiff_t size, const GLvoid * data, GL2D_GL_BUFFER_USAGE usage );
@@ -92,10 +92,13 @@ namespace GL2D
 		bool UnmapBuffer( GL2D_GL_BUFFER_TARGET target );
 		void DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
 		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
-		
+
 		HRESULT DrawTexture( GLuint name, const GL2D_RECT_F & destinationRectangle, GL2D_BITMAP_INTERPOLATION_MODE interpolationMode, const GL2D_RECT_F & sourceRectangle );
 
-		inline HDC GetDC()const { return m_dc; }
+		inline HDC GetDC()const
+		{
+			return m_dc;
+		}
 
 	private:
 		HGLRC DoCreateContext();
@@ -139,7 +142,7 @@ namespace GL2D
 		GL_FUNCTION( void, glFramebufferTexture, GLenum target, uint32_t attachment, uint32_t texture, int level );
 		GL_FUNCTION( void, glFramebufferTexture1D, GLenum target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level );
 		GL_FUNCTION( void, glFramebufferTexture2D, GLenum target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level );
-		GL_FUNCTION( void, glFramebufferTextureLayer, GLenum target,uint32_t attachment, uint32_t texture,int level,int layer );
+		GL_FUNCTION( void, glFramebufferTextureLayer, GLenum target, uint32_t attachment, uint32_t texture, int level, int layer );
 
 #if DEF_HAS_VARIADIC_TEMPLATES
 		GL_FUNCTION( void, glFramebufferTexture3D, GLenum target, uint32_t attachment, uint32_t textarget, uint32_t texture, int level, int layer );
@@ -171,7 +174,7 @@ namespace GL2D
 #else
 		void ( CALLBACK * glTexImage2DMultisample )( uint32_t target, int samples, int internalformat, int width, int height, uint8_t fixedsamplelocations );
 #endif
-		GL_FUNCTION( void, glGetRenderbufferParameteriv, uint32_t target, uint32_t param, int* value );
+		GL_FUNCTION( void, glGetRenderbufferParameteriv, uint32_t target, uint32_t param, int * value );
 
 		//@}
 		/**@name VBO */
@@ -196,11 +199,11 @@ namespace GL2D
 		GL_FUNCTION( void, glGenVertexArrays, GLsizei n, GLuint * buffers );
 		GL_FUNCTION( void, glDeleteVertexArrays, GLsizei n, GLuint const * buffers );
 		GL_FUNCTION( void, glBindVertexArray, GLuint buffer );
-		
+
 		//@}
 		/**@name Shader */
 		//@{
-		
+
 		GL_FUNCTION( GLuint, glCreateShader, GLenum type );
 		GL_FUNCTION( void, glDeleteShader, GLuint name );
 		GL_FUNCTION( void, glShaderSource, GLuint shader, GLsizei count, const GLchar ** string, const GLint * length );
@@ -215,7 +218,7 @@ namespace GL2D
 		GL_FUNCTION( void, glGetProgramInfoLog, GLuint program, GLsizei maxLength, GLsizei * length, GLchar * infoLog );
 		GL_FUNCTION( GLint, glGetUniformLocation, GLuint program, const GLchar * name );
 		GL_FUNCTION( void, glUniform1i, GLint location, GLint v0 );
-		GL_FUNCTION( void, glUniformMatrix4fv, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value );
+		GL_FUNCTION( void, glUniformMatrix4fv, GLint location, GLsizei count, GLboolean transpose, const GLfloat * value );
 		GL_FUNCTION( GLint, glGetAttribLocation, GLuint program, const GLchar * name );
 		GL_FUNCTION( GLint, glUseProgram, GLuint program );
 

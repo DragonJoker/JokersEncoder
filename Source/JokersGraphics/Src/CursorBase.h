@@ -26,7 +26,7 @@ namespace Joker
 		 *\param[in]	hCursor	Le curseur
 		 *\param[in]	bOwn	Dit si CCursor gère ce curseur
 		 */
-		virtual HCURSOR SetCursor( HCURSOR hCursor, BOOL bOwn=TRUE );
+		virtual HCURSOR SetCursor( HCURSOR hCursor, BOOL bOwn = TRUE );
 		/**
 		 *\brief		Définit le curseur courant comme le curseur de base
 		 */
@@ -35,7 +35,10 @@ namespace Joker
 		 *\brief		Récupère le curseur courant
 		 *\return		Le curseur
 		 */
-		inline HCURSOR GetCursor() { return m_hCurrentCursor; }
+		inline HCURSOR GetCursor()
+		{
+			return m_hCurrentCursor;
+		}
 
 	protected:
 		HCURSOR m_hBasicCursor;		//!< Le curseur de base (la flèche)

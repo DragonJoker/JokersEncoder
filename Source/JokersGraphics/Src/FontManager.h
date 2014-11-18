@@ -56,19 +56,19 @@ namespace Joker
 		 *\param[in]	dRatio		Le ratio d'affichage
 		 *\return		L'index de la police créée
 		 */
-		static UINT AddFont( LPCTSTR szFace=_T( "Arial" ), int iHeight=20, int iWeight=FW_NORMAL, BOOL bItalic=FALSE, BOOL bUnderlined=FALSE );
+		static UINT AddFont( LPCTSTR szFace = _T( "Arial" ), int iHeight = 20, int iWeight = FW_NORMAL, BOOL bItalic = FALSE, BOOL bUnderlined = FALSE );
 		/**
 		 *\brief		Récupère la police à l'index donné
 		 *\param[in]	uiIndex	L'index de la police que l'on veut récupérer
 		 *\param[in]	bManual	Dit si on recherche parmi les polices manuelles ou pas
-		 *\return		
+		 *\return
 		 */
-		static FontPtr	GetFont( UINT uiIndex, BOOL bManual=FALSE );
+		static FontPtr	GetFont( UINT uiIndex, BOOL bManual = FALSE );
 
 	private:
 		void DoCleanup();
 		FontPtr DoAddFont( UINT uiIndex, LPCTSTR szFont );
-		UINT DoAddFont( LPCTSTR szFace=_T( "Arial" ), int iHeight=20, int iWeight=FW_NORMAL, BOOL bItalic=FALSE, BOOL bUnderlined=FALSE );
+		UINT DoAddFont( LPCTSTR szFace = _T( "Arial" ), int iHeight = 20, int iWeight = FW_NORMAL, BOOL bItalic = FALSE, BOOL bUnderlined = FALSE );
 		FontPtr DoGetFont( UINT uiIndex, BOOL bManual );
 
 	protected:

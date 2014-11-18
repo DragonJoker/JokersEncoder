@@ -29,13 +29,13 @@ namespace GL2D
 				if ( ( riid == IID_IUnknown ) || ( riid == *Clsid ) )
 				{
 					*ppv = this;
-					AddRef(); 
+					AddRef();
 					hr = S_OK;
 				}
 				else
 				{
 					hr = E_NOINTERFACE;
-					*ppv = NULL; 
+					*ppv = NULL;
 				}
 			}
 

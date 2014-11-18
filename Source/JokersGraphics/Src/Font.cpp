@@ -11,11 +11,11 @@ static char THIS_FILE[] = __FILE__;
 namespace Joker
 {
 	CFont::CFont( LPCTSTR szFace, int iHeight, int iWeight, BOOL bItalic, BOOL bUnderlined, double dRatio )
-		:	m_lfLogFont		(			)
-		,	m_dRatio		( dRatio	)
-		,	m_hFont			( NULL		)
-		,	m_bOwnFont		( TRUE		)
-		,	m_hOldFont		( NULL		)
+		:	m_lfLogFont(	)
+		,	m_dRatio( dRatio	)
+		,	m_hFont( NULL	)
+		,	m_bOwnFont( TRUE	)
+		,	m_hOldFont( NULL	)
 	{
 		_tcscpy_s( m_lfLogFont.lfFaceName, szFace );
 		m_lfLogFont.lfHeight	= iHeight;
@@ -27,11 +27,11 @@ namespace Joker
 	}
 
 	CFont::CFont( const CFont & font )
-		:	m_lfLogFont		(				)
-		,	m_dRatio		( font.m_dRatio	)
-		,	m_hFont			( NULL			)
-		,	m_bOwnFont		( TRUE			)
-		,	m_hOldFont		( NULL			)
+		:	m_lfLogFont(	)
+		,	m_dRatio( font.m_dRatio	)
+		,	m_hFont( NULL	)
+		,	m_bOwnFont( TRUE	)
+		,	m_hOldFont( NULL	)
 	{
 		_tcscpy_s( m_lfLogFont.lfFaceName, font.m_lfLogFont.lfFaceName );
 		m_lfLogFont.lfHeight	= font.m_lfLogFont.lfHeight;
@@ -43,11 +43,11 @@ namespace Joker
 	}
 
 	CFont::CFont( ::CFont * pFont )
-		:	m_lfLogFont		(		)
-		,	m_dRatio		( 1		)
-		,	m_hFont			( NULL	)
-		,	m_bOwnFont		( TRUE	)
-		,	m_hOldFont		( NULL	)
+		:	m_lfLogFont(	)
+		,	m_dRatio( 1	)
+		,	m_hFont( NULL	)
+		,	m_bOwnFont( TRUE	)
+		,	m_hOldFont( NULL	)
 	{
 		if ( pFont )
 		{
@@ -66,11 +66,11 @@ namespace Joker
 	}
 
 	CFont::CFont( LOGFONT const & lfLogFont )
-		:	m_lfLogFont		(		)
-		,	m_dRatio		( 1		)
-		,	m_hFont			( NULL	)
-		,	m_bOwnFont		( TRUE	)
-		,	m_hOldFont		( NULL	)
+		:	m_lfLogFont(	)
+		,	m_dRatio( 1	)
+		,	m_hFont( NULL	)
+		,	m_bOwnFont( TRUE	)
+		,	m_hOldFont( NULL	)
 	{
 		_tcscpy_s( m_lfLogFont.lfFaceName, lfLogFont.lfFaceName );
 		m_lfLogFont.lfHeight		= lfLogFont.lfHeight;
@@ -82,11 +82,11 @@ namespace Joker
 	}
 
 	CFont::CFont( HFONT hFont )
-		:	m_lfLogFont		(		)
-		,	m_dRatio		( 1		)
-		,	m_hFont			( hFont	)
-		,	m_bOwnFont		( FALSE	)
-		,	m_hOldFont		( NULL	)
+		:	m_lfLogFont(	)
+		,	m_dRatio( 1	)
+		,	m_hFont( hFont	)
+		,	m_bOwnFont( FALSE	)
+		,	m_hOldFont( NULL	)
 	{
 		::GetObject( hFont, sizeof( LOGFONT ), &m_lfLogFont );
 	}

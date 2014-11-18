@@ -18,9 +18,9 @@ namespace Joker
 	static const uint32_t BUFFER_SIZE = 1024;
 
 	CConsoleInfo::CConsoleInfo()
-		:	m_uiOldCP			( 0						)
-		,	m_hScreenBuffer		( INVALID_HANDLE_VALUE	)
-		,	m_pOldInfos			( NULL					)
+		:	m_uiOldCP( 0	)
+		,	m_hScreenBuffer( INVALID_HANDLE_VALUE	)
+		,	m_pOldInfos( NULL	)
 	{
 		if ( ::AllocConsole() )
 		{
@@ -84,13 +84,27 @@ namespace Joker
 	{
 		WORD l_wAttributes;
 
-		switch( p_eLogType )
+		switch ( p_eLogType )
 		{
-		case eLOG_TYPE_DEBUG	:	l_wAttributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;					break;
-		case eLOG_TYPE_MESSAGE	:	l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;	break;
-		case eLOG_TYPE_WARNING	:	l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;					break;
-		case eLOG_TYPE_ERROR	:	l_wAttributes = FOREGROUND_RED | FOREGROUND_INTENSITY;										break;
-		default:					l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;	break;
+		case eLOG_TYPE_DEBUG	:
+			l_wAttributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			break;
+
+		case eLOG_TYPE_MESSAGE	:
+			l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			break;
+
+		case eLOG_TYPE_WARNING	:
+			l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			break;
+
+		case eLOG_TYPE_ERROR	:
+			l_wAttributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
+			break;
+
+		default:
+			l_wAttributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			break;
 		}
 
 		::SetConsoleTextAttribute( m_hScreenBuffer, l_wAttributes );
@@ -106,7 +120,7 @@ namespace Joker
 		{
 			l_csbiInfo.dwCursorPosition.X = 0;
 
-			if ( (l_csbiInfo.dwSize.Y-1) == l_csbiInfo.dwCursorPosition.Y )
+			if ( ( l_csbiInfo.dwSize.Y - 1 ) == l_csbiInfo.dwCursorPosition.Y )
 			{
 				SMALL_RECT l_srctScrollRect, l_srctClipRect;
 				CHAR_INFO l_chiFill;
@@ -126,7 +140,7 @@ namespace Joker
 				l_chiFill.Attributes = 0;
 				l_chiFill.Char.AsciiChar = char( ' ' );
 				// Scroll up one line.
-				::ScrollConsoleScreenBuffer(  m_hScreenBuffer, & l_srctScrollRect, & l_srctClipRect, l_coordDest, & l_chiFill );
+				::ScrollConsoleScreenBuffer( m_hScreenBuffer, & l_srctScrollRect, & l_srctClipRect, l_coordDest, & l_chiFill );
 			}
 			else
 			{
@@ -156,25 +170,25 @@ namespace Joker
 	//*************************************************************************************************
 
 	CDebugConsole::CDebugConsole()
-	#if ! defined( NDEBUG )
-		:	m_pConsoleInfo	( new CConsoleInfo )
-	#endif
+#if !defined( NDEBUG )
+		:	m_pConsoleInfo( new CConsoleInfo )
+#endif
 	{
 
 	}
 
 	CDebugConsole::~CDebugConsole()
 	{
-	#if ! defined( NDEBUG )
+#if !defined( NDEBUG )
 		delete m_pConsoleInfo;
-	#endif
+#endif
 	}
 
 	void CDebugConsole::Print( eLOG_TYPE p_eLogType, String const & p_strToLog )
 	{
-	#if ! defined( NDEBUG )
+#if !defined( NDEBUG )
 		m_pConsoleInfo->Print( p_eLogType, p_strToLog );
-	#endif
+#endif
 	}
 
 	//*************************************************************************************************
@@ -183,19 +197,19 @@ namespace Joker
 	bool		CLogger::m_bOwnInstance	= true;
 
 	CLogger::CLogger()
-		:	m_eCurrentLogType	( eLOG_TYPE_COUNT		)
-		,	m_pfnCallback		( NULL					)
-		,	m_pThis				( NULL					)
-	#if DEF_MT_LOGGER
-		,	m_hThread			( NULL					)
-		,	m_hEventEndThread	( NULL					)
-	#endif
+		:	m_eCurrentLogType( eLOG_TYPE_COUNT	)
+		,	m_pfnCallback( NULL	)
+		,	m_pThis( NULL	)
+#if DEF_MT_LOGGER
+		,	m_hThread( NULL	)
+		,	m_hEventEndThread( NULL	)
+#endif
 	{
 		std::unique_lock<std::recursive_mutex > lock( m_mutex );
 		m_strHeaders[eLOG_TYPE_DEBUG	] = _T( "***DEBUG*** " );
 		m_strHeaders[eLOG_TYPE_MESSAGE	] = _T( "" );
 		m_strHeaders[eLOG_TYPE_WARNING	] = _T( "***WARNING*** " );
-		m_strHeaders[eLOG_TYPE_ERROR	] = _T( "***ERROR*** ");
+		m_strHeaders[eLOG_TYPE_ERROR	] = _T( "***ERROR*** " );
 
 		m_outThread = std::thread( [&]()
 		{
@@ -209,6 +223,7 @@ namespace Joker
 				while ( !m_cout.eof() )
 				{
 					m_cout.getline( line, 1024 );
+
 					if ( strlen( line ) )
 					{
 						CLogger::LogMessage( line );
@@ -220,6 +235,7 @@ namespace Joker
 				while ( !m_cerr.eof() )
 				{
 					m_cerr.getline( line, 1024 );
+
 					if ( strlen( line ) )
 					{
 						CLogger::LogError( line );
@@ -231,6 +247,7 @@ namespace Joker
 				while ( !m_clog.eof() )
 				{
 					m_clog.getline( line, 1024 );
+
 					if ( strlen( line ) )
 					{
 						CLogger::LogDebug( line );
@@ -248,7 +265,8 @@ namespace Joker
 	{
 		m_end.notify_one();
 		m_outThread.join();
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
+
 		if ( m_hThread != NULL )
 		{
 			if ( ::WaitForSingleObject( m_hThread, 100 ) == WAIT_TIMEOUT && m_hThread )
@@ -269,7 +287,8 @@ namespace Joker
 			::CloseHandle( m_hEventEndThread );
 			m_hEventEndThread = NULL;
 		}
-	#endif
+
+#endif
 	}
 
 	void CLogger::InitInstance( CLogger * p_pLogger )
@@ -282,20 +301,20 @@ namespace Joker
 	void CLogger::SetFileName( String const & p_logFilePath, eLOG_TYPE p_eLogType )
 	{
 		GetSingleton().DoSetFileName( p_logFilePath, p_eLogType );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 		GetSingleton().m_hEventEndThread	= ::CreateEvent( NULL, TRUE, FALSE, NULL );
 		GetSingleton().m_hEventLog			= ::CreateEvent( NULL, TRUE, FALSE, NULL );
 		GetSingleton().m_hThread			= ::CreateThread( NULL, 0, LPTHREAD_START_ROUTINE( RunCallback ), GetSingletonPtr(), 0, NULL );
-	#endif
+#endif
 	}
 
 	void CLogger::Cleanup()
 	{
 		if ( m_bOwnInstance && m_pSingleton )
 		{
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 			::SetEvent( m_pSingleton->m_hEventEndThread );
-	#endif
+#endif
 			delete m_pSingleton;
 		}
 
@@ -309,7 +328,7 @@ namespace Joker
 
 	void CLogger::LogDebug( char const * p_pFormat, ... )
 	{
-	#if ! defined( NDEBUG )
+#if !defined( NDEBUG )
 		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
@@ -318,58 +337,61 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				USES_CONVERSION;
+
 				if ( A2W( p_pFormat ) )
 				{
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
-	#else
+
+#else
 				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
-	#endif
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, l_pText );
-	#endif
+#endif
 			}
-			catch( ... )
+			catch ( ... )
 			{
 			}
 		}
-	#endif
+
+#endif
 	}
 
 	void CLogger::LogDebug( std::string const & p_msg )
 	{
 		try
 		{
-	#if ! defined( NDEBUG )
-	#if		defined( UNICODE )
-		USES_CONVERSION;
-	#		if DEF_MT_LOGGER
+#if !defined( NDEBUG )
+#if		defined( UNICODE )
+			USES_CONVERSION;
+#		if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, A2W( p_msg.c_str() ) );
-	#		else
- 			GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, A2W( p_msg.c_str() ) );
-	#		endif
-	#	else
-	#		if DEF_MT_LOGGER
+#		else
+			GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, A2W( p_msg.c_str() ) );
+#		endif
+#	else
+#		if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, p_msg.c_str() );
-	#		else
+#		else
 			GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, p_msg.c_str() );
-	#		endif
-	#	endif
-	#endif
+#		endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 	}
 
 	void CLogger::LogDebug( wchar_t const * p_pFormat , ... )
 	{
-	#if ! defined( NDEBUG )
+#if !defined( NDEBUG )
 		TCHAR l_pText[BUFFER_SIZE];
 		va_list l_vaList;
 
@@ -378,51 +400,54 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				vswprintf_s( l_pText, p_pFormat, l_vaList );
-	#else
+#else
 				USES_CONVERSION;
+
 				if ( W2A( p_pFormat ) )
 				{
 					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
-	#endif
+
+#endif
 				va_end( l_vaList );
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, l_pText );
-	#	else
+#	else
 				GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, l_pText );
-	#	endif
+#	endif
 			}
-			catch( ... )
+			catch ( ... )
 			{
 			}
 		}
-	#endif
+
+#endif
 	}
 
 	void CLogger::LogDebug( std::wstring const & p_msg )
 	{
 		try
 		{
-	#if ! defined( NDEBUG )
-	#if		defined( UNICODE )
-	#		if DEF_MT_LOGGER
+#if !defined( NDEBUG )
+#if		defined( UNICODE )
+#		if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, p_msg.c_str() );
-	#		else
+#		else
 			GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, p_msg.c_str() );
-	#		endif
-	#	else
+#		endif
+#	else
 			USES_CONVERSION;
-	#		if DEF_MT_LOGGER
+#		if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, W2A( p_msg.c_str() ) );
-	#		else
+#		else
 			GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, W2A( p_msg.c_str() ) );
-	#		endif
-	#	endif
-	#endif
+#		endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 	}
@@ -437,23 +462,25 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				USES_CONVERSION;
+
 				if ( A2W( p_pFormat ) )
 				{
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
-	#else
+
+#else
 				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
-	#endif
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, l_pText );
-	#endif
+#endif
 			}
-			catch( ... )
+			catch ( ... )
 			{
 			}
 		}
@@ -463,22 +490,22 @@ namespace Joker
 	{
 		try
 		{
-	#if	defined( UNICODE )
+#if	defined( UNICODE )
 			USES_CONVERSION;
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, A2W( p_msg.c_str() ) );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, A2W( p_msg.c_str() ) );
-	#	endif
-	#else
-	#	if DEF_MT_LOGGER
+#	endif
+#else
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, p_msg.c_str() );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, p_msg.c_str() );
-	#	endif
-	#endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 	}
@@ -493,21 +520,23 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				vswprintf_s( l_pText, p_pFormat, l_vaList );
-	#else
-			USES_CONVERSION;
+#else
+				USES_CONVERSION;
+
 				if ( W2A( p_pFormat ) )
 				{
 					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
-	#endif
+
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, l_pText );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -520,22 +549,22 @@ namespace Joker
 	{
 		try
 		{
-	#if	defined( UNICODE )
-	#	if DEF_MT_LOGGER
+#if	defined( UNICODE )
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, p_msg.c_str() );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, p_msg.c_str() );
-	#	endif
-	#else
+#	endif
+#else
 			USES_CONVERSION;
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, W2A( p_msg.c_str() ) );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, W2A( p_msg.c_str() ) );
-	#	endif
-	#endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 	}
@@ -550,21 +579,23 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				USES_CONVERSION;
+
 				if ( A2W( p_pFormat ) )
 				{
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
-	#else
+
+#else
 				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
-	#endif
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, l_pText );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -576,22 +607,22 @@ namespace Joker
 	{
 		try
 		{
-	#if	defined( UNICODE )
+#if	defined( UNICODE )
 			USES_CONVERSION;
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, A2W( p_msg.c_str() ) );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, A2W( p_msg.c_str() ) );
-	#	endif
-	#else
-	#	if DEF_MT_LOGGER
+#	endif
+#else
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, p_msg.c_str() );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, p_msg.c_str() );
-	#	endif
-	#endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 	}
@@ -606,21 +637,23 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				vswprintf_s( l_pText, p_pFormat, l_vaList );
-	#else
+#else
 				USES_CONVERSION;
+
 				if ( W2A( p_pFormat ) )
 				{
 					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
-	#endif
+
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, l_pText );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -633,22 +666,22 @@ namespace Joker
 	{
 		try
 		{
-	#if	defined( UNICODE )
-	#	if DEF_MT_LOGGER
+#if	defined( UNICODE )
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, p_msg.c_str() );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, p_msg.c_str() );
-	#	endif
-	#else
+#	endif
+#else
 			USES_CONVERSION;
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, W2A( p_msg.c_str() ) );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, W2A( p_msg.c_str() ) );
-	#	endif
-	#endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 	}
@@ -663,21 +696,23 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				USES_CONVERSION;
+
 				if ( A2W( p_pFormat ) )
 				{
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
-	#else
+
+#else
 				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
-	#endif
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_pText );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -690,22 +725,22 @@ namespace Joker
 	{
 		try
 		{
-	#if	defined( UNICODE )
+#if	defined( UNICODE )
 			USES_CONVERSION;
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, A2W( p_msg.c_str() ) );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, A2W( p_msg.c_str() ) );
-	#	endif
-	#else
-	#	if DEF_MT_LOGGER
+#	endif
+#else
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, p_msg.c_str() );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, p_msg.c_str() );
-	#	endif
-	#endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 
@@ -725,21 +760,23 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				vswprintf_s( l_pText, p_pFormat, l_vaList );
-	#else
+#else
 				USES_CONVERSION;
+
 				if ( W2A( p_pFormat ) )
 				{
 					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
-	#endif
+
+#endif
 				va_end( l_vaList );
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_pText );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_pText );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -752,22 +789,22 @@ namespace Joker
 	{
 		try
 		{
-	#if	defined( UNICODE )
-	#	if DEF_MT_LOGGER
+#if	defined( UNICODE )
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, p_msg.c_str() );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, p_msg.c_str() );
-	#	endif
-	#else
+#	endif
+#else
 			USES_CONVERSION;
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, W2A( p_msg.c_str() ) );
-	#	else
+#	else
 			GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, W2A( p_msg.c_str() ) );
-	#	endif
-	#endif
+#	endif
+#endif
 		}
-		catch( ... )
+		catch ( ... )
 		{
 		}
 
@@ -783,7 +820,7 @@ namespace Joker
 		DWORD l_dwError = ::GetLastError();
 		LPTSTR l_szError = 0;
 
-		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, (LPTSTR)& l_szError, 0, NULL ) != 0 )
+		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, ( LPTSTR )& l_szError, 0, NULL ) != 0 )
 		{
 			l_strError = l_szError;
 			::LocalFree( l_szError );
@@ -797,22 +834,24 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				USES_CONVERSION;
+
 				if ( A2W( p_pFormat ) )
 				{
 					vswprintf_s( l_pText, A2W( p_pFormat ), l_vaList );
 				}
-	#else
+
+#else
 				vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, p_pFormat, l_vaList );
-	#endif
+#endif
 				va_end( l_vaList );
 				l_strError += String( _T( " - " ) ) + l_pText;
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -827,7 +866,7 @@ namespace Joker
 		DWORD l_dwError = ::GetLastError();
 		LPTSTR l_szError = 0;
 
-		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, (LPTSTR)& l_szError, 0, NULL ) != 0 )
+		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, ( LPTSTR )& l_szError, 0, NULL ) != 0 )
 		{
 			l_strError = l_szError;
 			::LocalFree( l_szError );
@@ -835,17 +874,17 @@ namespace Joker
 
 		try
 		{
-	#if defined( UNICODE )
+#if defined( UNICODE )
 			USES_CONVERSION;
 			l_strError += String( _T( " - " ) ) + A2W( p_msg.c_str() );
-	#else
+#else
 			l_strError += String( _T( " - " ) ) + p_msg;
-	#endif
-	#if DEF_MT_LOGGER
+#endif
+#if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#else
+#else
 			GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#endif
+#endif
 		}
 		catch ( ... )
 		{
@@ -863,7 +902,7 @@ namespace Joker
 		DWORD l_dwError = ::GetLastError();
 		LPTSTR l_szError = 0;
 
-		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, (LPTSTR)& l_szError, 0, NULL ) != 0 )
+		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, ( LPTSTR )& l_szError, 0, NULL ) != 0 )
 		{
 			l_strError = l_szError;
 			::LocalFree( l_szError );
@@ -877,22 +916,24 @@ namespace Joker
 			try
 			{
 				va_start( l_vaList, p_pFormat );
-	#if defined( _UNICODE )
+#if defined( _UNICODE )
 				vswprintf_s( l_pText, p_pFormat, l_vaList );
-	#else
+#else
 				USES_CONVERSION;
+
 				if ( W2A( p_pFormat ) )
 				{
 					vsnprintf_s( l_pText, BUFFER_SIZE, BUFFER_SIZE, W2A( p_pFormat ), l_vaList );
 				}
-	#endif
+
+#endif
 				va_end( l_vaList );
 				l_strError += String( _T( " - " ) ) + l_pText;
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 				GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#else
+#else
 				GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#endif
+#endif
 			}
 			catch ( ... )
 			{
@@ -906,7 +947,7 @@ namespace Joker
 		DWORD l_dwError = ::GetLastError();
 		LPTSTR l_szError = 0;
 
-		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, (LPTSTR)& l_szError, 0, NULL ) != 0 )
+		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, ( LPTSTR )& l_szError, 0, NULL ) != 0 )
 		{
 			l_strError = l_szError;
 			::LocalFree( l_szError );
@@ -914,17 +955,17 @@ namespace Joker
 
 		try
 		{
-	#if defined( UNICODE )
+#if defined( UNICODE )
 			l_strError += String( _T( " - " ) ) + p_msg.c_str();
-	#else
+#else
 			USES_CONVERSION;
 			l_strError += String( _T( " - " ) ) + W2A( p_msg.c_str() );
-	#endif
-	#if DEF_MT_LOGGER
+#endif
+#if DEF_MT_LOGGER
 			GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#else
+#else
 			GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#endif
+#endif
 		}
 		catch ( ... )
 		{
@@ -935,43 +976,43 @@ namespace Joker
 			throw false;
 		}
 	}
-	#if DEF_USING_CSTRING
+#if DEF_USING_CSTRING
 	void CLogger::LogDebug( CString const & p_msg )
 	{
-	#if ! defined( NDEBUG )
-	#	if DEF_MT_LOGGER
+#if !defined( NDEBUG )
+#	if DEF_MT_LOGGER
 		GetSingleton().DoPostMessage( eLOG_TYPE_DEBUG, p_msg );
-	#	else
- 		GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, p_msg );
-	#	endif
-	#endif
+#	else
+		GetSingleton().DoLogMessage( eLOG_TYPE_DEBUG, p_msg );
+#	endif
+#endif
 	}
 
 	void CLogger::LogMessage( CString const & p_msg )
 	{
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 		GetSingleton().DoPostMessage( eLOG_TYPE_MESSAGE, p_msg );
-	#else
+#else
 		GetSingleton().DoLogMessage( eLOG_TYPE_MESSAGE, p_msg );
-	#endif
+#endif
 	}
 
 	void CLogger::LogWarning( CString const & p_msg )
 	{
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 		GetSingleton().DoPostMessage( eLOG_TYPE_WARNING, p_msg );
-	#else
+#else
 		GetSingleton().DoLogMessage( eLOG_TYPE_WARNING, p_msg );
-	#endif
+#endif
 	}
 
 	void CLogger::LogError( CString const & p_msg, bool p_bThrow )throw( bool )
 	{
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 		GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, p_msg );
-	#else
+#else
 		GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, p_msg );
-	#endif
+#endif
 
 		if ( p_bThrow )
 		{
@@ -986,28 +1027,28 @@ namespace Joker
 		DWORD l_dwError = ::GetLastError();
 		LPTSTR l_szError = 0;
 
-		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, (LPTSTR)& l_szError, 0, NULL ) != 0 )
+		if ( l_dwError != ERROR_SUCCESS && ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, l_dwError, 0, ( LPTSTR )& l_szError, 0, NULL ) != 0 )
 		{
 			l_strError = l_szError;
 			::LocalFree( l_szError );
 		}
 
 		l_strError += String( _T( " - " ) ) + LPCTSTR( p_msg );
-	#	if DEF_MT_LOGGER
+#	if DEF_MT_LOGGER
 		GetSingleton().DoPostMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#	else
+#	else
 		GetSingleton().DoLogMessage( eLOG_TYPE_ERROR, l_strError.c_str() );
-	#	endif
+#	endif
 
 		if ( p_bThrow )
 		{
 			throw false;
 		}
 	}
-	#endif
+#endif
 	CLogger & CLogger::GetSingleton()
 	{
-		if ( ! m_pSingleton )
+		if ( !m_pSingleton )
 		{
 			m_bOwnInstance = true;
 			m_pSingleton = new CLogger();
@@ -1021,7 +1062,7 @@ namespace Joker
 		return & GetSingleton();
 	}
 
-	#if DEF_MT_LOGGER
+#if DEF_MT_LOGGER
 	void CLogger::DoProcessMessages()
 	{
 		m_mutexLines.Lock();
@@ -1058,7 +1099,7 @@ namespace Joker
 		{
 			DWORD dwWaitResult = ::WaitForSingleObject( m_hThread, 0 );
 
-			switch( dwWaitResult )
+			switch ( dwWaitResult )
 			{
 			case WAIT_OBJECT_0:
 				bReturn = TRUE;
@@ -1085,7 +1126,7 @@ namespace Joker
 
 		do
 		{
-			switch( ::WaitForMultipleObjects( dwCount, arrayHandles, FALSE, 10 ) )
+			switch ( ::WaitForMultipleObjects( dwCount, arrayHandles, FALSE, 10 ) )
 			{
 			case WAIT_OBJECT_0:		// Lignes de log en attente
 				bContinue = TRUE;
@@ -1105,11 +1146,11 @@ namespace Joker
 				break;
 			}
 		}
-		while ( bContinue && ! pThis->IsStopped() );
+		while ( bContinue && !pThis->IsStopped() );
 
 		return 0;
 	}
-	#endif
+#endif
 
 	void CLogger::DoSetCallback( PLogCallback p_pfnCallback, void * p_pThis )
 	{
@@ -1164,7 +1205,7 @@ namespace Joker
 
 		if ( l_pFile )
 		{
-			fclose( l_pFile);
+			fclose( l_pFile );
 		}
 	}
 
@@ -1180,9 +1221,9 @@ namespace Joker
 		time( & l_tTime );
 		localtime_s( & l_dtToday, & l_tTime );
 
-		l_strToLog << (l_dtToday.tm_year + 1900) << _T( "-" );
-		l_strToLog << (l_dtToday.tm_mon + 1 < 10 ? _T( "0" ) : _T( "" )) << (l_dtToday.tm_mon + 1) << _T( "-" ) << (l_dtToday.tm_mday < 10 ? _T( "0" ) : _T( "" )) << l_dtToday.tm_mday;
-		l_strToLog << _T( " - " ) << (l_dtToday.tm_hour < 10 ? _T( "0" ) : _T( "" )) << l_dtToday.tm_hour << _T( ":" ) << (l_dtToday.tm_min < 10 ? _T( "0" ) : _T( "" )) << l_dtToday.tm_min << _T( ":" ) << (l_dtToday.tm_sec < 10 ? _T( "0" ) : _T( "" )) << l_dtToday.tm_sec << _T( "s" );
+		l_strToLog << ( l_dtToday.tm_year + 1900 ) << _T( "-" );
+		l_strToLog << ( l_dtToday.tm_mon + 1 < 10 ? _T( "0" ) : _T( "" ) ) << ( l_dtToday.tm_mon + 1 ) << _T( "-" ) << ( l_dtToday.tm_mday < 10 ? _T( "0" ) : _T( "" ) ) << l_dtToday.tm_mday;
+		l_strToLog << _T( " - " ) << ( l_dtToday.tm_hour < 10 ? _T( "0" ) : _T( "" ) ) << l_dtToday.tm_hour << _T( ":" ) << ( l_dtToday.tm_min < 10 ? _T( "0" ) : _T( "" ) ) << l_dtToday.tm_min << _T( ":" ) << ( l_dtToday.tm_sec < 10 ? _T( "0" ) : _T( "" ) ) << l_dtToday.tm_sec << _T( "s" );
 		l_strToLog << _T( " - " ) << m_strHeaders[m_eCurrentLogType];
 
 		l_strToLog += p_szToLog;

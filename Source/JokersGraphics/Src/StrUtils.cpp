@@ -12,7 +12,7 @@
 #ifdef _DEBUG
 #	define new DEBUG_NEW
 #	undef THIS_FILE
-	static char THIS_FILE[] = __FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 #define MAX_STRING_SIZE 1048576
@@ -25,7 +25,7 @@ namespace Joker
 
 		if ( !strIn.empty() )
 		{
-			bReturn =( strIn[0] >= '0' && strIn[0] <= '9' ) || strIn[0] == '-';
+			bReturn = ( strIn[0] >= '0' && strIn[0] <= '9' ) || strIn[0] == '-';
 
 			for ( std::size_t GL2D_SIZE_I = 1 ; GL2D_SIZE_I < strIn.size() && bReturn ; GL2D_SIZE_I++ )
 			{
@@ -168,7 +168,7 @@ namespace Joker
 
 	void CStrUtils::Split( std::string const & strIn, std::string const & strDelims, std::vector< std::string > & aResult, BOOL bKeepVoid )
 	{
-		if ( !strIn.empty() && ! strDelims.empty() )
+		if ( !strIn.empty() && !strDelims.empty() )
 		{
 			std::size_t uiNumSplits = 0;
 			std::size_t uiStart = 0;
@@ -202,7 +202,7 @@ namespace Joker
 					uiStart = uiPos + 1;
 				}
 
-				if (  ! bKeepVoid && uiPos != std::string::npos )
+				if ( !bKeepVoid && uiPos != std::string::npos )
 				{
 					uiStart = strIn.find_first_not_of( strDelims, uiStart );
 				}
@@ -218,7 +218,7 @@ namespace Joker
 		std::size_t uiIndex = 0;
 		std::size_t uiPreviousIndex = 0;
 
-		while ( uiPreviousIndex < strIn.size() && (uiIndex = strIn.find_first_of( cDelim, uiPreviousIndex )) != std::string::npos )
+		while ( uiPreviousIndex < strIn.size() && ( uiIndex = strIn.find_first_of( cDelim, uiPreviousIndex ) ) != std::string::npos )
 		{
 			arrayResult.push_back( strIn.substr( uiPreviousIndex, uiIndex - uiPreviousIndex ) );
 			uiPreviousIndex = uiIndex + 1;
@@ -236,7 +236,7 @@ namespace Joker
 		std::size_t uiPreviousIndex = 0;
 		std::string strToken;
 
-		while ( uiPreviousIndex < strIn.size() && (uiIndex = strIn.find( strTextDelim, uiPreviousIndex )) != std::string::npos )
+		while ( uiPreviousIndex < strIn.size() && ( uiIndex = strIn.find( strTextDelim, uiPreviousIndex ) ) != std::string::npos )
 		{
 			strToken = strIn.substr( uiPreviousIndex, uiIndex - uiPreviousIndex );
 
@@ -270,7 +270,7 @@ namespace Joker
 			std::string strCorresp1;
 			std::string strCorresp2;
 			double dCommon = 0;
-			std::size_t uiMaxDist =((uiMax / 2) - 1);
+			std::size_t uiMaxDist = ( ( uiMax / 2 ) - 1 );
 			std::size_t j;
 
 			for ( std::size_t GL2D_SIZE_I = 0 ; GL2D_SIZE_I < strString1.size() ; GL2D_SIZE_I++ )
@@ -333,7 +333,7 @@ namespace Joker
 
 			if ( dCommon > 0 )
 			{
-				dReturn = std::min< double >( 1, (( dCommon / strString1.size() ) +( dCommon / strString2.size() ) +(( dCommon - dTranspositions ) / dCommon ) ) / 3 );
+				dReturn = std::min< double >( 1, ( ( dCommon / strString1.size() ) + ( dCommon / strString2.size() ) + ( ( dCommon - dTranspositions ) / dCommon ) ) / 3 );
 			}
 			else
 			{
@@ -347,7 +347,7 @@ namespace Joker
 	double CStrUtils::DistanceJaroWinkler( std::string const & strA, std::string const & strB, int iPrefixe, double dCoeff )
 	{
 		double dJaro = DistanceJaro( strA, strB );
-		return dJaro + (iPrefixe * dCoeff * (1 - dJaro));
+		return dJaro + ( iPrefixe * dCoeff * ( 1 - dJaro ) );
 	}
 
 	void CStrUtils::ToUpperCase( std::string & strIn, std::locale const & locale )
@@ -406,7 +406,7 @@ namespace Joker
 				strIn = strText;
 			}
 		}
-		catch(  ...  )
+		catch ( ... )
 		{
 		}
 	}
@@ -508,7 +508,7 @@ namespace Joker
 
 		if ( !strIn.empty() )
 		{
-			bReturn =( strIn[0] >= L'0' && strIn[0] <= L'9' ) || strIn[0] == L'-';
+			bReturn = ( strIn[0] >= L'0' && strIn[0] <= L'9' ) || strIn[0] == L'-';
 
 			for ( std::size_t GL2D_SIZE_I = 1 ; GL2D_SIZE_I < strIn.size() && bReturn ; GL2D_SIZE_I++ )
 			{
@@ -651,7 +651,7 @@ namespace Joker
 
 	void CStrUtils::Split( std::wstring const & strIn, std::wstring const & strDelims, std::vector< std::wstring > & aResult, BOOL bKeepVoid )
 	{
-		if ( !strIn.empty() && ! strDelims.empty() )
+		if ( !strIn.empty() && !strDelims.empty() )
 		{
 			std::size_t uiNumSplits = 0;
 			std::size_t uiStart = 0;
@@ -685,7 +685,7 @@ namespace Joker
 					uiStart = uiPos + 1;
 				}
 
-				if (  ! bKeepVoid && uiPos != std::wstring::npos )
+				if ( !bKeepVoid && uiPos != std::wstring::npos )
 				{
 					uiStart = strIn.find_first_not_of( strDelims, uiStart );
 				}
@@ -701,7 +701,7 @@ namespace Joker
 		std::size_t uiIndex = 0;
 		std::size_t uiPreviousIndex = 0;
 
-		while ( uiPreviousIndex < strIn.size() && (uiIndex = strIn.find_first_of( cDelim, uiPreviousIndex )) != std::wstring::npos )
+		while ( uiPreviousIndex < strIn.size() && ( uiIndex = strIn.find_first_of( cDelim, uiPreviousIndex ) ) != std::wstring::npos )
 		{
 			arrayResult.push_back( strIn.substr( uiPreviousIndex, uiIndex - uiPreviousIndex ) );
 			uiPreviousIndex = uiIndex + 1;
@@ -719,7 +719,7 @@ namespace Joker
 		std::size_t uiPreviousIndex = 0;
 		std::wstring strToken;
 
-		while ( uiPreviousIndex < strIn.size() && (uiIndex = strIn.find( strTextDelim, uiPreviousIndex )) != std::wstring::npos )
+		while ( uiPreviousIndex < strIn.size() && ( uiIndex = strIn.find( strTextDelim, uiPreviousIndex ) ) != std::wstring::npos )
 		{
 			strToken = strIn.substr( uiPreviousIndex, uiIndex - uiPreviousIndex );
 
@@ -753,7 +753,7 @@ namespace Joker
 			std::wstring strCorresp1;
 			std::wstring strCorresp2;
 			double dCommon = 0;
-			std::size_t uiMaxDist =((uiMax / 2) - 1);
+			std::size_t uiMaxDist = ( ( uiMax / 2 ) - 1 );
 			std::size_t j;
 
 			for ( std::size_t GL2D_SIZE_I = 0 ; GL2D_SIZE_I < strString1.size() ; GL2D_SIZE_I++ )
@@ -816,7 +816,7 @@ namespace Joker
 
 			if ( dCommon > 0 )
 			{
-				dReturn = std::min< double >( 1, (( dCommon / strString1.size() ) +( dCommon / strString2.size() ) +(( dCommon - dTranspositions ) / dCommon ) ) / 3 );
+				dReturn = std::min< double >( 1, ( ( dCommon / strString1.size() ) + ( dCommon / strString2.size() ) + ( ( dCommon - dTranspositions ) / dCommon ) ) / 3 );
 			}
 			else
 			{
@@ -830,7 +830,7 @@ namespace Joker
 	double CStrUtils::DistanceJaroWinkler( std::wstring const & strA, std::wstring const & strB, int iPrefixe, double dCoeff )
 	{
 		double dJaro = DistanceJaro( strA, strB );
-		return dJaro + (iPrefixe * dCoeff * (1 - dJaro));
+		return dJaro + ( iPrefixe * dCoeff * ( 1 - dJaro ) );
 	}
 
 	void CStrUtils::ToUpperCase( std::wstring & strIn, std::locale const & locale )
@@ -889,7 +889,7 @@ namespace Joker
 				strIn = strText;
 			}
 		}
-		catch(  ...  )
+		catch ( ... )
 		{
 		}
 	}
@@ -991,7 +991,7 @@ namespace Joker
 
 		if ( !strIn.IsEmpty() )
 		{
-			bReturn =( strIn[0] >= _T( '0' ) && strIn[0] <= _T( '9' ) ) || strIn[0] == _T( '-' );
+			bReturn = ( strIn[0] >= _T( '0' ) && strIn[0] <= _T( '9' ) ) || strIn[0] == _T( '-' );
 
 			for ( int GL2D_SIZE_I = 1 ; GL2D_SIZE_I < strIn.GetLength() && bReturn ; GL2D_SIZE_I++ )
 			{
@@ -1137,7 +1137,7 @@ namespace Joker
 
 	void CStrUtils::Split( CString const & strIn, CString const & strDelims, std::vector< CString > & aResult, BOOL bKeepVoid )
 	{
-		if ( !strIn.IsEmpty() && ! strDelims.IsEmpty() )
+		if ( !strIn.IsEmpty() && !strDelims.IsEmpty() )
 		{
 			int iNumSplits = 0;
 			int iStart = 0;
@@ -1169,7 +1169,7 @@ namespace Joker
 		int iIndex = 0;
 		int iPreviousIndex = 0;
 
-		while ( iPreviousIndex < strIn.GetLength() && (iIndex = strIn.Find( cDelim, iPreviousIndex )) != -1 )
+		while ( iPreviousIndex < strIn.GetLength() && ( iIndex = strIn.Find( cDelim, iPreviousIndex ) ) != -1 )
 		{
 			arrayResult.push_back( strIn.Mid( iPreviousIndex, iIndex - iPreviousIndex ) );
 			iPreviousIndex = iIndex + 1;
@@ -1187,7 +1187,7 @@ namespace Joker
 		int iPreviousIndex = 0;
 		CString csToken;
 
-		while ( iPreviousIndex < strIn.GetLength() && (iIndex = strIn.Find( strTextDelim, iPreviousIndex )) != -1 )
+		while ( iPreviousIndex < strIn.GetLength() && ( iIndex = strIn.Find( strTextDelim, iPreviousIndex ) ) != -1 )
 		{
 			csToken = strIn.Mid( iPreviousIndex, iIndex - iPreviousIndex );
 
@@ -1221,7 +1221,7 @@ namespace Joker
 			CString strCorresp1;
 			CString strCorresp2;
 			double dCommon = 0;
-			int iMaxDist =((iMax / 2) - 1);
+			int iMaxDist = ( ( iMax / 2 ) - 1 );
 			int j;
 
 			for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < strString1.GetLength() ; GL2D_SIZE_I++ )
@@ -1284,7 +1284,7 @@ namespace Joker
 
 			if ( dCommon > 0 )
 			{
-				dReturn = std::min< double >( 1.0, (( dCommon / strString1.GetLength() ) +( dCommon / strString2.GetLength() ) +(( dCommon - dTranspositions ) / dCommon ) ) / 3 );
+				dReturn = std::min< double >( 1.0, ( ( dCommon / strString1.GetLength() ) + ( dCommon / strString2.GetLength() ) + ( ( dCommon - dTranspositions ) / dCommon ) ) / 3 );
 			}
 			else
 			{
@@ -1298,7 +1298,7 @@ namespace Joker
 	double CStrUtils::DistanceJaroWinkler( CString const & strA, CString const & strB, int iPrefixe, double dCoeff )
 	{
 		double dJaro = DistanceJaro( strA, strB );
-		return dJaro + (iPrefixe * dCoeff * (1 - dJaro));
+		return dJaro + ( iPrefixe * dCoeff * ( 1 - dJaro ) );
 	}
 
 	void CStrUtils::ToUpperCase( CString & strIn, std::locale const & UNUSED( locale ) )
@@ -1348,7 +1348,7 @@ namespace Joker
 				strIn = pszText;
 			}
 		}
-		catch(  ...  )
+		catch ( ... )
 		{
 		}
 
@@ -1369,7 +1369,7 @@ namespace Joker
 
 	std::wstring CStrUtils::ToWStr( CString const & strIn )
 	{
-		return (LPCTSTR)strIn;
+		return ( LPCTSTR )strIn;
 	}
 
 	String CStrUtils::ToTStr( CString const & strIn )
@@ -1379,7 +1379,7 @@ namespace Joker
 #	else
 	std::string CStrUtils::ToStr( CString const & strIn )
 	{
-		return (LPCTSTR)strIn;
+		return ( LPCTSTR )strIn;
 	}
 
 	std::wstring CStrUtils::ToWStr( CString const & strIn )
@@ -1404,7 +1404,7 @@ namespace Joker
 
 	bool Joker::operator !=( std::string const & strA, char cToCompare )
 	{
-		return ! operator ==( strA, cToCompare );
+		return !operator ==( strA, cToCompare );
 	}
 
 	bool Joker::operator <( std::string const & strA, char cToCompare )

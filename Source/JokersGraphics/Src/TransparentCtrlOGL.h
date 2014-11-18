@@ -12,9 +12,6 @@
 
 #include <algorithm>
 
-#include <GL2D.h>
-#include <GLHelper.h>
-
 #ifdef min
 #	undef min
 #endif
@@ -40,26 +37,43 @@ namespace Joker
 	protected:
 		typedef T BaseType;
 
-		CTransparentBrush			m_brushMask;			//!< Le masque de transparence (pour le distinguer du fond)
-		CColour						m_clText;				//!< La couleur du texte (si texte il y a)
-		CColour						m_clBorder;				//!< La couleur du contour (si contour il y a)
-		bool						m_bPainting;			//!< Dit qu'on est en train de dessiner le contrôle
-		bool						m_bHasBackground;		//!< Dit si l'arrière plan a été défini
-		CBitmap						m_bmpBackground;		//!< L'image contenant l'arrière plan
-		bool						m_bMouseOver;			//!< Dit si la souris est au-dessus de ce contrôle
-		bool						m_bFocused;				//!< Dit si ce contrôle a le focus
-		IGL2DBitmap *				m_pBitmap;				//!< Le bitmap contenant le dessin
-		IGL2DHwndRenderTarget *		m_pHwndRenderTarget;	//!< La cible du rendu
-		IGL2DBitmapRenderTarget *	m_pBmpRenderTarget;		//!< La cible du rendu temporaire
-		IGL2DRenderTarget *			m_pRenderTarget;		//!< Le contenu du backbuffer
-		eRENDERER					m_eRenderer;			//!< Le type de rendu (GDI ou D2D)
-		bool						m_bReinitBackground;	//!< Dit s'il faut réinitialiser l'arrière plan
-		HDC							m_hDC;					//!< Le HDC du contrôle
-		bool						m_bHasBorder;			//!< Dit si le contrôle a un contour ou pas
+		//! Le masque de transparence (pour le distinguer du fond)
+		CTransparentBrush m_brushMask;
+		//! La couleur du texte (si texte il y a)
+		CColour m_clText;
+		//! La couleur du contour (si contour il y a)
+		CColour m_clBorder;
+		//! Dit qu'on est en train de dessiner le contrôle
+		bool m_bPainting;
+		//! Dit si l'arrière plan a été défini
+		bool m_bHasBackground;
+		//! L'image contenant l'arrière plan
+		CBitmap m_bmpBackground;
+		//! Dit si la souris est au-dessus de ce contrôle
+		bool m_bMouseOver;
+		//! Dit si ce contrôle a le focus
+		bool m_bFocused;
+		//! Le bitmap contenant le dessin
+		IGL2DBitmap * m_pBitmap;
+		//! La cible du rendu
+		IGL2DHwndRenderTarget * m_pRenderTarget;
+		//! Le type de rendu (GDI ou D2D)
+		eRENDERER m_eRenderer;
+		//! Dit s'il faut réinitialiser l'arrière plan
+		bool m_bReinitBackground;
+		//! Le HDC du contrôle
+		HDC m_hDC;
+		//! Dit si le contrôle a un contour ou pas
+		bool m_bHasBorder;
 
-		static int					m_iReferences;			//!< Le nombre d'instanciations
-		static IDWriteFactory *		m_pWriteFactory;		//!< La factory de création de bitmap
-		static IGL2DFactory *		m_pFactory;				//!< La factory de création de cibles de rendu
+		//! Le nombre d'instanciations
+		static int m_iReferences;
+		//! La factory de création de bitmap
+		static IDWriteFactory * m_pWriteFactory;
+		//! La factory de création de cibles de rendu
+		static IGL2DFactory * m_pFactory;
+		//! Le nombre de bitmas créés
+		static std::map< HBITMAP, IGL2DBitmap * > m_bitmaps;
 
 	public:
 		/**
@@ -90,29 +104,47 @@ namespace Joker
 		/**
 		 *\return		La couleur du masque de transparence
 		 */
-		inline CColour GetBorderColour()const { return m_clBorder; }
+		inline CColour GetBorderColour()const
+		{
+			return m_clBorder;
+		}
 		/**
 		 *\return		La couleur du masque de transparence
 		 */
-		inline CColour GetTextColour()const { return m_clText; }
+		inline CColour GetTextColour()const
+		{
+			return m_clText;
+		}
 		/**
 		 *\return		L'alpha du masque de transparence
 		 */
-		inline BYTE GetMaskAlpha()const { return m_brushMask.GetAlpha(); }
+		inline BYTE GetMaskAlpha()const
+		{
+			return m_brushMask.GetAlpha();
+		}
 		/**
 		 *\return		L'alpha du masque de transparence
 		 */
-		inline bool IsPainting()const { return m_bPainting; }
+		inline bool IsPainting()const
+		{
+			return m_bPainting;
+		}
 		/**
 		 *\brief		Récupère le masque
 		 *\return		Une référence non constante sur le masque
 		 */
-		inline CTransparentBrush & GetMaskBrush() { return m_brushMask; }
+		inline CTransparentBrush & GetMaskBrush()
+		{
+			return m_brushMask;
+		}
 		/**
 		 *\brief		Récupère le masque
 		 *\return		Une référence constante sur le masque
 		 */
-		inline CTransparentBrush const & GetMaskBrush()const { return m_brushMask; }
+		inline CTransparentBrush const & GetMaskBrush()const
+		{
+			return m_brushMask;
+		}
 		/**
 		 *\brief		Récupère les informations d'un bitmap donné
 		 *\param[in]	hDC			Le HDC utilisé pour déterminer les informations du HBITMAP
@@ -129,7 +161,7 @@ namespace Joker
 		 *\param[in]	rcSrc		Le rectangle du bitmap à dessiner
 		 *\param[in]	bSrcAlpha	Détermine si on utilise l'alpha de la source ou pas
 		 */
-		void DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL bSrcAlpha=TRUE );
+		void DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL bSrcAlpha = TRUE );
 		/**
 		 *\brief		Dessine le contour d'un rectangle
 		 *\param[in]	rcRect		Le rectangle
@@ -184,7 +216,10 @@ namespace Joker
 		 *\brief		Définit si le contrôle a un contour ou pas
 		 *\param[in]	bBorder	La valeur
 		 */
-		void SetBorder( bool bBorder ) { m_bHasBorder = bBorder; }
+		void SetBorder( bool bBorder )
+		{
+			m_bHasBorder = bBorder;
+		}
 
 	private:
 		void DoInitDeviceIndependent();
@@ -204,7 +239,7 @@ namespace Joker
 		/**
 		 *\brief		Fonction de nettoyage (effective)
 		 */
-		virtual void DoRelease(){}
+		virtual void DoRelease() {}
 		/**
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin
@@ -218,11 +253,11 @@ namespace Joker
 		/**
 		 *\brief		Fonction appelée par le framework pour faire les sous-classements nécessaire avant de sous-classer le contrôle
 		 */
-		virtual void	PreSubclassWindow	();
+		virtual void PreSubclassWindow();
 
 		DECLARE_MESSAGE_MAP()
 		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
-		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT nCtlColor );
+		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID );
 		afx_msg void OnDestroy();
 		afx_msg void OnPaint();
 		afx_msg void OnSize( UINT type, int cx, int cy );

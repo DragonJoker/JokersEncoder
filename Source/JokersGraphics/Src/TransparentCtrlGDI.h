@@ -47,7 +47,7 @@ namespace Joker
 		eRENDERER			m_eRenderer;			//!< Le type de rendu (GDI ou D2D)
 		bool				m_bReinitBackground;	//!< Dit s'il faut réinitialiser l'arrière plan
 		HDC					m_hDC;					//!< Le HDC du contrôle
-		CBitmapDC *			m_pBackDC;				//!< Le contenu du backbuffer
+		CBitmapDC 	*		m_pBackDC;				//!< Le contenu du backbuffer
 		bool				m_bHasBorder;			//!< Dit si le contrôle a un contour ou pas
 
 	public:
@@ -79,29 +79,47 @@ namespace Joker
 		/**
 		 *\return		La couleur du masque de transparence
 		 */
-		inline CColour GetBorderColour()const { return m_clBorder; }
+		inline CColour GetBorderColour()const
+		{
+			return m_clBorder;
+		}
 		/**
 		 *\return		La couleur du masque de transparence
 		 */
-		inline CColour GetTextColour()const { return m_clText; }
+		inline CColour GetTextColour()const
+		{
+			return m_clText;
+		}
 		/**
 		 *\return		L'alpha du masque de transparence
 		 */
-		inline BYTE GetMaskAlpha()const { return m_brushMask.GetAlpha(); }
+		inline BYTE GetMaskAlpha()const
+		{
+			return m_brushMask.GetAlpha();
+		}
 		/**
 		 *\return		L'alpha du masque de transparence
 		 */
-		inline bool IsPainting()const { return m_bPainting; }
+		inline bool IsPainting()const
+		{
+			return m_bPainting;
+		}
 		/**
 		 *\brief		Récupère le masque
 		 *\return		Une référence non constante sur le masque
 		 */
-		inline CTransparentBrush & GetMaskBrush() { return m_brushMask; }
+		inline CTransparentBrush & GetMaskBrush()
+		{
+			return m_brushMask;
+		}
 		/**
 		 *\brief		Récupère le masque
 		 *\return		Une référence constante sur le masque
 		 */
-		inline CTransparentBrush const & GetMaskBrush()const { return m_brushMask; }
+		inline CTransparentBrush const & GetMaskBrush()const
+		{
+			return m_brushMask;
+		}
 		/**
 		 *\brief		Récupère les informations d'un bitmap donné
 		 *\param[in]	hDC			Le HDC utilisé pour déterminer les informations du HBITMAP
@@ -117,7 +135,7 @@ namespace Joker
 		 *\param[in]	rcSrc		Le rectangle du bitmap à dessiner
 		 *\param[in]	bSrcAlpha	Détermine si on utilise l'alpha de la source ou pas
 		 */
-		void DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL bSrcAlpha=TRUE );
+		void DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL bSrcAlpha = TRUE );
 		/**
 		 *\brief		Dessine le contour d'un rectangle
 		 *\param[in]	rcRect		Le rectangle
@@ -172,7 +190,10 @@ namespace Joker
 		 *\brief		Définit si le contrôle a un contour ou pas
 		 *\param[in]	bBorder	La valeur
 		 */
-		void SetBorder( bool bBorder ) { m_bHasBorder = bBorder; }
+		void SetBorder( bool bBorder )
+		{
+			m_bHasBorder = bBorder;
+		}
 
 	protected:
 		/**
@@ -186,7 +207,7 @@ namespace Joker
 		/**
 		 *\brief		Fonction de nettoyage (effective)
 		 */
-		virtual void DoRelease(){}
+		virtual void DoRelease() {}
 		/**
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin
@@ -203,13 +224,13 @@ namespace Joker
 		virtual void PreSubclassWindow();
 
 		DECLARE_MESSAGE_MAP()
-		afx_msg BOOL	OnEraseBkgnd		( CDC * pDC );
-		afx_msg void	OnSize				( UINT type, int cx, int cy );
-		afx_msg void	OnPaint				();
-		afx_msg void	OnSetFocus			( CWnd * pOldWnd );
-		afx_msg void	OnKillFocus			( CWnd * pNewWnd );
-		afx_msg void	OnMouseMove			( UINT nFlags, CPoint point );
-		afx_msg LRESULT	OnMouseLeave		( WPARAM wParam, LPARAM lParam );
+		afx_msg BOOL	OnEraseBkgnd( CDC * pDC );
+		afx_msg void	OnSize( UINT type, int cx, int cy );
+		afx_msg void	OnPaint();
+		afx_msg void	OnSetFocus( CWnd * pOldWnd );
+		afx_msg void	OnKillFocus( CWnd * pNewWnd );
+		afx_msg void	OnMouseMove( UINT nFlags, CPoint point );
+		afx_msg LRESULT	OnMouseLeave( WPARAM wParam, LPARAM lParam );
 
 	protected:
 		/**

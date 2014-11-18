@@ -13,15 +13,15 @@ namespace Joker
 		HANDLE						m_hEventEndList;
 		HANDLE						m_hEventEndFile;
 		std::vector< CString >		m_arrayFiles;
-		CEncodingOptions			*	m_pEncodingOptions;
+		CEncodingOptions		*		m_pEncodingOptions;
 
 	public:
 		CEncoderThread( CEncodingOptions * pEncodingOptions, std::vector< CString > const & arrayFiles );
 		virtual ~CEncoderThread();
 
-		void	CreateThread	();
-		void	StopThread		();
-		void	EncodeFile		( CString const & csFile );
+		void	CreateThread();
+		void	StopThread();
+		void	EncodeFile( CString const & csFile );
 
 	private:
 		DWORD Run();

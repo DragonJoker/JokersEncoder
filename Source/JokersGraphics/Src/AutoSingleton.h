@@ -11,8 +11,8 @@ namespace Joker
 	class JGRA_API CAutoSingleton
 	{
 	protected:
-		CAutoSingleton(){}
-		~CAutoSingleton(){}
+		CAutoSingleton() {}
+		~CAutoSingleton() {}
 
 	private:
 		/**

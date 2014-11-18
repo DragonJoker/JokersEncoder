@@ -10,12 +10,13 @@ namespace Joker
 	\brief		Enumération des états possibles pour un bouton
 	*/
 	typedef enum
-	{	eBTN_STATE_DISABLED		//!< Bouton désactivé
-	,	eBTN_STATE_ENABLED		//!< Bouton activé
-	,	eBTN_STATE_HIGHLIGHTED	//!< Bouton au-dessus duquel se trouve la souris
-	,	eBTN_STATE_PUSHED		//!< Bouton cliqué
-	,	eBTN_STATE_HOVERED		//!< Souris reste au-dessus du bouton
-	,	eBTN_STATE_COUNT
+	{
+		eBTN_STATE_DISABLED		//!< Bouton désactivé
+		,	eBTN_STATE_ENABLED		//!< Bouton activé
+		,	eBTN_STATE_HIGHLIGHTED	//!< Bouton au-dessus duquel se trouve la souris
+		,	eBTN_STATE_PUSHED		//!< Bouton cliqué
+		,	eBTN_STATE_HOVERED		//!< Souris reste au-dessus du bouton
+		,	eBTN_STATE_COUNT
 	}	eBTN_STATE;
 	/*!
 	\author		Sylvain DOREMUS
@@ -56,7 +57,7 @@ namespace Joker
 		 *\param[in]	crColour	La couleur
 		 *\param[in]	bRedraw		Dit si on force le redessin
 		 */
-		void SetSolidBrush( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw=TRUE );
+		void SetSolidBrush( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Définit des brushes de type solid, pour chaque état
 		 *\param[in]	clEnable	La couleur du bouton actif
@@ -73,7 +74,10 @@ namespace Joker
 		 *\param[in]	eState		L'état à affecter
 		 *\param[in]	bRedraw		Dit si on force le redessin
 		 */
-		inline void SetBrush( COLORREF clColour, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw=TRUE ) { SetSolidBrush( eState, CColour::FromCOLORREF( clColour ), bRedraw );	}
+		inline void SetBrush( COLORREF clColour, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw = TRUE )
+		{
+			SetSolidBrush( eState, CColour::FromCOLORREF( clColour ), bRedraw );
+		}
 		/**
 		 *\brief		Définit des brushes de type solid, pour chaque état
 		 *\remark		Ecrite pour une meilleure interchangeabilité entre CA2iButton et CTransparentButton
@@ -82,14 +86,17 @@ namespace Joker
 		 *\param[in]	crPushed	La couleur du bouton cliqué
 		 *\param[in]	crDisabl	La couleur du bouton inactif
 		 */
-		inline void SetBrushes( COLORREF crEnable, COLORREF crHighlt, COLORREF crPushed, COLORREF crDisabl ) { SetSolidBrushes( CColour::FromCOLORREF( crEnable ), CColour::FromCOLORREF( crHighlt ), CColour::FromCOLORREF( crPushed ), CColour::FromCOLORREF( crDisabl ) ); }
+		inline void SetBrushes( COLORREF crEnable, COLORREF crHighlt, COLORREF crPushed, COLORREF crDisabl )
+		{
+			SetSolidBrushes( CColour::FromCOLORREF( crEnable ), CColour::FromCOLORREF( crHighlt ), CColour::FromCOLORREF( crPushed ), CColour::FromCOLORREF( crDisabl ) );
+		}
 		/**
 		 *\brief		Crée un brush de type pattern pour l'état donné.
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
 		 *\param[in]	eState		L'état à affecter
 		 *\param[in]	imgPattern	L'image contenant le pattern
 		 */
-		void SetPatternBrush( eBTN_STATE eState, HBITMAP hPattern, CRect const & rcPattern, BOOL bRedraw=TRUE );
+		void SetPatternBrush( eBTN_STATE eState, HBITMAP hPattern, CRect const & rcPattern, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Crée un brush de type pattern ayant pour pattern un dégradé, pour l'état donné.
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -100,7 +107,7 @@ namespace Joker
 		 *\param[in]	crFin		La couleur de fin( en bas )
 		 *\param[in]	iSteps		Le nombre d'étapes( détermine le nombre de pixels de hauteur du dégradé )
 		 */
-		void SetGradientBrush( eBTN_STATE eState, int iType, CColour const & clDebut, CColour const & clMilieu, CColour const & clFin, int iSteps, BOOL bRedraw=TRUE );
+		void SetGradientBrush( eBTN_STATE eState, int iType, CColour const & clDebut, CColour const & clMilieu, CColour const & clFin, int iSteps, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Définit la couleur du texte, pour l'état donné
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -108,7 +115,7 @@ namespace Joker
 		 *\param[in]	clColour	La couleur
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		void SetTextColour( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw=TRUE );
+		void SetTextColour( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Définit la couleur du texte, pour l'état donné, utilise le CColourManager pour récupérer la couleur
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -116,7 +123,7 @@ namespace Joker
 		 *\param[in]	uiId		L'id de la couleur
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		void SetTextColour( eBTN_STATE eState, UINT uiId, BOOL bRedraw=TRUE );
+		void SetTextColour( eBTN_STATE eState, UINT uiId, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Définit la couleur du texte, pour l'état donné
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -125,7 +132,10 @@ namespace Joker
 		 *\param[in]	eState		L'état à affecter
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		inline void SetTextColour( COLORREF crColour, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw=TRUE )	{ SetTextColour( eState, CColour::FromCOLORREF( crColour ), bRedraw ); }
+		inline void SetTextColour( COLORREF crColour, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw = TRUE )
+		{
+			SetTextColour( eState, CColour::FromCOLORREF( crColour ), bRedraw );
+		}
 		/**
 		 *\brief		Définit la couleur du texte, pour l'état donné
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -134,7 +144,10 @@ namespace Joker
 		 *\param[in]	eState		L'état à affecter
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		inline void SetTextColour( CColour::ePREDEFINED eColour, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw=TRUE )	{ SetTextColour( eState, CColour( eColour ), bRedraw ); }
+		inline void SetTextColour( CColour::ePREDEFINED eColour, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw = TRUE )
+		{
+			SetTextColour( eState, CColour( eColour ), bRedraw );
+		}
 		/**
 		 *\brief		Définit la couleur du texte, pour chaque état
 		 *\param[in]	clEnabled	La couleur du bouton actif
@@ -151,7 +164,7 @@ namespace Joker
 		 *\param[in]	uiPushed	La couleur du bouton cliqué
 		 *\param[in]	uiDisabl	La couleur du bouton inactif
 		 */
-		void SetTextColours( UINT uiEnable, UINT uiHighlt, UINT uiPushed, UINT uiDisabl, BOOL bFromResources=FALSE );
+		void SetTextColours( UINT uiEnable, UINT uiHighlt, UINT uiPushed, UINT uiDisabl, BOOL bFromResources = FALSE );
 		/**
 		 *\brief		Définit la police du texte, pour l'état donné
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -159,7 +172,7 @@ namespace Joker
 		 *\param[in]	pFont		La police
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		void SetFont( eBTN_STATE eState, FontPtr pFont, BOOL bRedraw=TRUE );
+		void SetFont( eBTN_STATE eState, FontPtr pFont, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Définit la police du texte, pour l'état donné
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -168,7 +181,10 @@ namespace Joker
 		 *\param[in]	pFont		La police
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		void SetFont( FontPtr pFont, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw=TRUE ) { SetFont( eState, pFont, bRedraw ); }
+		void SetFont( FontPtr pFont, eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw = TRUE )
+		{
+			SetFont( eState, pFont, bRedraw );
+		}
 		/**
 		 *\brief		Définit la police du texte, pour l'état donné, passe par le CFontManager pour récuperer la police
 		 *\remark		Si eState vaut eBTN_STATE_COUNT, tous les états sont affectés
@@ -176,7 +192,7 @@ namespace Joker
 		 *\param[in]	uiId		L'id de la police
 		 *\param[in]	bRedraw		Pour forcer le redessin
 		 */
-		void SetFont( eBTN_STATE eState, UINT uiId, BOOL bRedraw=TRUE );
+		void SetFont( eBTN_STATE eState, UINT uiId, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Définit les polices utilisées dans les différents états du bouton
 		 *\param[in]	pEnabledFont	La police du bouton actif
@@ -198,7 +214,7 @@ namespace Joker
 		 *\param[in]	bEnable	Dit si on active ou désactive le bouton
 		 *\return		L'état précédent l'appel à cette fonction
 		 */
-		virtual BOOL EnableWindow( BOOL bEnable=TRUE );
+		virtual BOOL EnableWindow( BOOL bEnable = TRUE );
 		/**
 		 *\brief		Définit l'image (pattern brush) de chaque état du bouton, utilise le CImageManager pour charger les images
 		 *\remark		Ecrite pour une meilleure interchangeabilité entre CA2iButton et CTransparentButton
@@ -210,7 +226,7 @@ namespace Joker
 		 *\param[in]	bFromResources	Dit si les id viennent des ressources ou pas
 		 *\return
 		 */
-		void SetImages( int iEnabled, int iHighlight, int iPush, int iDisabled, CRect const & rcFixed=CRect( 0, 0, 0, 0 ), BOOL bFromResources=FALSE );
+		void SetImages( int iEnabled, int iHighlight, int iPush, int iDisabled, CRect const & rcFixed = CRect( 0, 0, 0, 0 ), BOOL bFromResources = FALSE );
 		/**
 		 *\brief		Définit l'image (pattern brush) de chaque état du bouton, utilise le CImageManager pour charger les images
 		 *\remark		Ecrite pour une meilleure interchangeabilité entre CA2iButton et CTransparentButton
@@ -222,7 +238,7 @@ namespace Joker
 		 *\param[in]	bFromResources	Dit si les id viennent des ressources ou pas
 		 *\return
 		 */
-		void SetImage( int nResourceID, CRect const & rcFixed=CRect( 0, 0, 0, 0 ), eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw=TRUE );
+		void SetImage( int nResourceID, CRect const & rcFixed = CRect( 0, 0, 0, 0 ), eBTN_STATE eState = eBTN_STATE_COUNT, BOOL bRedraw = TRUE );
 		/**
 		 *\brief		Fonction définissant le texte du bouton
 		 *\remark		Ecrite pour une meilleure interchangeabilité entre CA2iButton et CTransparentButton
@@ -233,27 +249,42 @@ namespace Joker
 		 *\brief		Définit l'alignement du texte du bouton
 		 *\param[in]	dwAlign	L'alignement
 		 */
-		inline void SetTextAlign( DWORD dwAlign ) { m_dwAlign = dwAlign; }
+		inline void SetTextAlign( DWORD dwAlign )
+		{
+			m_dwAlign = dwAlign;
+		}
 		/**
 		 *\brief		Récupère l'état courant
 		 *\return		L'état courant
 		 */
-		inline eBTN_STATE	GetState()const { return m_eState; }
+		inline eBTN_STATE	GetState()const
+		{
+			return m_eState;
+		}
 		/**
 		 *\brief		Définit les tailles fixes
 		 *\param[in]	Les tailles fixes
 		 */
-		inline void SetFixedSizes( CRect const & rcVal ) { m_rcFixedSizes = rcVal; }
+		inline void SetFixedSizes( CRect const & rcVal )
+		{
+			m_rcFixedSizes = rcVal;
+		}
 		/**
 		 *\brief		Definit si on veut afficher le masque de focus ou pas
 		 *\param[in]	bShow	\p TRUE pour afficher, \p FALSE sinon
 		 */
-		inline void ShowFocus( BOOL bShow ) { m_bDrawFocus = bShow; }
+		inline void ShowFocus( BOOL bShow )
+		{
+			m_bDrawFocus = bShow;
+		}
 		/**
 		 *\brief		Definit si on veut afficher le contour ou pas
 		 *\param[in]	bShow	\p TRUE pour afficher, \p FALSE sinon
 		 */
-		inline void ShowBorder( BOOL bShow ) { m_bDrawBorder = bShow; }
+		inline void ShowBorder( BOOL bShow )
+		{
+			m_bDrawBorder = bShow;
+		}
 
 	private:
 		virtual void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct );
@@ -297,28 +328,43 @@ namespace Joker
 		 *\param[in]	L'état dont on veut récupérer le masque
 		 *\return		Une référence constante sur le masque de l'état concerné
 		 */
-		inline const CTransparentBrush	&	GetBtnBrush		( eBTN_STATE eState )const	{ return m_brushesCheck[eState];	}
+		inline const CTransparentBrush	&	GetBtnBrush( eBTN_STATE eState )const
+		{
+			return m_brushesCheck[eState];
+		}
 		/**
 		 *\brief		Récupère le masque de surbrillance
 		 *\param[in]	L'état dont on veut récupérer le masque
 		 *\return		Une référence non constante sur le masque de l'état concerné
 		 */
-		inline CTransparentBrush	&		GetBtnBrush		( eBTN_STATE eState )		{ return m_brushesCheck[eState];	}
+		inline CTransparentBrush		&	GetBtnBrush( eBTN_STATE eState )
+		{
+			return m_brushesCheck[eState];
+		}
 		/**
 		 *\brief		Définit l'image du bouton coché
 		 *\param[in]	pImage	La nouvelle image
 		 */
-		inline void							SetCheckImage	( ImagePtr pImage )		{ m_pImgCheck = pImage;				}
+		inline void							SetCheckImage( ImagePtr pImage )
+		{
+			m_pImgCheck = pImage;
+		}
 		/**
 		 *\brief		Définit l'image du bouton non coché
 		 *\param[in]	pImage	La nouvelle image
 		 */
-		inline void							SetUncheckImage	( ImagePtr pImage )		{ m_pImgUncheck = pImage;			}
+		inline void							SetUncheckImage( ImagePtr pImage )
+		{
+			m_pImgUncheck = pImage;
+		}
 		/**
 		 *\brief		Définit l'image du bouton désactivé
 		 *\param[in]	pImage	La nouvelle image
 		 */
-		inline void							SetDisableImage	( ImagePtr pImage )		{ m_pImgDisable = pImage;			}
+		inline void							SetDisableImage( ImagePtr pImage )
+		{
+			m_pImgDisable = pImage;
+		}
 
 	private:
 		virtual void DoRelease();

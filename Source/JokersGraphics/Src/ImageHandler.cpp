@@ -40,7 +40,7 @@ namespace Joker
 			HINSTANCE hResourceModule = ::AfxGetResourceHandle();
 			HRSRC hRes = ::FindResource( hResourceModule, MAKEINTRESOURCE( p_image.GetId() ), RT_BITMAP );
 
-			if ( ! hRes )
+			if ( !hRes )
 			{
 				hRes = ::FindResource( hResourceModule, MAKEINTRESOURCE( p_image.GetId() ), _T( "PNG" ) );
 			}
@@ -53,7 +53,7 @@ namespace Joker
 			Load( p_image, p_image.GetId() );
 		}
 
-		l_bReturn = ! p_image.IsNull();
+		l_bReturn = !p_image.IsNull();
 
 		return l_bReturn;
 	}

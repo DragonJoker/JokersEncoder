@@ -8,10 +8,10 @@
 namespace GL2D
 {
 	//! Fonction de création d'identificateur OpenGL.
-	typedef std::function< HRESULT ( GLsizei, GLuint * ) > Ctor;
+	typedef std::function< HRESULT( GLsizei, GLuint * ) > Ctor;
 	//! Fonction de destruction d'identificateur OpenGL.
-	typedef std::function< HRESULT ( GLsizei, const GLuint * ) > Dtor;
-	
+	typedef std::function< HRESULT( GLsizei, const GLuint * ) > Dtor;
+
 	/*!
 	\author 	Sylvain DOREMUS
 	\brief		Gère l'identificateur OpenGL d'un objet.

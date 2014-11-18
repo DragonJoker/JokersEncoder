@@ -19,10 +19,10 @@ namespace Joker
 	}
 
 	CColour::CColour( ePREDEFINED eCColour )
-		:	r( BYTE(( eCColour & 0xFF000000 ) >> 24 ) )
-		,	g( BYTE(( eCColour & 0x00FF0000 ) >> 16 ) )
-		,	b( BYTE(( eCColour & 0x0000FF00 ) >>  8 ) )
-		,	a( BYTE(( eCColour & 0x000000FF ) >>  0 ) )
+		:	r( BYTE( ( eCColour & 0xFF000000 ) >> 24 ) )
+		,	g( BYTE( ( eCColour & 0x00FF0000 ) >> 16 ) )
+		,	b( BYTE( ( eCColour & 0x0000FF00 ) >>  8 ) )
+		,	a( BYTE( ( eCColour & 0x000000FF ) >>  0 ) )
 	{
 	}
 
@@ -157,55 +157,55 @@ namespace Joker
 
 	CColour CColour::FromRGB( DWORD dwCColour )
 	{
-		BYTE r = BYTE(( dwCColour & 0x00FF0000 ) >> 16 );
-		BYTE g = BYTE(( dwCColour & 0x0000FF00 ) >>  8 );
-		BYTE b = BYTE(( dwCColour & 0x000000FF ) >>  0 );
+		BYTE r = BYTE( ( dwCColour & 0x00FF0000 ) >> 16 );
+		BYTE g = BYTE( ( dwCColour & 0x0000FF00 ) >>  8 );
+		BYTE b = BYTE( ( dwCColour & 0x000000FF ) >>  0 );
 		BYTE a = 255;
 		return FromComponents( r, g, b, a );
 	}
 
 	CColour CColour::FromBGR( DWORD dwCColour )
 	{
-		BYTE b = BYTE(( dwCColour & 0x00FF0000 ) >> 16 );
-		BYTE g = BYTE(( dwCColour & 0x0000FF00 ) >>  8 );
-		BYTE r = BYTE(( dwCColour & 0x000000FF ) >>  0 );
+		BYTE b = BYTE( ( dwCColour & 0x00FF0000 ) >> 16 );
+		BYTE g = BYTE( ( dwCColour & 0x0000FF00 ) >>  8 );
+		BYTE r = BYTE( ( dwCColour & 0x000000FF ) >>  0 );
 		BYTE a = 255;
 		return FromComponents( r, g, b, a );
 	}
 
 	CColour CColour::FromARGB( DWORD dwCColour )
 	{
-		BYTE a = BYTE(( dwCColour & 0xFF000000 ) >> 24 );
-		BYTE r = BYTE(( dwCColour & 0x00FF0000 ) >> 16 );
-		BYTE g = BYTE(( dwCColour & 0x0000FF00 ) >>  8 );
-		BYTE b = BYTE(( dwCColour & 0x000000FF ) >>  0 );
+		BYTE a = BYTE( ( dwCColour & 0xFF000000 ) >> 24 );
+		BYTE r = BYTE( ( dwCColour & 0x00FF0000 ) >> 16 );
+		BYTE g = BYTE( ( dwCColour & 0x0000FF00 ) >>  8 );
+		BYTE b = BYTE( ( dwCColour & 0x000000FF ) >>  0 );
 		return FromComponents( r, g, b, a );
 	}
 
 	CColour CColour::FromBGRA( DWORD dwCColour )
 	{
-		BYTE b = BYTE(( dwCColour & 0xFF000000 ) >> 24 );
-		BYTE g = BYTE(( dwCColour & 0x00FF0000 ) >> 16 );
-		BYTE r = BYTE(( dwCColour & 0x0000FF00 ) >>  8 );
-		BYTE a = BYTE(( dwCColour & 0x000000FF ) >>  0 );
-		return FromComponents( r, g, b, a );		   
-	}												   
-												   
-	CColour CColour::FromRGBA( DWORD dwCColour )		   
-	{												   
-		BYTE r = BYTE(( dwCColour & 0xFF000000 ) >> 24 );
-		BYTE g = BYTE(( dwCColour & 0x00FF0000 ) >> 16 );
-		BYTE b = BYTE(( dwCColour & 0x0000FF00 ) >>  8 );
-		BYTE a = BYTE(( dwCColour & 0x000000FF ) >>  0 );
-		return FromComponents( r, g, b, a );		   
-	}												   
-												   
-	CColour CColour::FromABGR( DWORD dwCColour )		   
-	{												   
-		BYTE a = BYTE(( dwCColour & 0xFF000000 ) >> 24 );
-		BYTE b = BYTE(( dwCColour & 0x00FF0000 ) >> 16 );
-		BYTE g = BYTE(( dwCColour & 0x0000FF00 ) >>  8 );
-		BYTE r = BYTE(( dwCColour & 0x000000FF ) >>  0 );
+		BYTE b = BYTE( ( dwCColour & 0xFF000000 ) >> 24 );
+		BYTE g = BYTE( ( dwCColour & 0x00FF0000 ) >> 16 );
+		BYTE r = BYTE( ( dwCColour & 0x0000FF00 ) >>  8 );
+		BYTE a = BYTE( ( dwCColour & 0x000000FF ) >>  0 );
+		return FromComponents( r, g, b, a );
+	}
+
+	CColour CColour::FromRGBA( DWORD dwCColour )
+	{
+		BYTE r = BYTE( ( dwCColour & 0xFF000000 ) >> 24 );
+		BYTE g = BYTE( ( dwCColour & 0x00FF0000 ) >> 16 );
+		BYTE b = BYTE( ( dwCColour & 0x0000FF00 ) >>  8 );
+		BYTE a = BYTE( ( dwCColour & 0x000000FF ) >>  0 );
+		return FromComponents( r, g, b, a );
+	}
+
+	CColour CColour::FromABGR( DWORD dwCColour )
+	{
+		BYTE a = BYTE( ( dwCColour & 0xFF000000 ) >> 24 );
+		BYTE b = BYTE( ( dwCColour & 0x00FF0000 ) >> 16 );
+		BYTE g = BYTE( ( dwCColour & 0x0000FF00 ) >>  8 );
+		BYTE r = BYTE( ( dwCColour & 0x000000FF ) >>  0 );
 		return FromComponents( r, g, b, a );
 	}
 
@@ -213,7 +213,7 @@ namespace Joker
 	{
 		return ToBGR();
 	}
-	
+
 #if DEF_USING_D2D
 	D2D1::ColorF CColour::ToD2DColor()const
 	{

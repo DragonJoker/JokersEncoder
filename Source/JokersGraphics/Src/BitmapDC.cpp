@@ -14,7 +14,7 @@ namespace Joker
 {
 	namespace
 	{
-		int WINAPI DrawText( HDC hdc, LPCTSTR lpchText, int cchText, LPRECT lprc, UINT format)
+		int WINAPI DrawText( HDC hdc, LPCTSTR lpchText, int cchText, LPRECT lprc, UINT format )
 		{
 #if defined( _UNICODE )
 			return ::DrawTextW( hdc, lpchText, cchText, lprc, format );
@@ -25,10 +25,10 @@ namespace Joker
 	}
 
 	CBitmapDC::CBitmapDC( HDC hDC )
-		:	m_hBaseDC		( hDC )
-		,	m_hDC			( NULL )
-		,	m_hBitmap		( NULL )
-		,	m_bOwnBitmap	( true )
+		:	m_hBaseDC( hDC )
+		,	m_hDC( NULL )
+		,	m_hBitmap( NULL )
+		,	m_bOwnBitmap( true )
 	{
 		m_hDC = ::CreateCompatibleDC( m_hBaseDC );
 	}
@@ -39,10 +39,10 @@ namespace Joker
 	}
 
 	CBitmapDC::CBitmapDC( CBitmapDC const & bmpDC )
-		:	m_hBaseDC		( bmpDC )
-		,	m_hDC			( NULL )
-		,	m_hBitmap		( NULL )
-		,	m_bOwnBitmap	( true )
+		:	m_hBaseDC( bmpDC )
+		,	m_hDC( NULL )
+		,	m_hBitmap( NULL )
+		,	m_bOwnBitmap( true )
 	{
 		m_hDC = ::CreateCompatibleDC( m_hBaseDC );
 	}
@@ -78,7 +78,7 @@ namespace Joker
 	{
 		HBITMAP hReturn = NULL;
 
-		if ( ! m_bOwnBitmap )
+		if ( !m_bOwnBitmap )
 		{
 			hReturn = m_hBitmap;
 			m_hBitmap = NULL;
@@ -132,7 +132,7 @@ namespace Joker
 
 	void CBitmapDC::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
 	{
-		if ( ! ::AlphaBlend( m_hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), blendFunc ) ) 
+		if ( !::AlphaBlend( m_hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), blendFunc ) )
 		{
 			ASSERT( FALSE );
 		}

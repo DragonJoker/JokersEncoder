@@ -36,7 +36,7 @@ namespace Joker
 		 *\param[in]	hCursor	Le curseur
 		 *\param[in]	bOwn	Dit si CCursor gère ce curseur
 		 */
-		virtual HCURSOR SetCursor( HCURSOR hCursor, BOOL bOwn=TRUE )
+		virtual HCURSOR SetCursor( HCURSOR hCursor, BOOL bOwn = TRUE )
 		{
 			return CCursorBase::SetCursor( hCursor, bOwn );
 		}
@@ -72,7 +72,7 @@ namespace Joker
 	};
 
 	BEGIN_TEMPLATE_MESSAGE_MAP( CCursor, T, T )
-		ON_WM_SETCURSOR ()
+	ON_WM_SETCURSOR()
 	END_MESSAGE_MAP()
 }
 

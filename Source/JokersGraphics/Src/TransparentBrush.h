@@ -28,7 +28,7 @@ namespace Joker
 		 *\remark		Définit la couleur du brush
 		 *\param[in]	crColour	La nouvelle couleur( ne change pas l'alpha )
 		 */
-		CTransparentBrush( CColour const & clColour=CColour( CColour::MediumAlphaBlack ) );
+		CTransparentBrush( CColour const & clColour = CColour( CColour::MediumAlphaBlack ) );
 		/**
 		 *\brief		Constructeur à partir d'un pattern
 		 *\remark		Définit le pattern du brush à partir d'une image
@@ -78,23 +78,38 @@ namespace Joker
 		/**
 		 *\return		Le HBITMAP contenant le pattern
 		 */
-		inline HBITMAP GetPattern()const { return m_hPattern; }
+		inline HBITMAP GetPattern()const
+		{
+			return m_hPattern;
+		}
 		/**
 		 *\return		Le CBitmapDC du pattern
 		 */
-		inline CBitmapDC const & GetDC()const { return m_bmpPatternDC; }
+		inline CBitmapDC const & GetDC()const
+		{
+			return m_bmpPatternDC;
+		}
 		/**
 		 *\return		Le CBitmapDC du pattern
 		 */
-		inline CBitmapDC & GetDC() { return m_bmpPatternDC; }
+		inline CBitmapDC & GetDC()
+		{
+			return m_bmpPatternDC;
+		}
 		/**
 		 *\return		Le CRect du pattern
 		 */
-		inline CRect const & GetRect()const	{ return m_rcSrcPattern; }
+		inline CRect const & GetRect()const
+		{
+			return m_rcSrcPattern;
+		}
 		/**
 		 *\return		Le CRect du pattern
 		 */
-		inline BYTE GetAlpha()const	{ return 255; }
+		inline BYTE GetAlpha()const
+		{
+			return 255;
+		}
 		/**
 		 *\brief		Opérateur d'affectation
 		 *\return		Une référence sur ce CTransparentBrush
@@ -104,7 +119,10 @@ namespace Joker
 		 *\brief		Opérateur de conversion implicite vers HBITMAP
 		 *\return		Le pattern de ce CTransparentBrush
 		 */
-		inline operator HBITMAP	()const	{ return m_hPattern; }
+		inline operator HBITMAP()const
+		{
+			return m_hPattern;
+		}
 		//@}
 
 	protected:

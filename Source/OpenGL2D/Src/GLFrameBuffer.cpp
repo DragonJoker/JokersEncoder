@@ -17,9 +17,9 @@ namespace GL2D
 	HRESULT CFrameBuffer::Initialise( std::shared_ptr< CContext > context )
 	{
 		HRESULT hr = CObject::Create(
-			std::bind( &CContext::GenFramebuffers, context, std::placeholders::_1, std::placeholders::_2 ),
-			std::bind( &CContext::DeleteFramebuffers, context, std::placeholders::_1, std::placeholders::_2 )
-		);
+						 std::bind( &CContext::GenFramebuffers, context, std::placeholders::_1, std::placeholders::_2 ),
+						 std::bind( &CContext::DeleteFramebuffers, context, std::placeholders::_1, std::placeholders::_2 )
+					 );
 
 		m_context = context;
 		return hr;

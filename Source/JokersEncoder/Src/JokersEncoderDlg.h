@@ -22,7 +22,7 @@ namespace Joker
 		CTransparentButton m_btnAddFolder;
 
 	public:
-		CJokersEncoderDlg( CWnd * pParent = NULL);
+		CJokersEncoderDlg( CWnd * pParent = NULL );
 
 	protected:
 		virtual void DoDataExchange( CDataExchange * pDX );
@@ -32,7 +32,8 @@ namespace Joker
 		afx_msg int OnCreate( LPCREATESTRUCT lpCreateStruct );
 		afx_msg void OnPaint();
 		afx_msg HCURSOR OnQueryDragIcon();
-		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID);
+		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID );
+		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
 		afx_msg void OnBnClickedFile();
 		afx_msg void OnBnClickedFolder();
 		afx_msg void OnBnClickedOptions();

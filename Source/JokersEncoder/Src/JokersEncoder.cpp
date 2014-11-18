@@ -28,9 +28,9 @@ CJokersEncoderApp::CJokersEncoderApp()
 BOOL CJokersEncoderApp::InitInstance()
 {
 	INITCOMMONCONTROLSEX InitCtrls;
-	InitCtrls.dwSize = sizeof(InitCtrls);
+	InitCtrls.dwSize = sizeof( InitCtrls );
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
-	InitCommonControlsEx(&InitCtrls);
+	InitCommonControlsEx( &InitCtrls );
 	CWinApp::InitInstance();
 
 	DWORD length = ::GetCurrentDirectory( 0, NULL );
@@ -39,20 +39,21 @@ BOOL CJokersEncoderApp::InitInstance()
 	Joker::CLogger::SetFileName( String( directory ) + _T( "\\JokersEncoder.log" ), eLOG_TYPE_COUNT );
 	delete [] directory;
 
-	CShellManager *pShellManager = new CShellManager;
+	CShellManager * pShellManager = new CShellManager;
 	Joker::CImage::AddHandler( eIMAGE_TYPE_BITMAP, new CBmpImageHandler() );
 	Joker::CImage::AddHandler( eIMAGE_TYPE_PNG, new CPngImageHandler() );
 
-	SetRegistryKey(_T("Applications locales générées par AppWizard"));
+	SetRegistryKey( _T( "Applications locales générées par AppWizard" ) );
 
 	CJokersEncoderDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 
-	if (pShellManager != NULL)
+	if ( pShellManager != NULL )
 	{
 		delete pShellManager;
 	}
+
 	Joker::CImage::DeleteHandlers();
 
 	return FALSE;

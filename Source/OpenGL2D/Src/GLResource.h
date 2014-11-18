@@ -17,7 +17,7 @@ namespace GL2D
 		GL2D_API virtual ~CResource()
 		{
 		}
-		
+
 		GL2D_API STDMETHOD_( void, GetFactory )( IGL2DFactory ** pFactory ) const
 		{
 		}

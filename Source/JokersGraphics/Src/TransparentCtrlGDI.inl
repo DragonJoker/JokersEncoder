@@ -4,16 +4,16 @@ namespace Joker
 {
 	template< typename T >
 	CTransparentCtrlT<T, eRENDERER_GDI>::CTransparentCtrlT()
-		:	m_bPainting			( false	 )
-		,	m_bHasBackground	( false	 )
-		,	m_brushMask			( CColour( CColour::Transparent ) )
-		,	m_clText			( CColour( CColour::FullAlphaBlack ) )
-		,	m_clBorder			( CColour( CColour::FullAlphaBlack ) )
-		,	m_bFocused			( false	 )
-		,	m_bMouseOver		( false )
-		,	m_bHasBorder		( true	)
-		,	m_eRenderer			( eRENDERER_GDI )
-		,	m_bReinitBackground	( false )
+		:	m_bPainting( false )
+		,	m_bHasBackground( false )
+		,	m_brushMask( CColour( CColour::Transparent ) )
+		,	m_clText( CColour( CColour::FullAlphaBlack ) )
+		,	m_clBorder( CColour( CColour::FullAlphaBlack ) )
+		,	m_bFocused( false )
+		,	m_bMouseOver( false )
+		,	m_bHasBorder( true	)
+		,	m_eRenderer( eRENDERER_GDI )
+		,	m_bReinitBackground( false )
 	{
 	}
 
@@ -85,7 +85,7 @@ namespace Joker
 
 		// On dessine le premier plan
 		DoDrawForeground( rcRect );
-	
+
 		// On blitte le backbuffer dans le dc final
 		::BitBlt( m_hDC, 0, 0, rcRect.Width(), rcRect.Height(), backDC, 0, 0, SRCCOPY );
 		m_pBackDC = NULL;
@@ -107,11 +107,11 @@ namespace Joker
 		CString csText;
 		GetWindowText( csText );
 
-		if ( ! csText.IsEmpty() )
+		if ( !csText.IsEmpty() )
 		{
 			LOGFONT logFont;
 			GetFont()->GetLogFont( & logFont );
-			m_pBackDC->DrawSolidText(( * GetFont() ), logFont, m_clText, csText, rcRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER );
+			m_pBackDC->DrawSolidText( ( * GetFont() ), logFont, m_clText, csText, rcRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER );
 		}
 
 		// On dessine le contour
@@ -166,23 +166,23 @@ namespace Joker
 			VOID * pvBits;
 			BLENDFUNCTION bf;
 
-			// create a DC for our bitmap -- the source DC for AlphaBlend  
+			// create a DC for our bitmap -- the source DC for AlphaBlend
 			CBitmapDC bmpDC( *m_pBackDC );
 
-			// setup bitmap info  
-			// set the bitmap width and height to 60% of the width and height of each of the three horizontal areas. Later on, the 
+			// setup bitmap info
+			// set the bitmap width and height to 60% of the width and height of each of the three horizontal areas. Later on, the
 			bmi.bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
 			bmi.bmiHeader.biWidth = size.cx;
 			bmi.bmiHeader.biHeight = size.cy;
 			bmi.bmiHeader.biPlanes = 1;
-			bmi.bmiHeader.biBitCount = 32;         // four 8-bit components 
+			bmi.bmiHeader.biBitCount = 32;         // four 8-bit components
 			bmi.bmiHeader.biCompression = BI_RGB;
 			bmi.bmiHeader.biSizeImage = size.cx * size.cy * 4;
 
-			// create our DIB section and select the bitmap into the dc 
+			// create our DIB section and select the bitmap into the dc
 			hBitmap = ::CreateDIBSection( bmpDC, & bmi, DIB_RGB_COLORS, & pvBits, NULL, 0x0 );
 
-			// select the bitmap into the dc 
+			// select the bitmap into the dc
 			bmpDC.Attach( hBitmap );
 
 			memcpy( pvBits, & arrayBits[0], bmi.bmiHeader.biSizeImage );
@@ -245,21 +245,21 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::DrawSolidText( HFONT UNUSED( hFont ), LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle )
 	{
-	//	if ( dwStyle & DT_VCENTER )
+		//	if ( dwStyle & DT_VCENTER )
 		{
 			CFont a2iFont( logFont );
 			CDrawer< eRENDERER_GDI > drawer( *m_pBackDC, m_brushMask.GetRect() );
-			drawer.DrawFormattedText( a2iFont, clColour.ToCOLORREF(), (LPCTSTR)csText, rcRect, dwStyle );
-	//		::DrawText( *m_pBackDC, csText, csText.GetLength(), rcRect, dwStyle );
+			drawer.DrawFormattedText( a2iFont, clColour.ToCOLORREF(), ( LPCTSTR )csText, rcRect, dwStyle );
+			//		::DrawText( *m_pBackDC, csText, csText.GetLength(), rcRect, dwStyle );
 		}
-	// 	else
-	// 	{
-	// 		HFONT hOldFont = HFONT( ::SelectObject( *m_pBackDC, hFont ) );
-	// 		COLORREF crOldTextColor = ::SetTextColor( *m_pBackDC, clColour.ToBGR() );
-	// 		::DrawText( *m_pBackDC, csText, csText.GetLength(), rcRect, dwStyle );
-	// 		::SetTextColor( *m_pBackDC, crOldTextColor );
-	// 		::SelectObject( *m_pBackDC, hOldFont );
-	// 	}
+		// 	else
+		// 	{
+		// 		HFONT hOldFont = HFONT( ::SelectObject( *m_pBackDC, hFont ) );
+		// 		COLORREF crOldTextColor = ::SetTextColor( *m_pBackDC, clColour.ToBGR() );
+		// 		::DrawText( *m_pBackDC, csText, csText.GetLength(), rcRect, dwStyle );
+		// 		::SetTextColor( *m_pBackDC, crOldTextColor );
+		// 		::SelectObject( *m_pBackDC, hOldFont );
+		// 	}
 	}
 
 	template< typename T >
@@ -279,7 +279,7 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
 	{
-		if ( ! ::AlphaBlend( *m_pBackDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), blendFunc ) ) 
+		if ( !::AlphaBlend( *m_pBackDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), blendFunc ) )
 		{
 			ASSERT( FALSE );
 		}
@@ -297,12 +297,12 @@ namespace Joker
 	void CTransparentCtrlT< T, eRENDERER_GDI >::DoInitialiseBackground()
 	{
 		CRect		rcRect;
-		CDC *		pDC;
+		CDC 	*	pDC;
 		int			iWidth;
 		int			iHeight;
 		CDC			memdc;
 		CBitmap *	pOldbmp;
-		CWnd *		pParent;
+		CWnd 	*	pParent;
 
 		pParent = BaseType::GetParent();
 
@@ -354,7 +354,9 @@ namespace Joker
 			ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
 			ON_WM_SETFOCUS()
 			ON_WM_KILLFOCUS()
-			{0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0 }
+			{
+				0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0
+			}
 		};
 		static const AFX_MSGMAP messageMap =
 		{
@@ -369,7 +371,7 @@ namespace Joker
 	{
 		BOOL bReturn = TRUE;
 
-		if ( ! m_bHasBackground )
+		if ( !m_bHasBackground )
 		{
 			DoInitialiseBackground();
 			m_bHasBackground = true;
@@ -414,7 +416,7 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT<T, eRENDERER_GDI>::OnMouseMove( UINT nFlags, CPoint point )
 	{
-		if ( ! m_bMouseOver )
+		if ( !m_bMouseOver )
 		{
 			TRACKMOUSEEVENT tme = { sizeof( TRACKMOUSEEVENT ), TME_LEAVE, m_hWnd, 0 };
 			TrackMouseEvent( & tme );
