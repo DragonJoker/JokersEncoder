@@ -87,7 +87,7 @@ namespace Joker
 		 *\brief		Récupère la hauteur de la police
 		 *\return		La hauteur de la police
 		 */
-		inline int		GetHeight(	)const
+		inline int GetHeight()const
 		{
 			return m_lfLogFont.lfHeight;
 		}
@@ -95,7 +95,7 @@ namespace Joker
 		 *\brief		Récupère si la police est en italique
 		 *\return		\p FALSE si pas italique
 		 */
-		inline BOOL		IsItalic(	)const
+		inline BOOL IsItalic()const
 		{
 			return m_lfLogFont.lfItalic;
 		}
@@ -103,7 +103,7 @@ namespace Joker
 		 *\brief		Récupère si la police est soulignée
 		 *\return		\p FALSE si pas soulignée
 		 */
-		inline BOOL		IsUnderlined(	)const
+		inline BOOL IsUnderlined()const
 		{
 			return m_lfLogFont.lfUnderline;
 		}
@@ -111,7 +111,7 @@ namespace Joker
 		 *\brief		Récupère le poids de la police
 		 *\return		Le poids de la police
 		 */
-		inline int		GetWeight(	)const
+		inline int GetWeight()const
 		{
 			return m_lfLogFont.lfWeight;
 		}
@@ -119,7 +119,7 @@ namespace Joker
 		 *\brief		Récupère le nom de la police
 		 *\return		Le nom de la police
 		 */
-		inline String	GetFaceName(	)const
+		inline String GetFaceName()const
 		{
 			return m_lfLogFont.lfFaceName;
 		}
@@ -128,7 +128,7 @@ namespace Joker
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	iVal	La nouvelle valeur
 		 */
-		inline void		SetHeight( int iVal	)
+		inline void SetHeight( int iVal )
 		{
 			m_lfLogFont.lfHeight = iVal;
 			DoCreate();
@@ -138,7 +138,7 @@ namespace Joker
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	iVal	La nouvelle valeur
 		 */
-		inline void		SetWeight( int iVal	)
+		inline void SetWeight( int iVal )
 		{
 			m_lfLogFont.lfWeight = iVal;
 			DoCreate();
@@ -148,7 +148,7 @@ namespace Joker
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	bVal	La nouvelle valeur
 		 */
-		inline void		SetItalic( BOOL bVal	)
+		inline void SetItalic( BOOL bVal )
 		{
 			m_lfLogFont.lfItalic = BYTE( bVal );
 			DoCreate();
@@ -158,7 +158,7 @@ namespace Joker
 		 *\remark		La police est recréée ensuite
 		 *\param[in]	bVal	La nouvelle valeur
 		 */
-		inline void		SetUnderlined( BOOL bVal	)
+		inline void SetUnderlined( BOOL bVal )
 		{
 			m_lfLogFont.lfUnderline = BYTE( bVal );
 			DoCreate();
@@ -167,7 +167,7 @@ namespace Joker
 		 *\brief		Dit si la police est chargée
 		 *\return		\p FALSE si la police n'est pas initialisée
 		 */
-		inline BOOL		IsLoaded()
+		inline BOOL IsLoaded()
 		{
 			return m_hFont != NULL ? TRUE : FALSE;
 		}
@@ -177,11 +177,16 @@ namespace Joker
 		void DoCreate();
 
 	protected:
-		LOGFONT	m_lfLogFont;	//!< Les informations de la police
-		double	m_dRatio;		//!< Le ratio de création
-		HFONT	m_hFont;		//!< La police
-		BOOL	m_bOwnFont;		//!< Dit si on a la charge de la destruction de la police
-		HFONT	m_hOldFont;		//!< L'ancienne police (pour les fonctions Select/Deselect)
+		//! Les informations de la police
+		LOGFONT m_lfLogFont;
+		//! Le ratio de création
+		double m_dRatio;
+		//! La police
+		HFONT m_hFont;
+		//! Dit si on a la charge de la destruction de la police
+		BOOL m_bOwnFont;
+		//! L'ancienne police (pour les fonctions Select/Deselect)
+		HFONT m_hOldFont;
 	};
 
 	typedef std::shared_ptr< Joker::CFont > FontPtr;

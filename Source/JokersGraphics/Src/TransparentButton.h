@@ -11,12 +11,12 @@ namespace Joker
 	*/
 	typedef enum
 	{
-		eBTN_STATE_DISABLED		//!< Bouton désactivé
-		,	eBTN_STATE_ENABLED		//!< Bouton activé
-		,	eBTN_STATE_HIGHLIGHTED	//!< Bouton au-dessus duquel se trouve la souris
-		,	eBTN_STATE_PUSHED		//!< Bouton cliqué
-		,	eBTN_STATE_HOVERED		//!< Souris reste au-dessus du bouton
-		,	eBTN_STATE_COUNT
+		eBTN_STATE_DISABLED,	//!< Bouton désactivé
+		eBTN_STATE_ENABLED,		//!< Bouton activé
+		eBTN_STATE_HIGHLIGHTED,	//!< Bouton au-dessus duquel se trouve la souris
+		eBTN_STATE_PUSHED,		//!< Bouton cliqué
+		eBTN_STATE_HOVERED,		//!< Souris reste au-dessus du bouton
+		eBTN_STATE_COUNT
 	}	eBTN_STATE;
 	/*!
 	\author		Sylvain DOREMUS
@@ -30,16 +30,6 @@ namespace Joker
 	{
 	public:
 		typedef CTransparentCtrlT< CCursor< CButton >, eDEFAULT_RENDERER > BaseType;
-
-	protected:
-		CTransparentBrush	m_brushes[eBTN_STATE_COUNT];		//!< Les masques du bouton (contiennent les images)
-		CColour				m_textColours[eBTN_STATE_COUNT];	//!< Les couleurs des textes
-		FontPtr				m_pFonts[eBTN_STATE_COUNT];			//!< Les fonts
-		eBTN_STATE			m_eState;							//!< L'état courant
-		DWORD				m_dwAlign;							//!< L'alignement du texte
-		CRect				m_rcFixedSizes;						//!< Les dimensions fixes (non stretchées)
-		BOOL				m_bDrawBorder;						//!< Dit si on dessine le contour
-		BOOL				m_bDrawFocus;						//!< Dit si on dessine le masque de focus
 
 	public:
 		/**
@@ -299,90 +289,25 @@ namespace Joker
 		afx_msg void OnLButtonUp( UINT nFlags, CPoint point );
 		afx_msg void OnSetFocus( CWnd * pOldWnd );
 		afx_msg void OnKillFocus( CWnd * pNewWnd );
-	};
-	/*!
-	\author 	Sylvain DOREMUS
-	\date 		23/05/2012
-	\brief		Classe commune pour les boutons radio et checkbox
-	\remark		Etend CTransparentButton
-	*/
-	class CTransparentRadioCheck : public CTransparentButton
-	{
-	private:
-		ImagePtr			m_pImgCheck;						//!< L'image du bouton coché
-		ImagePtr			m_pImgUncheck;						//!< L'image du bouton non coché
-		ImagePtr			m_pImgDisable;						//!< L'image du bouton désactivé
-		CTransparentBrush	m_brushesCheck[eBTN_STATE_COUNT];	//!< Les masques de surbrillance en fonction e l'état
 
-	public:
-		/**
-		 *\brief		Constructeur
-		 */
-		CTransparentRadioCheck();
-		/**
-		 *\brief		Destructeur
-		 */
-		virtual ~CTransparentRadioCheck();
-		/**
-		 *\brief		Récupère le masque de surbrillance
-		 *\param[in]	L'état dont on veut récupérer le masque
-		 *\return		Une référence constante sur le masque de l'état concerné
-		 */
-		inline const CTransparentBrush	&	GetBtnBrush( eBTN_STATE eState )const
-		{
-			return m_brushesCheck[eState];
-		}
-		/**
-		 *\brief		Récupère le masque de surbrillance
-		 *\param[in]	L'état dont on veut récupérer le masque
-		 *\return		Une référence non constante sur le masque de l'état concerné
-		 */
-		inline CTransparentBrush		&	GetBtnBrush( eBTN_STATE eState )
-		{
-			return m_brushesCheck[eState];
-		}
-		/**
-		 *\brief		Définit l'image du bouton coché
-		 *\param[in]	pImage	La nouvelle image
-		 */
-		inline void							SetCheckImage( ImagePtr pImage )
-		{
-			m_pImgCheck = pImage;
-		}
-		/**
-		 *\brief		Définit l'image du bouton non coché
-		 *\param[in]	pImage	La nouvelle image
-		 */
-		inline void							SetUncheckImage( ImagePtr pImage )
-		{
-			m_pImgUncheck = pImage;
-		}
-		/**
-		 *\brief		Définit l'image du bouton désactivé
-		 *\param[in]	pImage	La nouvelle image
-		 */
-		inline void							SetDisableImage( ImagePtr pImage )
-		{
-			m_pImgDisable = pImage;
-		}
-
-	private:
-		virtual void DoRelease();
-		virtual void DoDrawBackground( CRect const & rcRect );
-		virtual void DoDrawForeground( CRect const & rcRect );
+	protected:
+		//! Les masques du bouton (contiennent les images)
+		CTransparentBrush m_brushes[eBTN_STATE_COUNT];
+		//! Les couleurs des textes
+		CColour m_textColours[eBTN_STATE_COUNT];
+		//! Les fonts
+		FontPtr m_pFonts[eBTN_STATE_COUNT];
+		//! L'état courant
+		eBTN_STATE m_eState;
+		//! L'alignement du texte
+		DWORD m_dwAlign;
+		//! Les dimensions fixes (non stretchées)
+		CRect m_rcFixedSizes;
+		//! Dit si on dessine le contour
+		BOOL m_bDrawBorder;
+		//! Dit si on dessine le masque de focus
+		BOOL m_bDrawFocus;
 	};
-	/*!
-	\author 	Sylvain DOREMUS
-	\date 		23/05/2012
-	\brief		Typedef sur CTransparentRadioCheck pour les boutons radio
-	*/
-	typedef CTransparentRadioCheck	CTransparentRadio;
-	/*!
-	\author 	Sylvain DOREMUS
-	\date 		23/05/2012
-	\brief		Typedef sur CTransparentRadioCheck pour les cases à cocher
-	*/
-	typedef CTransparentRadioCheck	CTransparentCheck;
 	/**
 	 *\brief		Macro pour simplifier l'initialisation du bouton
 	 *\param[in]	btnCtrl		Le bouton à initialiser
@@ -415,7 +340,7 @@ namespace Joker
 	 *\param[in]	uiAlign			L'alignement des textes du bouton
 	 *\param[in]	uiCursor		Le curseur utilisé lors du survol du bouton
 	 */
-#	define InitialiseTransparentButton( btnCtrl, ImgTxtFntName, iRatio, tszCaption, uiAlign, uiCursor )					InitialiseTransparentButtonComplete( btnCtrl, ImgTxtFntName, ImgTxtFntName, ImgTxtFntName, iRatio , tszCaption, uiAlign, uiCursor, FALSE )
+#	define InitialiseTransparentButton( btnCtrl, ImgTxtFntName, iRatio, tszCaption, uiAlign, uiCursor ) InitialiseTransparentButtonComplete( btnCtrl, ImgTxtFntName, ImgTxtFntName, ImgTxtFntName, iRatio , tszCaption, uiAlign, uiCursor, FALSE )
 	/**
 	 *\brief		Macro pour simplifier l'initialisation du bouton
 	 *\remark		Utilise InitialiseTransparentButtonComplete
@@ -427,7 +352,7 @@ namespace Joker
 	 *\param[in]	uiAlign			L'alignement des textes du bouton
 	 *\param[in]	uiCursor		Le curseur utilisé lors du survol du bouton
 	 */
-#	define InitialiseTransparentButtonFocused( btnCtrl, ImgTxtFntName, iRatio, tszCaption, uiAlign, uiCursor )			InitialiseTransparentButtonComplete( btnCtrl, ImgTxtFntName, ImgTxtFntName, ImgTxtFntName, iRatio , tszCaption, uiAlign, uiCursor, TRUE )
+#	define InitialiseTransparentButtonFocused( btnCtrl, ImgTxtFntName, iRatio, tszCaption, uiAlign, uiCursor ) InitialiseTransparentButtonComplete( btnCtrl, ImgTxtFntName, ImgTxtFntName, ImgTxtFntName, iRatio , tszCaption, uiAlign, uiCursor, TRUE )
 	/**
 	 *\brief		Macro pour simplifier l'initialisation du bouton
 	 *\remark		Le texte du bouton sera centré verticalement et horizontalement
@@ -438,7 +363,7 @@ namespace Joker
 	 *\param[in]	tszCaption		Le libellé du bouton
 	 *\param[in]	uiCursor		Le curseur utilisé lors du survol du bouton
 	 */
-#	define InitialiseTransparentButtonCentered( btnCtrl, ImgTxtFntName, iRatio, tszCaption, uiCursor )					InitialiseTransparentButtonComplete( btnCtrl, ImgTxtFntName, ImgTxtFntName, ImgTxtFntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
+#	define InitialiseTransparentButtonCentered( btnCtrl, ImgTxtFntName, iRatio, tszCaption, uiCursor ) InitialiseTransparentButtonComplete( btnCtrl, ImgTxtFntName, ImgTxtFntName, ImgTxtFntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
 	/**
 	 *\brief		Macro pour simplifier l'initialisation du bouton
 	 *\remark		Le texte du bouton sera centré verticalement et horizontalement
@@ -450,7 +375,7 @@ namespace Joker
 	 *\param[in]	tszCaption	Le libellé du bouton
 	 *\param[in]	uiCursor	Le curseur utilisé lors du survol du bouton
 	 */
-#	define InitialiseTransparentButtonCenteredColoured( btnCtrl, ImgName, TxtFntName, iRatio, tszCaption, uiCursor )	InitialiseTransparentButtonComplete( btnCtrl, ImgName, TxtFntName, TxtFntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
+#	define InitialiseTransparentButtonCenteredColoured( btnCtrl, ImgName, TxtFntName, iRatio, tszCaption, uiCursor ) InitialiseTransparentButtonComplete( btnCtrl, ImgName, TxtFntName, TxtFntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
 	/**
 	 *\brief		Macro pour simplifier l'initialisation du bouton
 	 *\remark		Le texte du bouton sera centré verticalement et horizontalement
@@ -462,5 +387,5 @@ namespace Joker
 	 *\param[in]	tszCaption	Le libellé du bouton
 	 *\param[in]	uiCursor	Le curseur utilisé lors du survol du bouton
 	 */
-#	define InitialiseTransparentButtonCenteredFont( btnCtrl, ImgTxtName, FntName, iRatio, tszCaption, uiCursor )		InitialiseTransparentButtonComplete( btnCtrl, ImgTxtName, ImgTxtName, FntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
+#	define InitialiseTransparentButtonCenteredFont( btnCtrl, ImgTxtName, FntName, iRatio, tszCaption, uiCursor ) InitialiseTransparentButtonComplete( btnCtrl, ImgTxtName, ImgTxtName, FntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
 }

@@ -38,7 +38,9 @@ namespace Joker
 		}
 
 	protected:
-		int m_iRef;				//!< The number of times this resource is used
-		unsigned int m_uiID;	//!< The resource ID
+		//! The number of times this resource is used
+		int m_iRef;
+		//! The resource ID
+		unsigned int m_uiID;
 	};
 }

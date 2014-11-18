@@ -26,52 +26,52 @@ namespace Joker
 		}
 
 	protected:
-		void		DoReleaseDC();
-		void		DoSetDC( HDC hDC, CRect const & rcRect, BOOL bOwn = FALSE );
+		void DoReleaseDC();
+		void DoSetDC( HDC hDC, CRect const & rcRect, BOOL bOwn = FALSE );
 
-		inline void		DoAttachImage( ImagePtr pImage )
+		inline void DoAttachImage( ImagePtr pImage )
 		{
 			m_pImage = pImage;
 		}
-		inline void		DoDetachImage()
+		inline void DoDetachImage()
 		{
 			m_pImage.reset();
 		}
-		inline COLORREF	DoSetForegroundColour( COLORREF crColour )
+		inline COLORREF DoSetForegroundColour( COLORREF crColour )
 		{
 			COLORREF crReturn = m_crForeground;
 			m_crForeground = crColour;
 			return crReturn;
 		}
-		inline COLORREF	DoSetBackgroundColour( COLORREF crColour )
+		inline COLORREF DoSetBackgroundColour( COLORREF crColour )
 		{
 			COLORREF crReturn = m_crBackground;
 			m_crBackground = crColour;
 			return crReturn;
 		}
-		inline void		DoSetFont( Joker::CFont & ca2iFont )
+		inline void DoSetFont( Joker::CFont & ca2iFont )
 		{
 			m_pOldFont = m_pCurrentFont;
 			m_pCurrentFont = & ca2iFont;
 		}
-		inline void		DoUnsetFont()
+		inline void DoUnsetFont()
 		{
 			m_pCurrentFont = m_pOldFont;
 			m_pOldFont = & m_initialFont;
 		}
-		inline HPEN		DoSetPen( HPEN hPen )
+		inline HPEN DoSetPen( HPEN hPen )
 		{
 			m_hOldPen = m_hCurrentPen;
 			m_hCurrentPen = hPen;
 			return m_hOldPen;
 		}
-		inline HBRUSH	DoSetBrush( HBRUSH hBrush )
+		inline HBRUSH DoSetBrush( HBRUSH hBrush )
 		{
 			m_hOldBrush = m_hCurrentBrush;
 			m_hCurrentBrush = hBrush;
 			return m_hOldBrush;
 		}
-		inline HBITMAP	DoSetBitmap( HBITMAP hBitmap )
+		inline HBITMAP DoSetBitmap( HBITMAP hBitmap )
 		{
 			m_hOldBitmap = m_hCurrentBitmap;
 			m_hCurrentBitmap = hBitmap;

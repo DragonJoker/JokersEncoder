@@ -1,7 +1,7 @@
 #pragma once
 
 #define DEF_USING_D2D 1
-#define DEF_USING_OGL 1
+#define DEF_USING_OGL 0
 
 #include <sstream>
 #include <vector>
@@ -28,7 +28,7 @@
 #define DEF_A2I_STRING
 
 #if defined( __AFX_H__ )
-//#	define DEF_USING_CSTRING 1
+#	define DEF_USING_CSTRING 1
 #endif
 
 typedef std::basic_string<			TCHAR						>	String;
@@ -61,10 +61,10 @@ namespace Joker
 
 	typedef enum
 	{
-		eRENDERER_GDI
-		,	eRENDERER_D2D
-		,	eRENDERER_OGL
-		,	eRENDERER_COUNT
+		eRENDERER_GDI,
+		eRENDERER_D2D,
+		eRENDERER_OGL,
+		eRENDERER_COUNT,
 	}	eRENDERER;
 
 	JGRA_API COLORREF MakeRGBA( DWORD dwR, DWORD dwG, DWORD dwB, DWORD dwA );

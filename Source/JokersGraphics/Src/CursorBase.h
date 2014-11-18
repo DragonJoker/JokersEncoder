@@ -41,9 +41,12 @@ namespace Joker
 		}
 
 	protected:
-		HCURSOR m_hBasicCursor;		//!< Le curseur de base (la flèche)
-		HCURSOR m_hCurrentCursor;	//!< Le curseur défini
-		BOOL m_bOwn;				//!< Dit si le curseur est géré par CCursor ou par l'appelant
+		//! Le curseur de base (la flèche)
+		HCURSOR m_hBasicCursor;
+		//! Le curseur défini
+		HCURSOR m_hCurrentCursor;
+		//! Dit si le curseur est géré par CCursor ou par l'appelant
+		BOOL m_bOwn;
 	};
 }
 

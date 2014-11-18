@@ -13,9 +13,9 @@ namespace Joker
 	*/
 	typedef enum
 	{
-		eLB_ITEM_STATUS_NORMAL		//!< Item normal
-		,	eLB_ITEM_STATUS_SELECTED	//!< Item sélectionné
-		,	eLB_ITEM_STATUS_COUNT		//!< Un compte
+		eLB_ITEM_STATUS_NORMAL,		//!< Item normal
+		eLB_ITEM_STATUS_SELECTED,	//!< Item sélectionné
+		eLB_ITEM_STATUS_COUNT,		//!< Un compte
 	}	eLB_ITEM_STATUS;
 	/*!
 	\author Sylvain DOREMUS
@@ -26,13 +26,6 @@ namespace Joker
 	*/
 	class JGRA_API CAlphaLBItem
 	{
-	private:
-		CTransparentBrush	m_brushMask;	//!< Le masque de l'item
-		CColour				m_clText;		//!< Le texte de l'item
-		bool				m_bHasLine;		//!< Dit si l'item a un contour
-		CColour				m_clLine;		//!< La couleur du contour de l'item
-		int					m_iLineStyle;	//!< Le style du contour de l'item
-
 	public:
 		/**
 		 *\brief		Constructeur
@@ -132,5 +125,17 @@ namespace Joker
 		 *\param[in]	rcDest	Le rectangle de destination
 		 */
 		void AlphaBlend( CBitmapDC & bmpDC, CRect const & rcDest );
+
+	private:
+		//! Le masque de l'item
+		CTransparentBrush m_brushMask;
+		//! Le texte de l'item
+		CColour m_clText;
+		//! Dit si l'item a un contour
+		bool m_bHasLine;
+		//! La couleur du contour de l'item
+		CColour m_clLine;
+		//! Le style du contour de l'item
+		int m_iLineStyle;
 	};
 }

@@ -72,8 +72,11 @@ namespace Joker
 		FontPtr DoGetFont( UINT uiIndex, BOOL bManual );
 
 	protected:
-		FontPtrUIntMap m_mapFonts;			//!< La map des polices dont on a donné un index
-		FontPtrUIntMap m_mapManualFonts;	//!< La map des polices dont on n'a pas donné d'index
-		UINT m_uiManualID;					//!< L'index suivant pour les polices dont on n'a pas donné d'index
+		//! La map des polices dont on a donné un index
+		FontPtrUIntMap m_mapFonts;
+		//! La map des polices dont on n'a pas donné d'index
+		FontPtrUIntMap m_mapManualFonts;
+		//! L'index suivant pour les polices dont on n'a pas donné d'index
+		UINT m_uiManualID;
 	};
 }

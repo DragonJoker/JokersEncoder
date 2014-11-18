@@ -22,11 +22,11 @@ namespace Joker
 	*/
 	typedef enum
 	{
-		eLOG_TYPE_DEBUG		//!<Log de type debug
-		,	eLOG_TYPE_MESSAGE	//!<Log de type message
-		,	eLOG_TYPE_WARNING	//!<Log de type avertissement
-		,	eLOG_TYPE_ERROR		//!<Log de type erreur
-		,	eLOG_TYPE_COUNT		//!<Compte des logs
+		eLOG_TYPE_DEBUG,	//!<Log de type debug
+		eLOG_TYPE_MESSAGE,	//!<Log de type message
+		eLOG_TYPE_WARNING,	//!<Log de type avertissement
+		eLOG_TYPE_ERROR,	//!<Log de type erreur
+		eLOG_TYPE_COUNT,	//!<Compte des logs
 	}	eLOG_TYPE;
 	/*!
 	\author Sylvain DOREMUS
@@ -36,11 +36,6 @@ namespace Joker
 	*/
 	class CConsoleInfo
 	{
-	private:
-		unsigned int			m_uiOldCP;
-		HANDLE					m_hScreenBuffer;
-		PCONSOLE_FONT_INFOEX	m_pOldInfos;
-
 	public:
 		CConsoleInfo();
 		virtual ~CConsoleInfo();
@@ -48,6 +43,11 @@ namespace Joker
 
 	private:
 		static BOOL __stdcall DoCodePageProc( TCHAR * pszCodePageString );
+
+	private:
+		unsigned int m_uiOldCP;
+		HANDLE m_hScreenBuffer;
+		PCONSOLE_FONT_INFOEX m_pOldInfos;
 	};
 	/*!
 	\author Sylvain DOREMUS
@@ -81,30 +81,6 @@ namespace Joker
 	*/
 	class JGRA_API CLogger
 	{
-	private:
-		static bool			m_bOwnInstance;
-		static CLogger *	m_pSingleton;
-#if DEF_MT_LOGGER
-		HANDLE											m_hThread;
-		HANDLE											m_hEventEndThread;
-		HANDLE											m_hEventLog;
-		CA2iRecursiveMutex								m_mutexLines;
-		std::vector< std::pair< eLOG_TYPE, LPTSTR > >	m_lines;
-#endif
-		String					m_logFilePath[eLOG_TYPE_COUNT];
-		String					m_strHeaders[eLOG_TYPE_COUNT];
-		std::stringstream		m_cout;
-		std::stringstream		m_cerr;
-		std::stringstream		m_clog;
-		std::recursive_mutex	m_mutex;
-		eLOG_TYPE				m_eCurrentLogType;
-		PLogCallback			m_pfnCallback;
-		void 		*			m_pThis;
-		CDebugConsole			m_console;
-		std::thread				m_outThread;
-		std::mutex				m_outMutex;
-		std::condition_variable	m_end;
-
 	private:
 		/**@name Construction / Destruction */
 		//@{
@@ -290,15 +266,39 @@ namespace Joker
 
 	private:
 #if DEF_MT_LOGGER
-		void	DoProcessMessages();
-		void	DoPostMessage( eLOG_TYPE eLogType, LPCTSTR szText );
-		BOOL	IsStopped();
+		void DoProcessMessages();
+		void DoPostMessage( eLOG_TYPE eLogType, LPCTSTR szText );
+		BOOL IsStopped();
 #endif
-		void	DoSetCallback( PLogCallback p_pfnCallback, void * p_pThis );
-		void	DoSetFileName( String const & p_logFilePath, eLOG_TYPE p_eLogType = eLOG_TYPE_COUNT );
-		void	DoLogMessage( eLOG_TYPE p_eLogType, LPCTSTR p_szToLog );
+		void DoSetCallback( PLogCallback p_pfnCallback, void * p_pThis );
+		void DoSetFileName( String const & p_logFilePath, eLOG_TYPE p_eLogType = eLOG_TYPE_COUNT );
+		void DoLogMessage( eLOG_TYPE p_eLogType, LPCTSTR p_szToLog );
 
 		static DWORD RunCallback( CLogger * pThis );
+
+	private:
+		static bool m_bOwnInstance;
+		static CLogger * m_pSingleton;
+#if DEF_MT_LOGGER
+		HANDLE m_hThread;
+		HANDLE m_hEventEndThread;
+		HANDLE m_hEventLog;
+		CA2iRecursiveMutex m_mutexLines;
+		std::vector< std::pair< eLOG_TYPE, LPTSTR > > m_lines;
+#endif
+		String m_logFilePath[eLOG_TYPE_COUNT];
+		String m_strHeaders[eLOG_TYPE_COUNT];
+		std::stringstream m_cout;
+		std::stringstream m_cerr;
+		std::stringstream m_clog;
+		std::recursive_mutex m_mutex;
+		eLOG_TYPE m_eCurrentLogType;
+		PLogCallback m_pfnCallback;
+		void * m_pThis;
+		CDebugConsole m_console;
+		std::thread m_outThread;
+		std::mutex m_outMutex;
+		std::condition_variable m_end;
 	};
 }
 

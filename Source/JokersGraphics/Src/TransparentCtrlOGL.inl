@@ -14,94 +14,17 @@ namespace Joker
 
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_OGL >::CTransparentCtrlT()
-		: m_bPainting( false )
-		, m_bHasBackground( false )
-		, m_brushMask( CColour( CColour::Transparent ) )
-		, m_clText( CColour( CColour::FullAlphaBlack ) )
-		, m_clBorder( CColour( CColour::FullAlphaBlack ) )
-		, m_bHasBorder( true )
-		, m_bFocused( false )
-		, m_bMouseOver( false )
-		, m_pRenderTarget( NULL )
-		, m_eRenderer( eRENDERER_OGL )
-		, m_bReinitBackground( false )
+		: m_pRenderTarget( NULL )
 	{
+		m_ctrl = this;
 		DoInitDeviceIndependent();
 	}
 
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_OGL >::~CTransparentCtrlT()
 	{
-		Release();
-		DoCleanupDeviceIndependent();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::SetBorderColour( CColour const & clColour )
-	{
-		m_clBorder = clColour;
-		Invalidate();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::SetTextColour( CColour const & clColour )
-	{
-		m_clText = clColour;
-		Invalidate();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::GetRelativeRect( CRect & rcRect )
-	{
-		CRect l_rcRect1, l_rcRect2;
-		GetWindowRect( l_rcRect1 );
-		CWnd * pParent = GetParent();
-
-		if ( pParent )
-		{
-			pParent->GetWindowRect( l_rcRect2 );
-		}
-
-		rcRect.left = l_rcRect1.left - l_rcRect2.left;
-		rcRect.top = l_rcRect1.top - l_rcRect2.top;
-		rcRect.right = rcRect.left + l_rcRect1.Width();
-		rcRect.bottom = rcRect.top + l_rcRect1.Height();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::Release()
-	{
 		DoRelease();
-		DoCleanupDeviceDependent();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::Draw()
-	{
-		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
-		{
-			if ( m_bReinitBackground )
-			{
-				DoInitialiseBackground();
-			}
-
-			CRect rcRect;
-			GetClientRect( & rcRect );
-
-			if ( m_pRenderTarget )
-			{
-				m_pRenderTarget->BeginDraw();
-				m_pRenderTarget->Clear( GL2D::ColorF( GL2D::ColorF::Enum::Black, 0.0F ) );
-
-				// On dessine l'arrière plan
-				DoDrawBackground( rcRect );
-
-				// On dessine le premier plan
-				DoDrawForeground( rcRect );
-
-				m_pRenderTarget->EndDraw();
-			}
-		}
+		DoCleanupDeviceIndependent();
 	}
 
 	template< typename T >
@@ -280,9 +203,7 @@ namespace Joker
 	template< typename T >
 	BOOL CTransparentCtrlT< T, eRENDERER_OGL >::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
 	{
-		m_bReinitBackground = true;
-		BOOL bReturn = T::SetWindowPos( pWndInsertAfter, x, y, cx, cy, uiFlags );
-		return bReturn;
+		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
 	template< typename T >
@@ -346,31 +267,9 @@ namespace Joker
 	}
 
 	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoInitialiseBackground()
+	inline void CTransparentCtrlT< T, eRENDERER_OGL >::DoRelease()
 	{
-		CWnd * pParent = BaseType::GetParent();
-
-		if ( pParent )
-		{
-			CRect rcRect;
-			T::GetWindowRect( &rcRect );
-			pParent->ScreenToClient( &rcRect );
-
-			CDC * pDC = pParent->GetDC();
-			int iWidth = rcRect.Width();
-			int iHeight = rcRect.Height();
-
-			m_bmpBackground.DeleteObject();
-			m_bmpBackground.CreateCompatibleBitmap( pDC, rcRect.Width(), rcRect.Height() );
-			CDC memdc;
-			memdc.CreateCompatibleDC( pDC );
-
-			CBitmap * pOldbmp = memdc.SelectObject( & m_bmpBackground );
-			memdc.BitBlt( 0, 0, iWidth, iHeight, pDC, rcRect.left, rcRect.top, SRCCOPY );
-			memdc.SelectObject( pOldbmp );
-			pParent->ReleaseDC( pDC );
-			m_bReinitBackground = false;
-		}
+		DoCleanupDeviceDependent();
 	}
 
 	template< typename T >
@@ -400,6 +299,35 @@ namespace Joker
 		if ( m_bHasBorder )
 		{
 			FrameRect( rcRect, m_clBorder );
+		}
+	}
+
+	template< typename T >
+	inline void CTransparentCtrlT< T, eRENDERER_OGL >::DoDraw()
+	{
+		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
+		{
+			if ( m_bReinitBackground )
+			{
+				DoInitialiseBackground();
+			}
+
+			CRect rcRect;
+			GetClientRect( & rcRect );
+
+			if ( m_pRenderTarget )
+			{
+				m_pRenderTarget->BeginDraw();
+				m_pRenderTarget->Clear( GL2D::ColorF( GL2D::ColorF::Enum::Black, 0.0F ) );
+
+				// On dessine l'arrière plan
+				DoDrawBackground( rcRect );
+
+				// On dessine le premier plan
+				DoDrawForeground( rcRect );
+
+				m_pRenderTarget->EndDraw();
+			}
 		}
 	}
 
@@ -481,7 +409,7 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::OnDestroy()
 	{
-		Release();
+		DoRelease();
 	}
 
 	template< typename T >
@@ -493,7 +421,7 @@ namespace Joker
 			l_paintDC.SetBkMode( TRANSPARENT );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
-			Draw();
+			DoDraw();
 			m_hDC = NULL;
 			m_bPainting = false;
 		}
@@ -516,7 +444,7 @@ namespace Joker
 	LRESULT CTransparentCtrlT< T, eRENDERER_OGL >::OnDisplayChange( WPARAM, LPARAM )
 	{
 		m_bReinitBackground = true;
-		Draw();
+		DoDraw();
 		return 0;
 	}
 

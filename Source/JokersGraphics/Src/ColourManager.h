@@ -52,6 +52,7 @@ namespace Joker
 		COLORREF DoGetColour( UINT uiIndex );
 
 	protected:
-		std::map <UINT, COLORREF> m_mapColours;	//!< La map des couleurs, rangées par index
+		//! La map des couleurs, rangées par index
+		std::map <UINT, COLORREF> m_mapColours;
 	};
 }

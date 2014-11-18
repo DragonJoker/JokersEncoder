@@ -113,9 +113,9 @@ namespace Joker
 		void SelectBitmap();
 
 	private:
-		HDC		m_hBaseDC;
-		HDC		m_hDC;
-		HBITMAP	m_hBitmap;
-		bool	m_bOwnBitmap;
+		HDC m_hBaseDC;
+		HDC m_hDC;
+		HBITMAP m_hBitmap;
+		bool m_bOwnBitmap;
 	};
 }

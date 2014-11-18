@@ -9,97 +9,22 @@ namespace Joker
 	IDWriteFactory * CTransparentCtrlT< T, eRENDERER_D2D >:: m_pWriteFactory = NULL;
 	template< typename T >
 	ID2D1Factory * CTransparentCtrlT< T, eRENDERER_D2D >:: m_pFactory = NULL;
+	template< typename T >
+	std::map< HBITMAP, ID2D1Bitmap * > CTransparentCtrlT< T, eRENDERER_D2D >:: m_bitmaps;
 
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_D2D >::CTransparentCtrlT()
-		: m_bPainting( false )
-		, m_bHasBackground( false )
-		, m_brushMask( CColour( CColour::Transparent ) )
-		, m_clText( CColour( CColour::FullAlphaBlack ) )
-		, m_clBorder( CColour( CColour::FullAlphaBlack ) )
-		, m_bHasBorder( true )
-		, m_bFocused( false )
-		, m_bMouseOver( false )
-		, m_pRenderTarget( NULL )
-		, m_eRenderer( eRENDERER_D2D )
-		, m_bReinitBackground( false )
+		: m_pRenderTarget( NULL )
 	{
+		m_ctrl = this;
 		DoInitDeviceIndependent();
 	}
 
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_D2D >::~CTransparentCtrlT()
 	{
-		Release();
-		DoCleanupDeviceIndependent();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::SetBorderColour( CColour const & clColour )
-	{
-		m_clBorder = clColour;
-		Invalidate();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::SetTextColour( CColour const & clColour )
-	{
-		m_clText = clColour;
-		Invalidate();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::GetRelativeRect( CRect & rcRect )
-	{
-		CRect l_rcRect1, l_rcRect2;
-		GetWindowRect( l_rcRect1 );
-		CWnd * pParent = GetParent();
-
-		if ( pParent )
-		{
-			pParent->GetWindowRect( l_rcRect2 );
-		}
-
-		rcRect.left = l_rcRect1.left - l_rcRect2.left;
-		rcRect.top = l_rcRect1.top - l_rcRect2.top;
-		rcRect.right = rcRect.left + l_rcRect1.Width();
-		rcRect.bottom = rcRect.top + l_rcRect1.Height();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::Release()
-	{
 		DoRelease();
-		DoCleanupDeviceDependent();
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::Draw()
-	{
-		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
-		{
-			if ( m_bReinitBackground )
-			{
-				DoInitialiseBackground();
-			}
-
-			CRect rcRect;
-			GetClientRect( & rcRect );
-
-			if ( m_pRenderTarget )
-			{
-				m_pRenderTarget->BeginDraw();
-				m_pRenderTarget->Clear( D2D1::ColorF( D2D1::ColorF::Enum::Black, 0.0F ) );
-
-				// On dessine l'arrière plan
-				DoDrawBackground( rcRect );
-
-				// On dessine le premier plan
-				DoDrawForeground( rcRect );
-
-				m_pRenderTarget->EndDraw();
-			}
-		}
+		DoCleanupDeviceIndependent();
 	}
 
 	template< typename T >
@@ -145,22 +70,35 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_D2D >::DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL UNUSED( bSrcAlpha ) )
 	{
+		std::map< HBITMAP, ID2D1Bitmap * >::iterator it = m_bitmaps.find( hBitmap );
 		ID2D1Bitmap * pBmp = NULL;
-		CSize size;
-		std::vector< BYTE > arrayBits;
 
-		if ( GetBitmapInfos( m_hDC, hBitmap, size, arrayBits ) )
+		if ( it == m_bitmaps.end() )
 		{
-			D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties( D2D1::PixelFormat( DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED ) );
-			m_pRenderTarget->CreateBitmap( D2D1::SizeU( size.cx, size.cy ), & arrayBits[0], size.cx * 4, props, & pBmp );
+			CSize size;
+			std::vector< BYTE > arrayBits;
 
-			if ( pBmp )
+			if ( GetBitmapInfos( m_hDC, hBitmap, size, arrayBits ) )
 			{
-				D2D1_RECT_F rcfSrc = D2D1::RectF( float( rcSrc.left ), float( rcSrc.top ), float( rcSrc.right ), float( rcSrc.bottom ) );
-				D2D1_RECT_F rcfDst = D2D1::RectF( float( rcDst.left ), float( rcDst.top ), float( rcDst.right ), float( rcDst.bottom ) );
-				m_pRenderTarget->DrawBitmap( pBmp, rcfDst, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rcfSrc );
-				SafeRelease( pBmp );
+				D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties( D2D1::PixelFormat( DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED ) );
+				m_pRenderTarget->CreateBitmap( D2D1::SizeU( size.cx, size.cy ), & arrayBits[0], size.cx * 4, props, &pBmp );
+
+				if ( pBmp )
+				{
+					m_bitmaps.insert( std::make_pair( hBitmap, pBmp ) );
+				}
 			}
+		}
+		else
+		{
+			pBmp = it->second;
+		}
+
+		if ( pBmp )
+		{
+			D2D1_RECT_F rcfSrc = D2D1::RectF( float( rcSrc.left ), float( rcSrc.top ), float( rcSrc.right ), float( rcSrc.bottom ) );
+			D2D1_RECT_F rcfDst = D2D1::RectF( float( rcDst.left ), float( rcDst.top ), float( rcDst.right ), float( rcDst.bottom ) );
+			m_pRenderTarget->DrawBitmap( pBmp, rcfDst, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, rcfSrc );
 		}
 	}
 
@@ -269,9 +207,7 @@ namespace Joker
 	template< typename T >
 	BOOL CTransparentCtrlT< T, eRENDERER_D2D >::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
 	{
-		m_bReinitBackground = true;
-		BOOL bReturn = T::SetWindowPos( pWndInsertAfter, x, y, cx, cy, uiFlags );
-		return bReturn;
+		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
 	template< typename T >
@@ -297,6 +233,13 @@ namespace Joker
 
 		if ( m_iReferences <= 0 )
 		{
+			std::for_each( m_bitmaps.begin(), m_bitmaps.end(), [&]( std::pair< HBITMAP, ID2D1Bitmap * > pair )
+			{
+				SafeRelease( pair.second );
+			} );
+
+			m_bitmaps.clear();
+
 			SafeRelease( m_pFactory );
 			SafeRelease( m_pWriteFactory );
 		}
@@ -328,31 +271,9 @@ namespace Joker
 	}
 
 	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DoInitialiseBackground()
+	inline void CTransparentCtrlT< T, eRENDERER_D2D >::DoRelease()
 	{
-		CWnd * pParent = BaseType::GetParent();
-
-		if ( pParent )
-		{
-			CRect rcRect;
-			T::GetWindowRect( &rcRect );
-			pParent->ScreenToClient( &rcRect );
-
-			CDC * pDC = pParent->GetDC();
-			int iWidth = rcRect.Width();
-			int iHeight = rcRect.Height();
-
-			m_bmpBackground.DeleteObject();
-			m_bmpBackground.CreateCompatibleBitmap( pDC, rcRect.Width(), rcRect.Height() );
-			CDC memdc;
-			memdc.CreateCompatibleDC( pDC );
-
-			CBitmap * pOldbmp = memdc.SelectObject( & m_bmpBackground );
-			memdc.BitBlt( 0, 0, iWidth, iHeight, pDC, rcRect.left, rcRect.top, SRCCOPY );
-			memdc.SelectObject( pOldbmp );
-			pParent->ReleaseDC( pDC );
-			m_bReinitBackground = false;
-		}
+		DoCleanupDeviceDependent();
 	}
 
 	template< typename T >
@@ -386,6 +307,35 @@ namespace Joker
 	}
 
 	template< typename T >
+	inline void CTransparentCtrlT< T, eRENDERER_D2D >::DoDraw()
+	{
+		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
+		{
+			if ( m_bReinitBackground )
+			{
+				DoInitialiseBackground();
+			}
+
+			CRect rcRect;
+			GetClientRect( & rcRect );
+
+			if ( m_pRenderTarget )
+			{
+				m_pRenderTarget->BeginDraw();
+				m_pRenderTarget->Clear( D2D1::ColorF( D2D1::ColorF::Enum::Black, 0.0F ) );
+
+				// On dessine l'arrière plan
+				DoDrawBackground( rcRect );
+
+				// On dessine le premier plan
+				DoDrawForeground( rcRect );
+
+				m_pRenderTarget->EndDraw();
+			}
+		}
+	}
+
+	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_D2D >::PreSubclassWindow()
 	{
 		BaseType::PreSubclassWindow();
@@ -407,7 +357,6 @@ namespace Joker
 		{
 			ON_WM_ERASEBKGND()
 			ON_WM_CTLCOLOR()
-			ON_WM_DESTROY()
 			ON_WM_PAINT()
 			ON_WM_SIZE()
 			ON_MESSAGE( WM_DISPLAYCHANGE, OnDisplayChange )
@@ -461,12 +410,6 @@ namespace Joker
 	}
 
 	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnDestroy()
-	{
-		Release();
-	}
-
-	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_D2D >::OnPaint()
 	{
 		if ( T::IsWindowVisible() )
@@ -475,7 +418,7 @@ namespace Joker
 			l_paintDC.SetBkMode( TRANSPARENT );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
-			Draw();
+			DoDraw();
 			m_hDC = NULL;
 			m_bPainting = false;
 		}
@@ -498,7 +441,7 @@ namespace Joker
 	LRESULT CTransparentCtrlT< T, eRENDERER_D2D >::OnDisplayChange( WPARAM, LPARAM )
 	{
 		m_bReinitBackground = true;
-		Draw();
+		DoDraw();
 		return 0;
 	}
 

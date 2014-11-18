@@ -13,11 +13,6 @@ namespace Joker
 	*/
 	class JGRA_API CTransparentBrush
 	{
-	protected:
-		HBITMAP m_hPattern;
-		CBitmapDC m_bmpPatternDC;
-		CRect m_rcSrcPattern;
-
 	public:
 		/**
 		 *\brief		Constructeur
@@ -128,5 +123,10 @@ namespace Joker
 	protected:
 		void CreateBitmap( int iWidth, int iHeight, BYTE ** pBits );
 		virtual void Release();
+
+	protected:
+		HBITMAP m_hPattern;
+		CBitmapDC m_bmpPatternDC;
+		CRect m_rcSrcPattern;
 	};
 }

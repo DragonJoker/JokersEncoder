@@ -32,10 +32,10 @@ namespace Joker
 		void DoDrawBackground( CRect const & rcRect );
 
 		DECLARE_MESSAGE_MAP();
-		afx_msg int		OnCreate( LPCREATESTRUCT lpCreateStruct );
-		afx_msg BOOL	OnEraseBkgnd( CDC * pDC );
-		afx_msg	void	OnPaint();
-		afx_msg HBRUSH	OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiCtlId );
+		afx_msg int OnCreate( LPCREATESTRUCT lpCreateStruct );
+		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
+		afx_msg	void OnPaint();
+		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiCtlId );
 
 	private:
 		Joker::ImagePtr m_pImage;

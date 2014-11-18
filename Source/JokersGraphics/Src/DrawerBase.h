@@ -414,6 +414,7 @@ namespace Joker
 		void DoGetFormattedTextExtent( String const & strText, int iMaxWidth, CSize & sizeText );
 
 	protected:
-		CRect m_rcRect;	//!< Le rectangle concerné par le dessin
+		//! Le rectangle concerné par le dessin
+		CRect m_rcRect;
 	};
 }
