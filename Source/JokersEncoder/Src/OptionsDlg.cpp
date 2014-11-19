@@ -6,13 +6,22 @@
 
 #include <afxdialogex.h>
 #include <Image.h>
+#include <ImageManager.h>
+
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#	endif
+#endif
 
 using namespace Joker;
 
-IMPLEMENT_DYNAMIC( COptionsDlg, CDialogEx )
+IMPLEMENT_DYNAMIC( COptionsDlg, BaseType )
 
 COptionsDlg::COptionsDlg( CWnd * pParent )
-	:	CDialogEx( COptionsDlg::IDD, pParent )
+	:	BaseType( COptionsDlg::IDD, pParent )
 {
 	m_hIcon = AfxGetApp()->LoadIcon( IDR_MAINFRAME );
 }
@@ -23,22 +32,21 @@ COptionsDlg::~COptionsDlg()
 
 void COptionsDlg::DoDataExchange( CDataExchange * pDX )
 {
-	CDialogEx::DoDataExchange( pDX );
-	DDX_Control( pDX, IDC_STATIC_BACKGROUND,	m_staticBackground );
-	DDX_Control( pDX, IDOK,						m_buttonOK );
-	DDX_Control( pDX, IDCANCEL,					m_buttonCancel );
+	BaseType::DoDataExchange( pDX );
+	DDX_Control( pDX, IDOK,		m_buttonOK );
+	DDX_Control( pDX, IDCANCEL,	m_buttonCancel );
 }
 
 
 BOOL COptionsDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	BaseType::OnInitDialog();
 	SetIcon( m_hIcon, TRUE );
 	SetIcon( m_hIcon, FALSE );
 	CRect rcRect;
 	GetClientRect( rcRect );
-	m_staticBackground.SetWindowPos( NULL, 0, 0, rcRect.Width(), rcRect.Height(), SWP_SHOWWINDOW );
-	m_staticBackground.SetImage( IDB_BMP_DRAGON );
+	ImagePtr img = CImageManager::AddImage( IDB_BMP_DRAGON );
+	this->GetMaskBrush().SetPatternBrush( *img, CRect( 0, 0, img->GetWidth(), img->GetHeight() ) );
 
 	LOGFONT logfont;
 	::CFont * pFont = this->GetFont();
@@ -68,7 +76,7 @@ BOOL COptionsDlg::OnInitDialog()
 	return TRUE;
 }
 
-BEGIN_MESSAGE_MAP( COptionsDlg, CDialogEx )
+BEGIN_MESSAGE_MAP( COptionsDlg, COptionsDlg::BaseType )
 END_MESSAGE_MAP()
 
 

@@ -33,14 +33,6 @@ namespace Joker
 		eCOLOUR_WHITE				= RGB( 255, 255, 255 ),	//!< Blanc
 		eCOLOUR_TRUE_TRANSPARENT	= 0xFF000000			//!< Transparent
 	}	eCOLOUR;
-
-#if DEF_USING_OGL
-#	define eDEFAULT_RENDERER eRENDERER_OGL
-#elif DEF_USING_D2D
-#	define eDEFAULT_RENDERER eRENDERER_D2D
-#else
-#	define eDEFAULT_RENDERER eRENDERER_GDI
-#endif
 	/*!
 	\author 	Sylvain DOREMUS
 	\brief		Classe de gestion de couleurs

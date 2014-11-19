@@ -14,7 +14,7 @@ namespace GL2D
 		GL2D_API CComBitmap();
 		GL2D_API virtual ~CComBitmap();
 
-		GL2D_API void Initialise( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props );
+		GL2D_API STDMETHOD( Initialise )( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props );
 
 		GL2D_API STDMETHOD_( GL2D_SIZE_F, GetSize )()const;
 		GL2D_API STDMETHOD_( GL2D_SIZE_U, GetPixelSize )()const;

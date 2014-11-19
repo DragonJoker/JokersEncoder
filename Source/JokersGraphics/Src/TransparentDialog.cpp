@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "TransparentCtrl.h"
+#include "TransparentDialog.h"
 
 #if !defined( VLD_AVAILABLE )
 #	ifdef _DEBUG

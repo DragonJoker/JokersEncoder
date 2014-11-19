@@ -5,6 +5,8 @@
 namespace Joker
 {
 	template< typename T, eRENDERER R > class CTransparentCtrlT;
+	template< eRENDERER R > class CTransparentDialog;
+	template< eRENDERER R > class CTransparentDialogEx;
 }
 
 #if DEF_USING_OGL

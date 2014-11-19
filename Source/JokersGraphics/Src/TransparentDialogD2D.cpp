@@ -1,23 +1,48 @@
+#include "stdafx.h"
+
+#include "TransparentDialogD2D.h"
+
 #include <iostream>
+
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#	endif
+#endif
 
 namespace Joker
 {
 #if DEF_USING_D2D
-	template< typename T >
-	CTransparentCtrlT< T, eRENDERER_D2D >::CTransparentCtrlT()
+	typedef CTransparentCtrlT< CDialog, eRENDERER_D2D > CTransparentDlgD2D;
+
+	CTransparentDlgD2D::CTransparentCtrlT()
 		: m_pRenderTarget( NULL )
 	{
 		m_ctrl = this;
 	}
 
-	template< typename T >
-	CTransparentCtrlT< T, eRENDERER_D2D >::~CTransparentCtrlT()
+	CTransparentDlgD2D::CTransparentCtrlT( UINT nTemplate, CWnd * pParent )
+		: BaseType( nTemplate, pParent )
+		, m_pRenderTarget( NULL )
+	{
+		m_ctrl = this;
+	}
+
+	CTransparentDlgD2D::CTransparentCtrlT( LPCTSTR szTemplate, CWnd * pParent )
+		: BaseType( szTemplate, pParent )
+		, m_pRenderTarget( NULL )
+	{
+		m_ctrl = this;
+	}
+
+	CTransparentDlgD2D::~CTransparentCtrlT()
 	{
 		DoRelease();
 	}
 
-	template< typename T >
-	bool CTransparentCtrlT< T, eRENDERER_D2D >::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
+	bool CTransparentDlgD2D::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
 	{
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
@@ -56,8 +81,7 @@ namespace Joker
 		return bReturn;
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL UNUSED( bSrcAlpha ) )
+	void CTransparentDlgD2D::DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL UNUSED( bSrcAlpha ) )
 	{
 		std::map< HBITMAP, ID2D1Bitmap * >::iterator it = m_bitmaps.find( hBitmap );
 		ID2D1Bitmap * pBmp = NULL;
@@ -91,8 +115,7 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::FrameRect( CRect const & rcRect, CColour const & clColour, int iWidth, UINT uiStyle )
+	void CTransparentDlgD2D::FrameRect( CRect const & rcRect, CColour const & clColour, int iWidth, UINT uiStyle )
 	{
 		ID2D1StrokeStyle * pStroke;
 		ID2D1SolidColorBrush * pBrush;
@@ -107,8 +130,7 @@ namespace Joker
 		SafeRelease( pBrush );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DrawSolidText( HFONT UNUSED( hFont ), LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle )
+	void CTransparentDlgD2D::DrawSolidText( HFONT UNUSED( hFont ), LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle )
 	{
 		DWRITE_FONT_STYLE style = logFont.lfItalic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		ID2D1SolidColorBrush * pBrush = NULL;
@@ -170,8 +192,7 @@ namespace Joker
 		SafeRelease( pTextFormat );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::FillSolidRect( CColour const & clColour, CRect rcRect )
+	void CTransparentDlgD2D::FillSolidRect( CColour const & clColour, CRect rcRect )
 	{
 		ID2D1SolidColorBrush * pBrush;
 		m_pRenderTarget->CreateSolidColorBrush( clColour.ToD2DColor(), & pBrush );
@@ -179,31 +200,27 @@ namespace Joker
 		SafeRelease( pBrush );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::TransparentBlt( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, CColour const & clTransparent )
+	void CTransparentDlgD2D::TransparentBlt( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, CColour const & clTransparent )
 	{
-		//	::TransparentBlt( hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
+//		::TransparentBlt( hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
+	void CTransparentDlgD2D::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
 	{
 		HBITMAP hBitmap = HBITMAP( ::SelectObject( srcDC, NULL ) );
 		DrawBitmap( rcDest, hBitmap, rcSrc );
 		::SelectObject( srcDC, hBitmap );
 	}
 
-	template< typename T >
-	BOOL CTransparentCtrlT< T, eRENDERER_D2D >::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
+	BOOL CTransparentDlgD2D::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
 	{
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DoInitDeviceDependent()
+	void CTransparentDlgD2D::DoInitDeviceDependent()
 	{
 		CRect rcRect;
-		T::GetClientRect( rcRect );
+		BaseType::GetClientRect( rcRect );
 		D2D1_SIZE_U size = D2D1::SizeU( rcRect.Width(), rcRect.Height() );
 		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties( D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat( DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED ) );
 		HRESULT hr = m_pFactory->CreateHwndRenderTarget( props, D2D1::HwndRenderTargetProperties( m_hWnd, size ), &m_pRenderTarget );
@@ -214,8 +231,7 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DoCleanupDeviceDependent()
+	void CTransparentDlgD2D::DoCleanupDeviceDependent()
 	{
 		if ( m_pRenderTarget )
 		{
@@ -224,14 +240,12 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::DoRelease()
+	inline void CTransparentDlgD2D::DoRelease()
 	{
 		DoCleanupDeviceDependent();
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DoDrawBackground( CRect const & rcRect )
+	void CTransparentDlgD2D::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
 		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
@@ -239,29 +253,11 @@ namespace Joker
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DoDrawForeground( CRect const & rcRect )
+	void CTransparentDlgD2D::DoDrawForeground( CRect const & rcRect )
 	{
-		// On dessine le texte, s'il y en a un
-		CString csText;
-		GetWindowText( csText );
-
-		if ( !csText.IsEmpty() )
-		{
-			LOGFONT logFont;
-			GetFont()->GetLogFont( & logFont );
-			DrawSolidText( ( * GetFont() ), logFont, m_clText, csText, rcRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER );
-		}
-
-		// On dessine le contour
-		if ( m_bHasBorder )
-		{
-			FrameRect( rcRect, m_clBorder );
-		}
 	}
 
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::DoDraw()
+	inline void CTransparentDlgD2D::DoDraw()
 	{
 		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
 		{
@@ -284,50 +280,24 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::PreSubclassWindow()
+	void CTransparentDlgD2D::PreSubclassWindow()
 	{
 		BaseType::PreSubclassWindow();
 	}
 
-	PTM_WARNING_DISABLE
-	template< typename T >
-	const AFX_MSGMAP * CTransparentCtrlT< T, eRENDERER_D2D >::GetMessageMap() const
-	{
-		return GetThisMessageMap();
-	}
+	BEGIN_MESSAGE_MAP( CTransparentDlgD2D, CTransparentDlgD2D::BaseType )
+		ON_WM_ERASEBKGND()
+		ON_WM_CTLCOLOR()
+		ON_WM_PAINT()
+		ON_WM_SIZE()
+		ON_MESSAGE( WM_DISPLAYCHANGE, OnDisplayChange )
+		ON_WM_MOUSEMOVE()
+		ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
+		ON_WM_SETFOCUS()
+		ON_WM_KILLFOCUS()
+	END_MESSAGE_MAP()
 
-	template< typename T >
-	const AFX_MSGMAP * PASCAL CTransparentCtrlT< T, eRENDERER_D2D >::GetThisMessageMap()
-	{
-		typedef CTransparentCtrlT< T, eRENDERER_D2D > ThisClass;
-		typedef T TheBaseClass;
-		static const AFX_MSGMAP_ENTRY _messageEntries[] =
-		{
-			ON_WM_ERASEBKGND()
-			ON_WM_CTLCOLOR()
-			ON_WM_PAINT()
-			ON_WM_SIZE()
-			ON_WM_MOVE()
-			ON_MESSAGE( WM_DISPLAYCHANGE, OnDisplayChange )
-			ON_WM_MOUSEMOVE()
-			ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
-			ON_WM_SETFOCUS()
-			ON_WM_KILLFOCUS()
-			{
-				0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0
-			}
-		};
-		static const AFX_MSGMAP messageMap =
-		{
-			& TheBaseClass::GetThisMessageMap, &_messageEntries[0]
-		};
-		return &messageMap;
-	}
-	PTM_WARNING_RESTORE
-
-	template< typename T >
-	BOOL CTransparentCtrlT< T, eRENDERER_D2D >::OnEraseBkgnd( CDC * UNUSED( pDC ) )
+	BOOL CTransparentDlgD2D::OnEraseBkgnd( CDC * pDC )
 	{
 		if ( m_bHasBackground )
 		{
@@ -346,27 +316,24 @@ namespace Joker
 			DoInitialiseBackground();
 			m_bHasBackground = true;
 		}
+		else if ( m_bReinitBackground )
+		{
+			DoInitialiseBackground();
+		}
 
 		return TRUE;
 	}
 
-	template< typename T >
-	HBRUSH CTransparentCtrlT< T, eRENDERER_D2D >::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
+	HBRUSH CTransparentDlgD2D::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
 	{
 		pDC->SetBkMode( TRANSPARENT );
 		return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnPaint()
+	void CTransparentDlgD2D::OnPaint()
 	{
-		if ( T::IsWindowVisible() )
+		if ( BaseType::IsWindowVisible() )
 		{
-			if ( m_bReinitBackground )
-			{
-				DoInitialiseBackground();
-			}
-
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
 			m_bPainting = true;
@@ -377,9 +344,9 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnSize( UINT type, int cx, int cy )
+	void CTransparentDlgD2D::OnSize( UINT type, int cx, int cy )
 	{
+		LockWindowUpdate();
 		BaseType::OnSize( type, cx, cy );
 
 		if ( m_pRenderTarget )
@@ -388,39 +355,29 @@ namespace Joker
 		}
 
 		m_bReinitBackground = true;
+		UnlockWindowUpdate();
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnMove( int x, int y )
-	{
-		BaseType::OnMove( x, y );
-		m_bReinitBackground = true;
-	}
-
-	template< typename T >
-	LRESULT CTransparentCtrlT< T, eRENDERER_D2D >::OnDisplayChange( WPARAM, LPARAM )
+	LRESULT CTransparentDlgD2D::OnDisplayChange( WPARAM, LPARAM )
 	{
 		m_bReinitBackground = true;
 		DoDraw();
 		return 0;
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnSetFocus( CWnd * pOldWnd )
+	void CTransparentDlgD2D::OnSetFocus( CWnd * pOldWnd )
 	{
 		m_bFocused = true;
 		BaseType::OnSetFocus( pOldWnd );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnKillFocus( CWnd * pNewWnd )
+	void CTransparentDlgD2D::OnKillFocus( CWnd * pNewWnd )
 	{
 		m_bFocused = false;
 		BaseType::OnKillFocus( pNewWnd );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::OnMouseMove( UINT nFlags, CPoint point )
+	void CTransparentDlgD2D::OnMouseMove( UINT nFlags, CPoint point )
 	{
 		if ( !m_bMouseOver )
 		{
@@ -431,17 +388,14 @@ namespace Joker
 			mouseEvent.dwHoverTime = HOVER_DEFAULT;
 			TrackMouseEvent( & mouseEvent );
 			m_bMouseOver = true;
-			BaseType::Invalidate();
 		}
 
 		BaseType::OnMouseMove( nFlags, point );
 	}
 
-	template< typename T >
-	LRESULT CTransparentCtrlT< T, eRENDERER_D2D >::OnMouseLeave( WPARAM UNUSED( wParam ), LPARAM UNUSED( lParam ) )
+	LRESULT CTransparentDlgD2D::OnMouseLeave( WPARAM UNUSED( wParam ), LPARAM UNUSED( lParam ) )
 	{
 		m_bMouseOver = false;
-		BaseType::Invalidate();
 		BaseType::OnMouseLeave();
 		return 0;
 	}

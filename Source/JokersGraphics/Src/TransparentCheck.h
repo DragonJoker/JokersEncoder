@@ -10,8 +10,9 @@ namespace Joker
 	\brief		Classe commune pour les boutons radio et checkbox
 	\remark		Etend CTransparentButton
 	*/
-	class JGRA_API CTransparentRadioCheck
-		: public CTransparentButton
+    template< eRENDERER Renderer >
+	class CTransparentRadioCheck
+		: public CTransparentButton< Renderer >
 	{
 	public:
 		/**
@@ -85,11 +86,15 @@ namespace Joker
 	\date 		23/05/2012
 	\brief		Typedef sur CTransparentRadioCheck pour les boutons radio
 	*/
-	typedef CTransparentRadioCheck CTransparentRadio;
+	template< eRENDERER Renderer >
+	using CTransparentRadio = CTransparentRadioCheck;
 	/*!
 	\author 	Sylvain DOREMUS
 	\date 		23/05/2012
 	\brief		Typedef sur CTransparentRadioCheck pour les cases à cocher
 	*/
-	typedef CTransparentRadioCheck CTransparentCheck;
+	template< eRENDERER Renderer >
+	using CTransparentCheck = CTransparentRadioCheck;
 }
+
+#include "TransparentCheck.inl"

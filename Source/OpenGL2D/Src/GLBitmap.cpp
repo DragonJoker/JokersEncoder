@@ -20,7 +20,7 @@ namespace GL2D
 		CObject::Destroy();
 	}
 
-	void CComBitmap::Initialise( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props )
+	HRESULT CComBitmap::Initialise( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props )
 	{
 		CContext * context = CContext::GetActiveContext();
 		m_format = props.pixelFormat;
@@ -32,6 +32,8 @@ namespace GL2D
 			hr = context->TexImage2D( GL_TEXTURE_2D, 0, m_format.internal, size.width, size.height, 0, m_format.format, m_format.type, data );
 			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
+
+		return hr;
 	}
 
 	STDMETHODIMP_( GL2D_SIZE_F ) CComBitmap::GetSize()const
@@ -154,6 +156,7 @@ namespace GL2D
 
 			srcData = new uint8_t[componentSize * componentCount * std::abs( int( srcRect->right - srcRect->left ) ) * std::abs( int( srcRect->bottom - srcRect->top ) )];
 			hr = context->ReadPixels( srcRect->left, srcRect->top, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
+			delete [] srcData;
 			context->BindTexture( GL_TEXTURE_2D, 0 );
 		}
 

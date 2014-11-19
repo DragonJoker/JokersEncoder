@@ -4,7 +4,6 @@
 #include "GLResource.h"
 #include "GLFactory.h"
 
-
 #ifdef __cplusplus
 extern "C"
 {

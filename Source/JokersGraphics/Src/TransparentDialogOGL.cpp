@@ -1,23 +1,48 @@
+#include "stdafx.h"
+
+#include "TransparentDialogOGL.h"
+
 #include <iostream>
+
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#	endif
+#endif
 
 namespace Joker
 {
 #if DEF_USING_OGL
-	template< typename T >
-	CTransparentCtrlT< T, eRENDERER_OGL >::CTransparentCtrlT()
+	typedef CTransparentCtrlT< CDialog, eRENDERER_OGL > CTransparentDlgOGL;
+
+	CTransparentDlgOGL::CTransparentCtrlT()
 		: m_pRenderTarget( NULL )
 	{
 		m_ctrl = this;
 	}
 
-	template< typename T >
-	CTransparentCtrlT< T, eRENDERER_OGL >::~CTransparentCtrlT()
+	CTransparentDlgOGL::CTransparentCtrlT( UINT nTemplate, CWnd * pParent )
+		: BaseType( nTemplate, pParent )
+		, m_pRenderTarget( NULL )
+	{
+		m_ctrl = this;
+	}
+
+	CTransparentDlgOGL::CTransparentCtrlT( LPCTSTR szTemplate, CWnd * pParent )
+		: BaseType( szTemplate, pParent )
+		, m_pRenderTarget( NULL )
+	{
+		m_ctrl = this;
+	}
+
+	CTransparentDlgOGL::~CTransparentCtrlT()
 	{
 		DoRelease();
 	}
 
-	template< typename T >
-	bool CTransparentCtrlT< T, eRENDERER_OGL >::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
+	bool CTransparentDlgOGL::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
 	{
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
@@ -56,11 +81,10 @@ namespace Joker
 		return bReturn;
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL UNUSED( bSrcAlpha ) )
+	void CTransparentDlgOGL::DrawBitmap( CRect const & rcDst, HBITMAP hBitmap, CRect const & rcSrc, BOOL UNUSED( bSrcAlpha ) )
 	{
-		std::map< HBITMAP, IGL2DBitmap * >::iterator it = m_bitmaps.find( hBitmap );
 		IGL2DBitmap * pBmp = NULL;
+		std::map< HBITMAP, IGL2DBitmap * >::iterator it = m_bitmaps.find( hBitmap );
 
 		if ( it == m_bitmaps.end() )
 		{
@@ -91,8 +115,7 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::FrameRect( CRect const & rcRect, CColour const & clColour, int iWidth, UINT uiStyle )
+	void CTransparentDlgOGL::FrameRect( CRect const & rcRect, CColour const & clColour, int iWidth, UINT uiStyle )
 	{
 		IGL2DStrokeStyle * pStroke;
 		IGL2DSolidColorBrush * pBrush;
@@ -107,8 +130,7 @@ namespace Joker
 		SafeRelease( pBrush );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DrawSolidText( HFONT UNUSED( hFont ), LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle )
+	void CTransparentDlgOGL::DrawSolidText( HFONT UNUSED( hFont ), LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle )
 	{
 		DWRITE_FONT_STYLE style = logFont.lfItalic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		IGL2DSolidColorBrush * pBrush = NULL;
@@ -166,8 +188,7 @@ namespace Joker
 		SafeRelease( pTextFormat );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::FillSolidRect( CColour const & clColour, CRect rcRect )
+	void CTransparentDlgOGL::FillSolidRect( CColour const & clColour, CRect rcRect )
 	{
 		IGL2DSolidColorBrush * pBrush;
 		m_pRenderTarget->CreateSolidColorBrush( clColour.ToGL2DColor(), & pBrush );
@@ -175,31 +196,27 @@ namespace Joker
 		SafeRelease( pBrush );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::TransparentBlt( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, CColour const & clTransparent )
+	void CTransparentDlgOGL::TransparentBlt( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, CColour const & clTransparent )
 	{
-		//	::TransparentBlt( hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
+		//::TransparentBlt( hDC, rcDest.left, rcDest.top, rcDest.Width(), rcDest.Height(), srcDC, rcSrc.left, rcSrc.top, rcSrc.Width(), rcSrc.Height(), clTransparent.ToBGR() );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
+	void CTransparentDlgOGL::AlphaBlend( CRect const & rcDest, CBitmapDC & srcDC, CRect const & rcSrc, BLENDFUNCTION blendFunc )
 	{
 		HBITMAP hBitmap = HBITMAP( ::SelectObject( srcDC, NULL ) );
 		DrawBitmap( rcDest, hBitmap, rcSrc );
 		::SelectObject( srcDC, hBitmap );
 	}
 
-	template< typename T >
-	BOOL CTransparentCtrlT< T, eRENDERER_OGL >::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
+	BOOL CTransparentDlgOGL::SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags )
 	{
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoInitDeviceDependent()
+	void CTransparentDlgOGL::DoInitDeviceDependent()
 	{
 		CRect rcRect;
-		T::GetClientRect( rcRect );
+		BaseType::GetClientRect( rcRect );
 		GL2D_SIZE_U size = GL2D::SizeU( rcRect.Width(), rcRect.Height() );
 		GL2D_RENDER_TARGET_PROPERTIES props = GL2D::RenderTargetProperties( GL2D_RENDER_TARGET_TYPE_DEFAULT, GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_4, GL2D_GL_TYPE_UNSIGNED_BYTE ) );
 		HRESULT hr = m_pFactory->CreateHwndRenderTarget( props, GL2D::HwndRenderTargetProperties( m_hWnd, size ), &m_pRenderTarget );
@@ -210,8 +227,7 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoCleanupDeviceDependent()
+	void CTransparentDlgOGL::DoCleanupDeviceDependent()
 	{
 		if ( m_pRenderTarget )
 		{
@@ -220,44 +236,24 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::DoRelease()
+	inline void CTransparentDlgOGL::DoRelease()
 	{
 		DoCleanupDeviceDependent();
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawBackground( CRect const & rcRect )
+	void CTransparentDlgOGL::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
-		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
+		//DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
 		// on blende le backbuffer et le masque
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawForeground( CRect const & rcRect )
+	void CTransparentDlgOGL::DoDrawForeground( CRect const & rcRect )
 	{
-		// On dessine le texte, s'il y en a un
-		CString csText;
-		GetWindowText( csText );
-
-		if ( !csText.IsEmpty() )
-		{
-			LOGFONT logFont;
-			GetFont()->GetLogFont( & logFont );
-			DrawSolidText( ( * GetFont() ), logFont, m_clText, csText, rcRect, DT_SINGLELINE | DT_VCENTER | DT_CENTER );
-		}
-
-		// On dessine le contour
-		if ( m_bHasBorder )
-		{
-			FrameRect( rcRect, m_clBorder );
-		}
 	}
 
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::DoDraw()
+	inline void CTransparentDlgOGL::DoDraw()
 	{
 		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
 		{
@@ -280,51 +276,25 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::PreSubclassWindow()
+	void CTransparentDlgOGL::PreSubclassWindow()
 	{
 		BaseType::PreSubclassWindow();
 	}
 
-	PTM_WARNING_DISABLE
-	template< typename T >
-	const AFX_MSGMAP * CTransparentCtrlT< T, eRENDERER_OGL >::GetMessageMap() const
-	{
-		return GetThisMessageMap();
-	}
+	BEGIN_MESSAGE_MAP( CTransparentDlgOGL, CTransparentDlgOGL::BaseType )
+		ON_WM_ERASEBKGND()
+		ON_WM_CTLCOLOR()
+		ON_WM_DESTROY()
+		ON_WM_PAINT()
+		ON_WM_SIZE()
+		ON_MESSAGE( WM_DISPLAYCHANGE, OnDisplayChange )
+		ON_WM_MOUSEMOVE()
+		ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
+		ON_WM_SETFOCUS()
+		ON_WM_KILLFOCUS()
+	END_MESSAGE_MAP()
 
-	template< typename T >
-	const AFX_MSGMAP * PASCAL CTransparentCtrlT< T, eRENDERER_OGL >::GetThisMessageMap()
-	{
-		typedef CTransparentCtrlT< T, eRENDERER_OGL > ThisClass;
-		typedef T TheBaseClass;
-		static const AFX_MSGMAP_ENTRY _messageEntries[] =
-		{
-			ON_WM_ERASEBKGND()
-			ON_WM_CTLCOLOR()
-			ON_WM_DESTROY()
-			ON_WM_PAINT()
-			ON_WM_SIZE()
-			ON_WM_MOVE()
-			ON_MESSAGE( WM_DISPLAYCHANGE, OnDisplayChange )
-			ON_WM_MOUSEMOVE()
-			ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
-			ON_WM_SETFOCUS()
-			ON_WM_KILLFOCUS()
-			{
-				0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0
-			}
-		};
-		static const AFX_MSGMAP messageMap =
-		{
-			& TheBaseClass::GetThisMessageMap, &_messageEntries[0]
-		};
-		return &messageMap;
-	}
-	PTM_WARNING_RESTORE
-
-	template< typename T >
-	BOOL CTransparentCtrlT< T, eRENDERER_OGL >::OnEraseBkgnd( CDC * UNUSED( pDC ) )
+	BOOL CTransparentDlgOGL::OnEraseBkgnd( CDC * UNUSED( pDC ) )
 	{
 		if ( m_bHasBackground )
 		{
@@ -343,33 +313,29 @@ namespace Joker
 			DoInitialiseBackground();
 			m_bHasBackground = true;
 		}
+		else if ( m_bReinitBackground )
+		{
+			DoInitialiseBackground();
+		}
 
 		return TRUE;
 	}
 
-	template< typename T >
-	HBRUSH CTransparentCtrlT< T, eRENDERER_OGL >::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
+	HBRUSH CTransparentDlgOGL::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
 	{
 		pDC->SetBkMode( TRANSPARENT );
 		return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnDestroy()
+	void CTransparentDlgOGL::OnDestroy()
 	{
 		DoRelease();
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnPaint()
+	void CTransparentDlgOGL::OnPaint()
 	{
-		if ( T::IsWindowVisible() )
+		if ( BaseType::IsWindowVisible() )
 		{
-			if ( m_bReinitBackground )
-			{
-				DoInitialiseBackground();
-			}
-
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
 			m_bPainting = true;
@@ -380,9 +346,9 @@ namespace Joker
 		}
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnSize( UINT type, int cx, int cy )
+	void CTransparentDlgOGL::OnSize( UINT type, int cx, int cy )
 	{
+		LockWindowUpdate();
 		BaseType::OnSize( type, cx, cy );
 
 		if ( m_pRenderTarget )
@@ -391,39 +357,29 @@ namespace Joker
 		}
 
 		m_bReinitBackground = true;
+		UnlockWindowUpdate();
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnMove( int x, int y )
-	{
-		BaseType::OnMove( x, y );
-		m_bReinitBackground = true;
-	}
-
-	template< typename T >
-	LRESULT CTransparentCtrlT< T, eRENDERER_OGL >::OnDisplayChange( WPARAM, LPARAM )
+	LRESULT CTransparentDlgOGL::OnDisplayChange( WPARAM, LPARAM )
 	{
 		m_bReinitBackground = true;
 		DoDraw();
 		return 0;
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnSetFocus( CWnd * pOldWnd )
+	void CTransparentDlgOGL::OnSetFocus( CWnd * pOldWnd )
 	{
 		m_bFocused = true;
 		BaseType::OnSetFocus( pOldWnd );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnKillFocus( CWnd * pNewWnd )
+	void CTransparentDlgOGL::OnKillFocus( CWnd * pNewWnd )
 	{
 		m_bFocused = false;
 		BaseType::OnKillFocus( pNewWnd );
 	}
 
-	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnMouseMove( UINT nFlags, CPoint point )
+	void CTransparentDlgOGL::OnMouseMove( UINT nFlags, CPoint point )
 	{
 		if ( !m_bMouseOver )
 		{
@@ -434,17 +390,14 @@ namespace Joker
 			mouseEvent.dwHoverTime = HOVER_DEFAULT;
 			TrackMouseEvent( & mouseEvent );
 			m_bMouseOver = true;
-			BaseType::Invalidate();
 		}
 
 		BaseType::OnMouseMove( nFlags, point );
 	}
 
-	template< typename T >
-	LRESULT CTransparentCtrlT< T, eRENDERER_OGL >::OnMouseLeave( WPARAM UNUSED( wParam ), LPARAM UNUSED( lParam ) )
+	LRESULT CTransparentDlgOGL::OnMouseLeave( WPARAM UNUSED( wParam ), LPARAM UNUSED( lParam ) )
 	{
 		m_bMouseOver = false;
-		BaseType::Invalidate();
 		BaseType::OnMouseLeave();
 		return 0;
 	}

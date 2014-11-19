@@ -45,6 +45,6 @@ if( OPENGL_FOUND AND GLM_FOUND )
 		${JE_MIN_DEPENDENCIES}
 		OpenGL2D
 	)
-	
+
 	add_target_astyle( OpenGL2D ".h;.hpp;.inl;.cpp" )
 endif()

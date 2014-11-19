@@ -10,6 +10,9 @@ namespace GL2D
 {
 	CComFactory::CComFactory()
 	{
+#if !defined( VLD_AVAILABLE )
+        _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
 	}
 
 	CComFactory::~CComFactory()

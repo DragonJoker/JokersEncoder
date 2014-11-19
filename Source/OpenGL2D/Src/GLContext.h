@@ -52,6 +52,7 @@ namespace GL2D
 		int GetInt( GLenum param );
 
 		HRESULT Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar );
+		HRESULT MatrixMode( GLenum mode );
 		HRESULT PushMatrix();
 		HRESULT PopMatrix();
 		HRESULT MultMatrix( glm::mat4x4 const & mtx );
@@ -126,8 +127,9 @@ namespace GL2D
 		GLuint m_vertex;
 		GLuint m_texture;
 		typedef glm::mat4x4 mat4x4;
-		mat4x4 m_proj;
-		std::stack< mat4x4 > m_matrices;
+		std::stack< mat4x4 > m_projMtx;
+		std::stack< mat4x4 > m_viewMtx;
+		std::stack< mat4x4 > * m_currentMtx;
 
 		static std::recursive_mutex m_mutex;
 		static std::map< std::thread::id, CContext * > m_activeContexts;

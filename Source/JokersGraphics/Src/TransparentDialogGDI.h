@@ -11,19 +11,27 @@ namespace Joker
 	\remark		La transparence de ce control est personnalisable( via le masque ), en couleur comme en alpha( plus ou moins transparente ).
 				<br />Cette personnalisation est possible via la classe CTransparentBrush.
 	*/
-	template< typename T >
-	class CTransparentCtrlT< T, eRENDERER_GDI >
-		: public T
+	template<>
+	class JGRA_API CTransparentCtrlT< CDialog, eRENDERER_GDI >
+		: public CDialog
 		, public CTransparentCtrlBaseGDI
 	{
 	protected:
-		typedef T BaseType;
+		typedef CDialog BaseType;
 
 	public:
 		/**
 		 *\brief		Constructeur
 		 */
 		CTransparentCtrlT();
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlT( UINT nTemplate, CWnd * pParent );
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlT( LPCTSTR szTemplate, CWnd * pParent );
 		/**
 		 *\brief		Destructeur
 		 */
@@ -124,7 +132,6 @@ namespace Joker
 		DECLARE_MESSAGE_MAP()
 		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
 		afx_msg void OnSize( UINT type, int cx, int cy );
-		afx_msg void OnMove( int x, int y );
 		afx_msg void OnPaint();
 		afx_msg void OnSetFocus( CWnd * pOldWnd );
 		afx_msg void OnKillFocus( CWnd * pNewWnd );
@@ -136,5 +143,3 @@ namespace Joker
 		CBitmapDC * m_pBackDC;
 	};
 }
-
-#include "TransparentCtrlGDI.inl"

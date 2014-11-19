@@ -5,6 +5,7 @@
 #include <sstream>
 #include <set>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define BUFFER_OFFSET( x ) ( ( const GLvoid * )( x ) )
 
@@ -222,11 +223,14 @@ namespace GL2D
 	{
 		m_dc = ::GetDC( m_window );
 		m_context = DoCreateContext();
-		m_matrices.push( glm::mat4x4( 1.0f ) );
+		m_viewMtx.push( glm::mat4x4( 1.0f ) );
+		m_projMtx.push( glm::mat4x4( 1.0f ) );
 	}
 
 	CContext::~CContext()
 	{
+		::ReleaseDC( m_window, m_dc );
+		wglDeleteContext( m_context );
 	}
 
 	HRESULT CContext::Initialise()
@@ -246,6 +250,8 @@ namespace GL2D
 
 	void CContext::Cleanup()
 	{
+		MakeCurrent( GetDC() );
+
 		if ( m_program != GL_INVALID_INDEX )
 		{
 			glDeleteProgram( m_program );
@@ -261,8 +267,7 @@ namespace GL2D
 			glDeleteVertexArrays( 1, &m_vao );
 		}
 
-		::ReleaseDC( m_window, m_dc );
-		wglDeleteContext( m_context );
+		EndCurrent( GetDC() );
 	}
 
 	CContext * CContext::GetActiveContext()
@@ -378,33 +383,47 @@ namespace GL2D
 		return value;
 	}
 
+	HRESULT CContext::MatrixMode( GLenum mode )
+	{
+		if ( mode == GL_PROJECTION )
+		{
+			m_currentMtx = &m_projMtx;
+		}
+		else if ( mode == GL_MODELVIEW )
+		{
+			m_currentMtx = &m_viewMtx;
+		}
+        
+		return glGetLastError( "glMatrixMode" );
+	}
+
 	HRESULT CContext::Ortho( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar )
 	{
-		m_proj = glm::ortho( left, right, bottom, top, zNear, zFar );
-		return S_OK;
+		m_currentMtx->top() = m_currentMtx->top() * glm::mat4x4( glm::ortho( left, right, bottom, top, zNear, zFar ) );
+		return glGetLastError( "glOrtho" );
 	}
 
 	HRESULT CContext::PushMatrix()
 	{
-		m_matrices.push( m_matrices.top() );
+		m_currentMtx->push( m_currentMtx->top() );
 		return S_OK;
 	}
 
 	HRESULT CContext::PopMatrix()
 	{
-		m_matrices.pop();
+		m_currentMtx->pop();
 		return S_OK;
 	}
 
 	HRESULT CContext::MultMatrix( glm::mat4x4 const & mtx )
 	{
-		m_matrices.top() = m_matrices.top() * mtx;
+		m_currentMtx->top() = m_currentMtx->top() * mtx;
 		return S_OK;
 	}
 
 	HRESULT CContext::LoadIdentity()
 	{
-		m_matrices.top() = glm::mat4x4( 1.0 );
+		m_currentMtx->top() = glm::mat4x4();
 		return S_OK;
 	}
 
@@ -609,15 +628,17 @@ namespace GL2D
 
 	HRESULT CContext::DrawTexture( GLuint name, const GL2D_RECT_F & destinationRectangle, GL2D_BITMAP_INTERPOLATION_MODE interpolationMode, const GL2D_RECT_F & sourceRectangle )
 	{
+		HRESULT hr = S_OK;
+
 		GL2D_GL_TEXTURE_FILTER filter = GL2D_GL_TEXTURE_FILTER_NEAREST;
 
 		if ( interpolationMode == GL2D_BITMAP_INTERPOLATION_MODE_LINEAR )
 		{
 			filter = GL2D_GL_TEXTURE_FILTER_LINEAR;
 		}
-
+#if 0
 		glUseProgram( m_program );
-		HRESULT hr = glGetLastError( "glUseProgram" );
+		hr = glGetLastError( "glUseProgram" );
 
 		if ( hr == S_OK )
 		{
@@ -678,13 +699,13 @@ namespace GL2D
 
 			if ( hr == S_OK )
 			{
-				glVertexAttribPointer( m_vertex, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 0 ) );
+				glVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 0 ) );
 				hr = glGetLastError( "glVertexAttribPointer" );
 			}
 
 			if ( hr == S_OK )
 			{
-				glVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 4 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
+				glVertexAttribPointer( m_vertex, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
 				hr = glGetLastError( "glVertexAttribPointer" );
 			}
 		}
@@ -723,7 +744,89 @@ namespace GL2D
 			glUseProgram( 0 );
 			hr = glGetLastError( "glUseProgram" );
 		}
+#else
+		hr = ActiveTexture( GL_TEXTURE0 );
 
+		if ( hr == S_OK )
+		{
+			glBindTexture( GL_TEXTURE_2D, name );
+			hr = glGetLastError( "glBindTexture" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter );
+			hr = glGetLastError( "glTexParameteri" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter );
+			hr = glGetLastError( "glTexParameteri" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glMatrixMode( GL_PROJECTION );
+			hr = glGetLastError( "glMatrixMode" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glMultMatrixf( glm::value_ptr( m_projMtx.top() ) );
+			hr = glGetLastError( "glMultMatrixf" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glMatrixMode( GL_MODELVIEW );
+			hr = glGetLastError( "glMatrixMode" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glMultMatrixf( glm::value_ptr( m_viewMtx.top() ) );
+			hr = glGetLastError( "glMatrixMode" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
+			hr = glGetLastError( "glBindBuffer" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+			glTexCoordPointer( 2, GL_FLOAT, 5 * sizeof( float ), BUFFER_OFFSET( 0 ) );
+			hr = glGetLastError( "glTexCoordPointer" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glEnableClientState( GL_VERTEX_ARRAY );
+			glVertexPointer( 3, GL_FLOAT, 5 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
+			hr = glGetLastError( "glVertexPointer" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glDrawArrays( GL_TRIANGLES, 0, 6 );
+			hr = glGetLastError( "glDrawArrays" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, 0 );
+			hr = glGetLastError( "glBindBuffer" );
+		}
+
+		if ( hr == S_OK )
+		{
+			glBindTexture( GL_TEXTURE_2D, 0 );
+			hr = glGetLastError( "glBindTexture" );
+		}
+#endif
 		return hr;
 	}
 
@@ -777,6 +880,7 @@ namespace GL2D
 			char * l_pszTmp = new char[source.size() + 1];
 			strncpy_s( l_pszTmp, source.size() + 1, source.c_str(), source.size() );
 			glShaderSource( shader, 1, const_cast< const char ** >( &l_pszTmp ), &l_iLength );
+			delete [] l_pszTmp;
 			hr = glGetLastError( "glShaderSource" );
 
 			if ( hr == S_OK )
@@ -1094,10 +1198,6 @@ namespace GL2D
 		gl_api::GetFunction( "glGenVertexArrays", "ARB", glGenVertexArrays );
 		gl_api::GetFunction( "glDeleteVertexArrays", "ARB", glDeleteVertexArrays );
 		gl_api::GetFunction( "glBindVertexArray", "ARB", glBindVertexArray );
-
-		glFrontFace( GL_CCW );
-		glCullFace( GL_BACK );
-		glEnable( GL_CULL_FACE );
 	}
 
 	HRESULT CContext::DoLoadProgram()
@@ -1128,7 +1228,6 @@ namespace GL2D
 		fssrc += "void main()\n";
 		fssrc += "{\n";
 		fssrc += "    pxl_fragColor = texture( diffuse, vtx_texture );\n";
-		fssrc += "    pxl_fragColor = vec4( 1, 0, 0, 1 );\n";
 		fssrc += "}\n";
 		GLuint fs = DoCreateShader( fssrc, GL2D_GL_SHADER_TYPE_FRAGMENT );
 
@@ -1239,12 +1338,12 @@ namespace GL2D
 		{
 			float quad[] =
 			{
-				0, 0, 0, 0, 0,
-				1, 0, 0, 1, 0,
-				1, 1, 0, 1, 1,
-				0, 0, 0, 0, 0,
-				1, 1, 0, 1, 1,
-				0, 1, 0, 0, 1,
+				0, 2, 0, 0, 0,
+				0, 0, 0, 1, 0,
+				2, 0, 1, 1, 0,
+				0, 2, 0, 0, 0,
+				2, 0, 1, 1, 0,
+				2, 2, 1, 0, 0,
 			};
 
 			hr = BufferData( GL2D_GL_BUFFER_TARGET_ARRAY, sizeof( quad ), quad, GL2D_GL_BUFFER_USAGE_STATIC_DRAW );
@@ -1259,20 +1358,16 @@ namespace GL2D
 			if ( hr == S_OK )
 			{
 				glBindVertexArray( m_vao );
-//				hr = glGetLastError( "glBindVertexArray" );
 				glBindBuffer( GL2D_GL_BUFFER_TARGET_ARRAY, m_buffer );
-//				hr = glGetLastError( "glBindBuffer" );
-
-				if ( m_vertex != GL_INVALID_INDEX )
-				{
-					glVertexAttribPointer( m_vertex, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 0 ) );
-//					hr = glGetLastError( "glVertexAttribPointer" );
-				}
 
 				if ( m_texture != GL_INVALID_INDEX )
 				{
-					glVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 3 * sizeof( float ) ) );
-//					hr = glGetLastError( "glVertexAttribPointer" );
+					glVertexAttribPointer( m_texture, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 0 ) );
+				}
+
+				if ( m_vertex != GL_INVALID_INDEX )
+				{
+					glVertexAttribPointer( m_vertex, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( float ), BUFFER_OFFSET( 2 * sizeof( float ) ) );
 				}
 
 				glBindVertexArray( 0 );

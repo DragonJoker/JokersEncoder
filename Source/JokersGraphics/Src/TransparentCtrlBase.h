@@ -81,6 +81,10 @@ namespace Joker
 			return m_clText;
 		}
 		/**
+		 *\return		Le type d'interface de rendu
+		 */
+		virtual eRENDERER GetRenderer()const = 0;
+		/**
 		 *\return		L'alpha du masque de transparence
 		 */
 		inline BYTE GetMaskAlpha()const
@@ -225,5 +229,130 @@ namespace Joker
 		bool m_bHasBorder;
 		//! Le contrôle
 		CWnd * m_ctrl;
+	};
+#if DEF_USING_D2D
+	/*!
+	\author		Sylvain DOREMUS
+	\date		13/11/2011
+	\brief		Implémentation d'une classe de control transparent.
+	\remark		La transparence de ce control est personnalisable( via le masque ), en couleur comme en alpha( plus ou moins transparente ).
+				<br />Cette personnalisation est possible via la classe CTransparentBrush.
+	*/
+	class JGRA_API CTransparentCtrlBaseD2D
+		: public CTransparentCtrlBase
+	{
+	public:
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlBaseD2D();
+		/**
+		 *\brief		Destructeur
+		 */
+		virtual ~CTransparentCtrlBaseD2D();
+		/**
+		 *\return		Le type d'interface de rendu
+		 */
+		virtual eRENDERER GetRenderer()const
+		{
+			return eRENDERER_D2D;
+		}
+
+	protected:
+		/**
+		 *\brief		Initialise les données indépendantes du contrôle
+		 */
+		void DoInitialiseDeviceIndependent();
+		/**
+		 *\brief		Nettoie les données indépendantes du contrôle
+		 */
+		void DoCleanupDeviceIndependent();
+
+	protected:
+		//! Le nombre d'instanciations
+		static int m_iReferences;
+		//! La factory de création de bitmap
+		static IDWriteFactory * m_pWriteFactory;
+		//! La factory de création de cibles de rendu
+		static ID2D1Factory * m_pFactory;
+		//! Le nombre de bitmas créés
+		static std::map< HBITMAP, ID2D1Bitmap * > m_bitmaps;
+	};
+#endif
+#if DEF_USING_OGL
+	/*!
+	\author		Sylvain DOREMUS
+	\date		13/11/2011
+	\brief		Implémentation d'une classe de control transparent.
+	\remark		La transparence de ce control est personnalisable( via le masque ), en couleur comme en alpha( plus ou moins transparente ).
+				<br />Cette personnalisation est possible via la classe CTransparentBrush.
+	*/
+	class JGRA_API CTransparentCtrlBaseOGL
+		: public CTransparentCtrlBase
+	{
+	public:
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlBaseOGL();
+		/**
+		 *\brief		Destructeur
+		 */
+		virtual ~CTransparentCtrlBaseOGL();
+		/**
+		 *\return		Le type d'interface de rendu
+		 */
+		virtual eRENDERER GetRenderer()const
+		{
+			return eRENDERER_OGL;
+		}
+
+	protected:
+		/**
+		 *\brief		Initialise les données indépendantes du contrôle
+		 */
+		void DoInitialiseDeviceIndependent();
+		/**
+		 *\brief		Nettoie les données indépendantes du contrôle
+		 */
+		void DoCleanupDeviceIndependent();
+
+	protected:
+		//! Le nombre d'instanciations
+		static int m_iReferences;
+		//! La factory de création de bitmap
+		static IDWriteFactory * m_pWriteFactory;
+		//! La factory de création de cibles de rendu
+		static IGL2DFactory * m_pFactory;
+		//! Le nombre de bitmas créés
+		static std::map< HBITMAP, IGL2DBitmap * > m_bitmaps;
+	};
+#endif
+	/*!
+	\author		Sylvain DOREMUS
+	\date		13/11/2011
+	\brief		Implémentation d'une classe de control transparent.
+	\remark		La transparence de ce control est personnalisable( via le masque ), en couleur comme en alpha( plus ou moins transparente ).
+				<br />Cette personnalisation est possible via la classe CTransparentBrush.
+	*/
+	class JGRA_API CTransparentCtrlBaseGDI
+		: public CTransparentCtrlBase
+	{
+	public:
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlBaseGDI();
+		/**
+		 *\brief		Destructeur
+		 */
+		virtual ~CTransparentCtrlBaseGDI();
+		/**
+		 *\return		Le type d'interface de rendu
+		 */
+		virtual eRENDERER GetRenderer()const
+		{
+			return eRENDERER_GDI;
+		}
 	};
 }

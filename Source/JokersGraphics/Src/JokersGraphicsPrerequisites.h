@@ -1,7 +1,7 @@
 #pragma once
 
 #define DEF_USING_D2D 1
-#define DEF_USING_OGL 0
+#define DEF_USING_OGL 1
 
 #include <sstream>
 #include <vector>
@@ -92,6 +92,52 @@ namespace Joker
 
 		pPointer = NULL;
 	}
+
+	template< typename T > struct Deleter;
+
+	template <> struct Deleter< HBRUSH >
+	{
+		inline void operator()( HBRUSH & hBrush )
+		{
+			if ( hBrush )
+			{
+				::DeleteObject( hBrush );
+				hBrush = NULL;
+			}
+		}
+	};
+
+	template <> struct Deleter< HBITMAP >
+	{
+		inline void operator()( HBITMAP & hBitmap )
+		{
+			if ( hBitmap )
+			{
+				::DeleteObject( hBitmap );
+				hBitmap = NULL;
+			}
+		}
+	};
+
+	template <> struct Deleter< HDC >
+	{
+		inline void operator()( HDC & hDC )
+		{
+			if ( hDC )
+			{
+				::DeleteDC( hDC );
+				hDC = NULL;
+			}
+		}
+	};
+
+	template< typename T >
+	void Delete( T pPointer )
+	{
+		Deleter< T > deleter;
+		deleter( pPointer );
+	}
+
 
 	template< typename T, eRENDERER Renderer > class CTransparentCtrlT;
 }

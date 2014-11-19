@@ -4,26 +4,34 @@
 
 namespace Joker
 {
+#if DEF_USING_D2D
 	/*!
-	\author		Sylvain DOREMUS
-	\date		13/11/2011
 	\brief		Implémentation d'une classe de control transparent.
 	\remark		La transparence de ce control est personnalisable( via le masque ), en couleur comme en alpha( plus ou moins transparente ).
 				<br />Cette personnalisation est possible via la classe CTransparentBrush.
+	\author Sylvain DOREMUS
+	\date 13/11/2011
 	*/
-	template< typename T >
-	class CTransparentCtrlT< T, eRENDERER_GDI >
-		: public T
-		, public CTransparentCtrlBaseGDI
+	template<>
+	class JGRA_API CTransparentCtrlT< CDialog, eRENDERER_D2D >
+		: public CDialog
+		, public CTransparentCtrlBaseD2D
 	{
 	protected:
-		typedef T BaseType;
+		typedef CDialog BaseType;
 
-	public:
 		/**
 		 *\brief		Constructeur
 		 */
 		CTransparentCtrlT();
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlT( UINT nTemplate, CWnd * pParent );
+		/**
+		 *\brief		Constructeur
+		 */
+		CTransparentCtrlT( LPCTSTR szTemplate, CWnd * pParent );
 		/**
 		 *\brief		Destructeur
 		 */
@@ -38,6 +46,7 @@ namespace Joker
 		virtual bool GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits );
 		/**
 		 *\brief		Dessine un bitmap dans le HDC donné
+		 *\param[in]	hDC			Le HDC de destination
 		 *\param[in]	rcDst		Le rectangle dans lequel le bitmap doit être dessiné
 		 *\param[in]	hBitmap		Le bitmap à dessiner
 		 *\param[in]	rcSrc		Le rectangle du bitmap à dessiner
@@ -63,14 +72,14 @@ namespace Joker
 		virtual void DrawSolidText( HFONT hFont, LOGFONT logFont, CColour const & clColour, CString const & csText, CRect rcRect, DWORD dwStyle );
 		/**
 		 *\brief		Remplit le rectangle donné avec la couleur donnée
-		 * Dessine un texte avec la police et la couleur donnés
+		 *\remark		Dessine un texte avec la police et la couleur donnés
 		 *\param[in]	crColour	La couleur de remplissage
 		 *\param[in]	rcRect		Le rectangle à remplir
 		 */
 		virtual void FillSolidRect( CColour const & clColour, CRect rcRect );
 		/**
 		 *\brief		Transparent Blit un dc dans celui-ci
-		 * Dessine un texte avec la police et la couleur donnés
+		 *\remark		Dessine un texte avec la police et la couleur donnés
 		 *\param[in]	rcDest	La section de la destination
 		 *\param[in]	srcDC	Le DC source
 		 *\param[in]	rcSrc	La section de la source
@@ -95,6 +104,10 @@ namespace Joker
 		 */
 		BOOL SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags );
 
+	private:
+		void DoInitDeviceDependent();
+		void DoCleanupDeviceDependent();
+
 	protected:
 		/**
 		 *\brief		Fonction de nettoyage
@@ -113,7 +126,7 @@ namespace Joker
 		/**
 		 *\brief		Fonction de dessin
 		 */
-		virtual void DoDraw();
+		inline void DoDraw();
 
 	protected:
 		/**
@@ -123,18 +136,20 @@ namespace Joker
 
 		DECLARE_MESSAGE_MAP()
 		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
-		afx_msg void OnSize( UINT type, int cx, int cy );
-		afx_msg void OnMove( int x, int y );
+		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID );
 		afx_msg void OnPaint();
+		afx_msg void OnSize( UINT type, int cx, int cy );
+		afx_msg LRESULT OnDisplayChange( WPARAM, LPARAM );
 		afx_msg void OnSetFocus( CWnd * pOldWnd );
 		afx_msg void OnKillFocus( CWnd * pNewWnd );
 		afx_msg void OnMouseMove( UINT nFlags, CPoint point );
 		afx_msg LRESULT OnMouseLeave( WPARAM wParam, LPARAM lParam );
 
 	protected:
-		//! Le contenu du backbuffer
-		CBitmapDC * m_pBackDC;
+		//! Le bitmap contenant le dessin
+		ID2D1Bitmap * m_pBitmap;
+		//! La cible du rendu
+		ID2D1HwndRenderTarget * m_pRenderTarget;
 	};
+#endif
 }
-
-#include "TransparentCtrlGDI.inl"

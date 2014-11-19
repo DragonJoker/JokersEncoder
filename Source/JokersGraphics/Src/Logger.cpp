@@ -7,10 +7,12 @@
 #pragma warning( push )
 #pragma warning( disable:4290 )
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#	endif
 #endif
 
 namespace Joker
@@ -72,9 +74,10 @@ namespace Joker
 		if ( m_pOldInfos )
 		{
 			::SetCurrentConsoleFontEx( m_hScreenBuffer, FALSE, PCONSOLE_FONT_INFOEX( m_pOldInfos ) );
+			delete m_pOldInfos;
+			m_pOldInfos = NULL;
 		}
 
-		delete m_pOldInfos;
 		::CloseHandle( m_hScreenBuffer );
 		::SetConsoleOutputCP( m_uiOldCP );
 		::FreeConsole();

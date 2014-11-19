@@ -2,6 +2,14 @@
 
 #include "ScalableLayout.h"
 
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#	endif
+#endif
+
 namespace Joker
 {
 	CScalableLayout::CElement::CElement( HWND hElement, HWND hParent, LPRECT rcFixed, bool scalable, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
@@ -12,26 +20,37 @@ namespace Joker
 		,	m_verticAlign( vertic )
 	{
 		CRect rcOriginal;
+		CRect rcParent;
 		::GetWindowRect( m_hElement, rcOriginal );
-		m_ptOriginal = rcOriginal.TopLeft();
-		::ScreenToClient( hParent, & m_ptOriginal );
+		::GetWindowRect( hParent, rcParent );
+		m_ptLTOriginal = rcOriginal.TopLeft();
+		m_ptRBOriginal = rcOriginal.BottomRight();
+		::ScreenToClient( hParent, &m_ptLTOriginal );
+		m_ptRBOriginal.x = rcParent.Width() - m_ptRBOriginal.x;
+		m_ptRBOriginal.y = rcParent.Height() - m_ptRBOriginal.y;
 
 		m_sizeOriginal.cx = rcOriginal.Width();
 		m_sizeOriginal.cy = rcOriginal.Height();
-		m_ptOriginal.x += -m_rcFixed->left;
-		m_ptOriginal.y += -m_rcFixed->top;
+		m_ptLTOriginal.x -= m_rcFixed->left;
+		m_ptLTOriginal.y -= m_rcFixed->top;
+		m_ptRBOriginal.x -= m_rcFixed->right;
+		m_ptRBOriginal.y -= m_rcFixed->bottom;
 	}
 
 	void CScalableLayout::CElement ::Resize( double dX, double dY, LPRECT rcMaxExtent )
 	{
-		LONG iLeft = LONG( dX * m_ptOriginal.x );
-		LONG iTop = LONG( dY * m_ptOriginal.y );
+		LONG iLeft = LONG( dX * m_ptLTOriginal.x );
+		LONG iTop = LONG( dY * m_ptLTOriginal.y );
 		LONG iWidth = LONG( dX * m_sizeOriginal.cx );
 		LONG iHeight = LONG( dY * m_sizeOriginal.cy );
 
 		if ( !m_scalable )
 		{
-			if ( m_horizAlign == eHORIZ_ALIGN_RIGHT )
+			if ( m_horizAlign == eHORIZ_ALIGN_LEFT )
+			{
+				iLeft = m_ptLTOriginal.x;
+			}
+			else if ( m_horizAlign == eHORIZ_ALIGN_RIGHT )
 			{
 				iLeft = iLeft + iWidth - m_sizeOriginal.cx;
 			}
@@ -40,7 +59,11 @@ namespace Joker
 				iLeft = iLeft + ( iWidth - m_sizeOriginal.cx ) / 2;
 			}
 
-			if ( m_verticAlign == eVERTIC_ALIGN_BOTTOM )
+			if ( m_verticAlign == eVERTIC_ALIGN_TOP )
+			{
+				iTop = m_ptLTOriginal.y;
+			}
+			else if ( m_verticAlign == eVERTIC_ALIGN_BOTTOM )
 			{
 				iTop = iTop + iHeight - m_sizeOriginal.cy;
 			}
@@ -93,6 +116,16 @@ namespace Joker
 		if( it == m_mapElements.end() )
 		{
 			m_mapElements.insert( std::make_pair( uiId, CElement( hElement, m_hParent, &m_rcFixedBorders, scalable, horiz, vertic ) ) );
+		}
+	}
+
+	void CScalableLayout::AddElement( UINT uiId, bool scalable, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
+	{
+		HWND hWnd = ::GetDlgItem( m_hParent, uiId );
+
+		if( hWnd )
+		{
+			AddElement( uiId, hWnd, scalable, horiz, vertic );
 		}
 	}
 

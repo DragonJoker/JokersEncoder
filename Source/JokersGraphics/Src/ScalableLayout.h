@@ -26,7 +26,8 @@ namespace Joker
 		{
 		private:
 			HWND m_hElement;
-			POINT m_ptOriginal;
+			POINT m_ptLTOriginal;
+			POINT m_ptRBOriginal;
 			SIZE m_sizeOriginal;
 			LPRECT m_rcFixed;
 			bool m_scalable;
@@ -47,6 +48,7 @@ namespace Joker
 		virtual ~CScalableLayout();
 
 		void AddElement( UINT uiId, HWND hElement, bool scalable = true, eHORIZ_ALIGN horiz = eHORIZ_ALIGN_CENTER, eVERTIC_ALIGN vertic = eVERTIC_ALIGN_CENTER );
+		void AddElement( UINT uiId, bool scalable = true, eHORIZ_ALIGN horiz = eHORIZ_ALIGN_CENTER, eVERTIC_ALIGN vertic = eVERTIC_ALIGN_CENTER );
 		void RemoveElement( UINT uiId );
 		void Flush();
 

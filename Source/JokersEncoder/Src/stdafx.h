@@ -58,6 +58,20 @@
 
 #include <JokersGraphicsPrerequisites.h>
 #include <Image.h>
-#include <ImageCtrl.h>
+#include <ImageManager.h>
+#include <TransparentImageCtrl.h>
 #include <TransparentListBox.h>
 #include <TransparentButton.h>
+#include <TransparentDialog.h>
+
+#if DEF_USING_OGL
+#	define eDEFAULT_RENDERER eRENDERER_OGL
+#elif DEF_USING_D2D
+#	define eDEFAULT_RENDERER eRENDERER_D2D
+#else
+#	define eDEFAULT_RENDERER eRENDERER_GDI
+#endif
+
+#if defined( VLD_AVAILABLE )
+#	include <vld.h>
+#endif

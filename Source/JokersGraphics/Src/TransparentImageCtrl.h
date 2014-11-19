@@ -8,11 +8,12 @@ namespace Joker
 {
 	class CImage;
 
-	class JGRA_API CTransparentImageCtrl
-		: public CTransparentCtrlT< CStatic, eDEFAULT_RENDERER >
+    template< eRENDERER Renderer >
+	class CTransparentImageCtrl
+		: public CTransparentCtrlT< CStatic, Renderer >
 	{
 	public:
-		typedef CTransparentCtrlT< CStatic, eDEFAULT_RENDERER > BaseType;
+		typedef CTransparentCtrlT< CStatic, Renderer > BaseType;
 
 	public:
 		CTransparentImageCtrl();
@@ -43,3 +44,5 @@ namespace Joker
 		CTransparentBrush m_brush;
 	};
 }
+
+#include "TransparentImageCtrl.inl"

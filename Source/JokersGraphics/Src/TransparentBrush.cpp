@@ -3,10 +3,12 @@
 #include "TransparentBrush.h"
 #include "BitmapDC.h"
 
-#ifdef _DEBUG
-#	define new DEBUG_NEW
-#	undef THIS_FILE
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#	endif
 #endif
 
 namespace Joker
@@ -132,26 +134,26 @@ namespace Joker
 		m_rcSrcPattern	= rcPattern;
 
 		BYTE * pBits;
-		CreateBitmap( rcPattern.Width(), rcPattern.Height(), & pBits );
-		BYTE * pSrcBits = new BYTE[rcPattern.Width() * rcPattern.Height() * 4];
+		CreateBitmap( rcPattern.Width(), rcPattern.Height(), &pBits );
+		std::vector< BYTE > pSrcBits( rcPattern.Width() * rcPattern.Height() * 4 );
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
 		BYTE iRTmp, iGTmp, iBTmp, iATmp = 255;
 
-		if ( GetDIBits( m_bmpPatternDC, hPattern, 0, rcPattern.Height(), NULL, & bmiSrc, DIB_RGB_COLORS ) )
+		if ( ::GetDIBits( m_bmpPatternDC, hPattern, 0, rcPattern.Height(), NULL, & bmiSrc, DIB_RGB_COLORS ) )
 		{
 			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), bmiSrc.bmiHeader.biWidth, bmiSrc.bmiHeader.biHeight, 1, 32, BI_RGB } };
 
-			if ( GetDIBits( m_bmpPatternDC, hPattern, 0, rcPattern.Height(), pSrcBits, & bmi, DIB_RGB_COLORS ) )
+			if ( ::GetDIBits( m_bmpPatternDC, hPattern, 0, rcPattern.Height(), pSrcBits.data(), & bmi, DIB_RGB_COLORS ) )
 			{
 				if ( bmiSrc.bmiHeader.biBitCount != 32 )
 				{
 					COLORREF crColour;
 
-					for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < rcPattern.Width() * rcPattern.Height() ; ++GL2D_SIZE_I )
+					for ( int i = 0 ; i < rcPattern.Width() * rcPattern.Height() ; ++i )
 					{
-						iBTmp = pSrcBits[( GL2D_SIZE_I << 2 ) + 0];
-						iGTmp = pSrcBits[( GL2D_SIZE_I << 2 ) + 1];
-						iRTmp = pSrcBits[( GL2D_SIZE_I << 2 ) + 2];
+						iBTmp = pSrcBits[( i << 2 ) + 0];
+						iGTmp = pSrcBits[( i << 2 ) + 1];
+						iRTmp = pSrcBits[( i << 2 ) + 2];
 						crColour = MakeARGB( iRTmp, iGTmp, iBTmp, iATmp );
 						memcpy( pBits, & crColour, sizeof( COLORREF ) );
 						pBits += 4;
@@ -159,30 +161,23 @@ namespace Joker
 				}
 				else
 				{
-					memcpy( pBits, pSrcBits, rcPattern.Width() * rcPattern.Height() * 4 );
+					memcpy( pBits, pSrcBits.data(), rcPattern.Width() * rcPattern.Height() * 4 );
 				}
 			}
 		}
-
-		delete [] pSrcBits;
 	}
 
 	void CTransparentBrush::CreateBitmap( int iWidth, int iHeight, BYTE ** pBits )
 	{
 		BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), iWidth, iHeight, 1, 32, BI_RGB } };
-		m_hPattern = CreateDIBSection( NULL, & bmi, DIB_RGB_COLORS, ( void ** ) pBits, NULL, NULL );
+		m_hPattern = ::CreateDIBSection( NULL, & bmi, DIB_RGB_COLORS, ( void ** ) pBits, NULL, NULL );
 		m_rcSrcPattern = CRect( 0, 0, iWidth, iHeight );
 		m_bmpPatternDC.Attach( m_hPattern );
 	}
 
 	void CTransparentBrush::Release()
 	{
-		if ( m_hPattern )
-		{
-			DeleteObject( m_hPattern );
-			m_hPattern = NULL;
-		}
-
+		Delete( m_hPattern );
 		m_bmpPatternDC.Detach();
 	}
 }

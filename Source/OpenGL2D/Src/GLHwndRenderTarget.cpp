@@ -11,6 +11,7 @@ namespace GL2D
 
 	CComHwndRenderTarget::~CComHwndRenderTarget()
 	{
+		DestroyContext();
 	}
 
 	STDMETHODIMP CComHwndRenderTarget::CreateContext( const GL2D_RENDER_TARGET_PROPERTIES & renderTargetProperties, const GL2D_HWND_RENDER_TARGET_PROPERTIES & hwndRenderTargetProperties )
@@ -41,10 +42,17 @@ namespace GL2D
 		std::shared_ptr< CContext > context = GetContext();
 		context->MakeCurrent( context->GetDC() );
 		glDrawBuffer( GL_BACK );
+		glFrontFace( GL_CW );
+		glCullFace( GL_BACK );
+		context->Enable( GL_CULL_FACE );
+		context->Enable( GL_TEXTURE_2D );
 		context->Disable( GL_DEPTH_TEST );
 		GL2D_SIZE_U size = GetPixelSize();
+		context->MatrixMode( GL_PROJECTION );
+		context->LoadIdentity();
 		context->Viewport( 0, 0, size.width, size.height );
-		context->Ortho( 0, 1, 0, 1, 0, 1 );
+		context->Ortho( 0, 1, 1, 0, 0, 1 );
+		context->MatrixMode( GL_MODELVIEW );
 		context->LoadIdentity();
 	}
 

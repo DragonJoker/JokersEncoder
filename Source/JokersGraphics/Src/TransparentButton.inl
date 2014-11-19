@@ -1,20 +1,12 @@
-#include "stdafx.h"
-
-#include "TransparentButton.h"
 #include "Image.h"
 #include "ColourManager.h"
 #include "FontManager.h"
 #include "ImageManager.h"
 
-#ifdef _DEBUG
-#	define new DEBUG_NEW
-#	undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 namespace Joker
 {
-	CTransparentButton::CTransparentButton()
+    template< eRENDERER Renderer >
+	CTransparentButton< Renderer >::CTransparentButton()
 		: m_eState( eBTN_STATE_ENABLED )
 		, m_dwAlign( DT_CENTER | DT_VCENTER )
 		, m_bDrawBorder( FALSE )
@@ -27,13 +19,15 @@ namespace Joker
 			m_pFonts[GL2D_SIZE_I] = NULL;
 		}
 	}
-
-	CTransparentButton::~CTransparentButton()
+    
+    template< eRENDERER Renderer >
+	CTransparentButton< Renderer >::~CTransparentButton()
 	{
 		DoRelease();
 	}
-
-	void CTransparentButton::SetSolidBrush( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetSolidBrush( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw )
 	{
 		if ( eState >= eBTN_STATE_COUNT )
 		{
@@ -52,16 +46,18 @@ namespace Joker
 			BaseType::Invalidate();
 		}
 	}
-
-	void CTransparentButton::SetSolidBrushes( CColour const & clEnable, CColour const & clHighlt, CColour const & clPushed, CColour const & clDisabl )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetSolidBrushes( CColour const & clEnable, CColour const & clHighlt, CColour const & clPushed, CColour const & clDisabl )
 	{
 		SetSolidBrush( eBTN_STATE_DISABLED		, clDisabl	);
 		SetSolidBrush( eBTN_STATE_ENABLED		, clEnable	);
 		SetSolidBrush( eBTN_STATE_HIGHLIGHTED	, clHighlt	);
 		SetSolidBrush( eBTN_STATE_PUSHED		, clPushed	);
 	}
-
-	void CTransparentButton::SetPatternBrush( eBTN_STATE eState, HBITMAP hPattern, CRect const & rcPattern, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetPatternBrush( eBTN_STATE eState, HBITMAP hPattern, CRect const & rcPattern, BOOL bRedraw )
 	{
 		if ( eState >= eBTN_STATE_COUNT )
 		{
@@ -80,8 +76,9 @@ namespace Joker
 			BaseType::Invalidate();
 		}
 	}
-
-	void CTransparentButton::SetGradientBrush( eBTN_STATE eState, int iType, CColour const & clDebut, CColour const & clMilieu, CColour const & clFin, int iSteps, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetGradientBrush( eBTN_STATE eState, int iType, CColour const & clDebut, CColour const & clMilieu, CColour const & clFin, int iSteps, BOOL bRedraw )
 	{
 		if ( eState >= eBTN_STATE_COUNT )
 		{
@@ -100,8 +97,9 @@ namespace Joker
 			BaseType::Invalidate();
 		}
 	}
-
-	void CTransparentButton::SetImages( int iEnabled, int iHighlight, int iPush, int iDisabled, CRect const & rcFixed, BOOL bFromResources )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetImages( int iEnabled, int iHighlight, int iPush, int iDisabled, CRect const & rcFixed, BOOL bFromResources )
 	{
 		ImagePtr pImgEnable;
 		ImagePtr pImgHighlt;
@@ -129,8 +127,9 @@ namespace Joker
 		SetPatternBrush( eBTN_STATE_PUSHED,			*pImgPushed, CRect( 0, 0, pImgPushed->GetWidth(), pImgPushed->GetHeight() ) );
 		SetPatternBrush( eBTN_STATE_DISABLED,		*pImgDisabl, CRect( 0, 0, pImgDisabl->GetWidth(), pImgDisabl->GetHeight() ) );
 	}
-
-	void CTransparentButton::SetTextColour( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetTextColour( eBTN_STATE eState, CColour const & clColour, BOOL bRedraw )
 	{
 		if ( eState >= eBTN_STATE_COUNT )
 		{
@@ -149,21 +148,24 @@ namespace Joker
 			BaseType::Invalidate();
 		}
 	}
-
-	void CTransparentButton::SetTextColour( eBTN_STATE eState, UINT uiId, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetTextColour( eBTN_STATE eState, UINT uiId, BOOL bRedraw )
 	{
 		SetTextColour( eState, CColour::FromCOLORREF( CColourManager::GetColour( uiId ) ), bRedraw );
 	}
-
-	void CTransparentButton::SetTextColours( CColour const & clEnabled, CColour const & clHighlight, CColour const & clPush, CColour const & clDisabled )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetTextColours( CColour const & clEnabled, CColour const & clHighlight, CColour const & clPush, CColour const & clDisabled )
 	{
 		SetTextColour( eBTN_STATE_DISABLED		, clDisabled	, FALSE	);
 		SetTextColour( eBTN_STATE_ENABLED		, clEnabled		, FALSE	);
 		SetTextColour( eBTN_STATE_HIGHLIGHTED	, clHighlight	, FALSE	);
 		SetTextColour( eBTN_STATE_PUSHED		, clPush		, TRUE	);
 	}
-
-	void CTransparentButton::SetTextColours( UINT uiEnable, UINT uiHighlt, UINT uiPushed, UINT uiDisabl, BOOL bFromResources )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetTextColours( UINT uiEnable, UINT uiHighlt, UINT uiPushed, UINT uiDisabl, BOOL bFromResources )
 	{
 		if ( bFromResources )
 		{
@@ -174,8 +176,9 @@ namespace Joker
 			SetTextColours( CColour::FromCOLORREF( CColourManager::GetColour( uiEnable ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiHighlt ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiPushed ) ), CColour::FromCOLORREF( CColourManager::GetColour( uiDisabl ) ) );
 		}
 	}
-
-	void CTransparentButton::SetFont( eBTN_STATE eState, Joker::FontPtr pFont, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetFont( eBTN_STATE eState, Joker::FontPtr pFont, BOOL bRedraw )
 	{
 		if ( eState >= eBTN_STATE_COUNT )
 		{
@@ -194,29 +197,33 @@ namespace Joker
 			BaseType::Invalidate();
 		}
 	}
-
-	void CTransparentButton::SetFont( eBTN_STATE eState, UINT uiId, BOOL bRedraw )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetFont( eBTN_STATE eState, UINT uiId, BOOL bRedraw )
 	{
 		SetFont( eState, CFontManager::GetFont( uiId ), bRedraw );
 	}
-
-	void CTransparentButton::SetFonts( Joker::FontPtr pEnabledFont, Joker::FontPtr pHighlightFont, Joker::FontPtr pDownFont, Joker::FontPtr pDisabledFont )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetFonts( Joker::FontPtr pEnabledFont, Joker::FontPtr pHighlightFont, Joker::FontPtr pDownFont, Joker::FontPtr pDisabledFont )
 	{
 		SetFont( eBTN_STATE_DISABLED	, pDisabledFont		, FALSE	);
 		SetFont( eBTN_STATE_ENABLED		, pEnabledFont		, FALSE	);
 		SetFont( eBTN_STATE_HIGHLIGHTED	, pHighlightFont	, FALSE	);
 		SetFont( eBTN_STATE_PUSHED		, pDownFont			, TRUE	);
 	}
-
-	void CTransparentButton::SetFonts( int iEnabledIndex, int iHighlightIndex, int iDownIndex, int iDisabledIndex )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetFonts( int iEnabledIndex, int iHighlightIndex, int iDownIndex, int iDisabledIndex )
 	{
 		SetFont( eBTN_STATE_DISABLED	, iEnabledIndex		, FALSE	);
 		SetFont( eBTN_STATE_ENABLED		, iHighlightIndex	, FALSE	);
 		SetFont( eBTN_STATE_HIGHLIGHTED	, iDownIndex		, FALSE	);
 		SetFont( eBTN_STATE_PUSHED		, iDisabledIndex	, TRUE	);
 	}
-
-	BOOL CTransparentButton::EnableWindow( BOOL bEnable )
+    
+    template< eRENDERER Renderer >
+	BOOL CTransparentButton< Renderer >::EnableWindow( BOOL bEnable )
 	{
 		BOOL bReturn = BaseType::EnableWindow( bEnable );
 
@@ -240,13 +247,15 @@ namespace Joker
 
 		return bReturn;
 	}
-
-	void CTransparentButton::SetText( String const & strText )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::SetText( String const & strText )
 	{
 		BaseType::SetWindowText( strText.c_str() );
 	}
-
-	void CTransparentButton::DoRelease()
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::DoRelease()
 	{
 		m_bMouseOver = false;
 
@@ -259,8 +268,9 @@ namespace Joker
 			m_eState = eBTN_STATE_DISABLED;
 		}
 	}
-
-	void CTransparentButton::DoDrawBackground( CRect const & rcRect )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::DoDrawBackground( CRect const & rcRect )
 	{
 		BaseType::DoDrawBackground( rcRect );
 		// On blend le backbuffer et le pattern de ce bouton
@@ -280,8 +290,9 @@ namespace Joker
 		BaseType::DrawBitmap(	CRect( iRight, 0, iWidth, iHeight ),	m_brushes[m_eState], CRect( iImgWidth - m_rcFixedSizes.right, 0, iImgWidth, iImgHeight ) );
 		BaseType::DrawBitmap(	CRect( iLeft, 0, iRight, iHeight ),		m_brushes[m_eState], CRect( m_rcFixedSizes.left, 0, iImgWidth - m_rcFixedSizes.right, iImgHeight ) );
 	}
-
-	void CTransparentButton::DoDrawForeground( CRect const & rcRect )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::DoDrawForeground( CRect const & rcRect )
 	{
 		// On dessine le texte, s'il y en a un
 		CString csText;
@@ -312,24 +323,49 @@ namespace Joker
 			BaseType::FrameRect( rcTmp, CColour::FromComponents( 127, 127, 127, 255 ), 1, PS_DOT );
 		}
 	}
-
-	void CTransparentButton::DrawItem( LPDRAWITEMSTRUCT UNUSED( lpDrawItemStruct ) )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::DrawItem( LPDRAWITEMSTRUCT UNUSED( lpDrawItemStruct ) )
 	{
 		// 	m_hDC = lpDrawItemStruct->hDC;
 		// 	Draw();
 		// 	m_hDC = NULL;
 	}
 
-	BEGIN_MESSAGE_MAP( CTransparentButton, CTransparentButton::BaseType )
-		ON_WM_MOUSEMOVE()
-		ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
-		ON_WM_SETFOCUS()
-		ON_WM_KILLFOCUS()
-		ON_WM_LBUTTONDOWN()
-		ON_WM_LBUTTONUP()
-	END_MESSAGE_MAP()
-
-	void CTransparentButton::OnMouseMove( UINT nFlags, CPoint point )
+	PTM_WARNING_DISABLE
+    template< eRENDERER Renderer >
+	const AFX_MSGMAP * CTransparentButton< Renderer >::GetMessageMap() const
+	{
+		return GetThisMessageMap();
+	}
+    
+    template< eRENDERER Renderer >
+	const AFX_MSGMAP * PASCAL CTransparentButton< Renderer >::GetThisMessageMap()
+	{
+		typedef CTransparentButton< Renderer > ThisClass;
+		typedef ThisClass::BaseType TheBaseClass;
+		static const AFX_MSGMAP_ENTRY _messageEntries[] =
+		{
+			ON_WM_MOUSEMOVE()
+			ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
+			ON_WM_SETFOCUS()
+			ON_WM_KILLFOCUS()
+			ON_WM_LBUTTONDOWN()
+			ON_WM_LBUTTONUP()
+			{
+				0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0
+			}
+		};
+		static const AFX_MSGMAP messageMap =
+		{
+			& TheBaseClass::GetThisMessageMap, &_messageEntries[0]
+		};
+		return &messageMap;
+	}
+	PTM_WARNING_RESTORE
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::OnMouseMove( UINT nFlags, CPoint point )
 	{
 		if ( m_eState != eBTN_STATE_DISABLED )
 		{
@@ -370,8 +406,9 @@ namespace Joker
 			}
 		}
 	}
-
-	LRESULT CTransparentButton::OnMouseLeave( WPARAM wParam, LPARAM lParam )
+    
+    template< eRENDERER Renderer >
+	LRESULT CTransparentButton< Renderer >::OnMouseLeave( WPARAM wParam, LPARAM lParam )
 	{
 		BaseType::OnMouseLeave( wParam, lParam );
 
@@ -388,15 +425,17 @@ namespace Joker
 
 		return 0;
 	}
-
-	void CTransparentButton::OnLButtonDown( UINT nFlags, CPoint point )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::OnLButtonDown( UINT nFlags, CPoint point )
 	{
 		m_bFocused = true;
 		m_eState = eBTN_STATE_PUSHED;
 		BaseType::OnLButtonDown( nFlags, point );
 	}
-
-	void CTransparentButton::OnLButtonUp( UINT nFlags, CPoint point )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::OnLButtonUp( UINT nFlags, CPoint point )
 	{
 		if ( BaseType::IsWindowEnabled() )
 		{
@@ -416,14 +455,16 @@ namespace Joker
 
 		BaseType::OnLButtonUp( nFlags, point );
 	}
-
-	void CTransparentButton::OnSetFocus( CWnd * pOldWnd )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::OnSetFocus( CWnd * pOldWnd )
 	{
 		BaseType::OnSetFocus( pOldWnd );
 		Invalidate();
 	}
-
-	void CTransparentButton::OnKillFocus( CWnd * pNewWnd )
+    
+    template< eRENDERER Renderer >
+	void CTransparentButton< Renderer >::OnKillFocus( CWnd * pNewWnd )
 	{
 		BaseType::OnKillFocus( pNewWnd );
 		Invalidate();

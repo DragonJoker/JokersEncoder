@@ -124,9 +124,17 @@ namespace GL2D
 				std::bind( &CContext::GenTextures, context.get(), std::placeholders::_1, std::placeholders::_2 ),
 				std::bind( &CContext::DeleteTextures, context.get(), std::placeholders::_1, std::placeholders::_2 )
 			);
-			bmp->Initialise( size, srcData, pitch, *bitmapProperties );
-			*bitmap = bmp;
-			hr = S_OK;
+
+			hr = bmp->Initialise( size, srcData, pitch, *bitmapProperties );
+
+			if ( hr == S_OK )
+			{
+				*bitmap = bmp;
+			}
+			else
+			{
+				bmp->Release();
+			}
 		}
 
 		return hr;
@@ -444,32 +452,7 @@ namespace GL2D
 		context->ClearColor( colour->r, colour->g, colour->b, colour->a );
 		context->Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	}
-	/*
-		template< typename Object, typename Interface >
-		STDMETHODIMP_( void ) CRenderTargetInterface< Object, Interface >::BeginDraw()
-		{
-			std::shared_ptr< CContext > context = GetContext();
-			context->MakeCurrent( context->GetDC() );
-	//		m_frameBuffer.Bind( GL2D_GL_FRAMEBUFFER_MODE_DRAW );
-			glDrawBuffer( GL_BACK );
-			context->Disable( GL_DEPTH_TEST );
-			GL2D_SIZE_U size = GetPixelSize();
-			context->Viewport( 0, 0, size.width, size.height );
-			context->Ortho( 0, 1, 0, 1, 0, 1 );
-			context->LoadIdentity();
-		}
 
-		template< typename Object, typename Interface >
-		STDMETHODIMP CRenderTargetInterface< Object, Interface >::EndDraw( GL2D_TAG *tag1, GL2D_TAG *tag2 )
-		{
-			std::shared_ptr< CContext > context = GetContext();
-			HRESULT hr = S_OK;//m_frameBuffer.Unbind();
-			context->EndCurrent( context->GetDC() );
-			context->SwapBuffers( context->GetDC() );
-
-			return hr;
-		}
-	*/
 	template< typename Object, typename Interface >
 	STDMETHODIMP_( GL2D_PIXEL_FORMAT ) CRenderTargetInterface< Object, Interface >::GetPixelFormat() const
 	{

@@ -7,29 +7,38 @@
 
 #include <afxdialogex.h>
 #include <Image.h>
+#include <ImageManager.h>
 
-#ifdef _DEBUG
-#	define new DEBUG_NEW
-#	undef THIS_FILE
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#	endif
 #endif
-
-#define DEF_DEBUG_OGL 0
 
 using namespace Joker;
 
 CJokersEncoderDlg::CJokersEncoderDlg( CWnd * pParent )
-	: CDialogEx( CJokersEncoderDlg::IDD, pParent )
+	: BaseType( CJokersEncoderDlg::IDD, pParent )
 {
-	CWnd::EnableD2DSupport( TRUE );
 	m_hIcon = AfxGetApp()->LoadIcon( IDR_MAINFRAME );
+#if DEF_USING_D2D
+	if ( GetRenderer() == eRENDERER_D2D )
+	{
+		BaseType::EnableD2DSupport( TRUE );
+	}
+#endif
+}
+
+CJokersEncoderDlg::~CJokersEncoderDlg()
+{
 }
 
 void CJokersEncoderDlg::DoDataExchange( CDataExchange * pDX )
 {
-	CDialogEx::DoDataExchange( pDX );
+	BaseType::DoDataExchange( pDX );
 #if !DEF_DEBUG_OGL
-	DDX_Control( pDX, IDC_BACKGROUND,	m_staticBackground );
 	DDX_Control( pDX, IDC_LIST_FILES,	m_listFiles );
 	DDX_Control( pDX, IDOK,				m_btnOk );
 	DDX_Control( pDX, IDCANCEL,			m_btnCancel );
@@ -41,15 +50,17 @@ void CJokersEncoderDlg::DoDataExchange( CDataExchange * pDX )
 
 BOOL CJokersEncoderDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	BaseType::OnInitDialog();
 	SetIcon( m_hIcon, TRUE );
 	SetIcon( m_hIcon, FALSE );
-	GetWindowRect( m_rcRect );
+	GetWindowRect( m_rcInitialRect );
+	GetClientRect( m_rcRect );
+	ScreenToClient( m_rcInitialRect );
 	
 	CRect rcRect;
 	GetClientRect( rcRect );
-	m_staticBackground.SetWindowPos( NULL, 0, 0, rcRect.Width(), rcRect.Height(), SWP_SHOWWINDOW );
-	m_staticBackground.SetImage( IDB_BMP_DRAGON );
+	ImagePtr img = CImageManager::AddImage( IDB_BMP_DRAGON );
+	this->GetMaskBrush().SetPatternBrush( *img, CRect( 0, 0, img->GetWidth(), img->GetHeight() ) );
 	
 #if !DEF_DEBUG_OGL
 	LOGFONT logfont;
@@ -132,20 +143,18 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 	m_listFiles.SetItemTextColour( eLB_ITEM_STATUS_NORMAL, CColour( CColour::FullAlphaBlack ) );
 #endif
 	m_layout.Create( m_hWnd, CRect() );
-	m_layout.AddElement( IDC_BACKGROUND, m_staticBackground );
-	m_layout.AddElement( IDC_LIST_FILES, m_listFiles );
-	m_layout.AddElement( IDOK, m_btnOk, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDCANCEL, m_btnCancel, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDC_OPTIONS, m_btnSettings, false, eHORIZ_ALIGN_LEFT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDC_FILE, m_btnAddFile, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
-	m_layout.AddElement( IDC_FOLDER, m_btnAddFolder, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
+	m_layout.AddElement( IDC_LIST_FILES );
+	m_layout.AddElement( IDOK, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDCANCEL, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDC_OPTIONS, false, eHORIZ_ALIGN_LEFT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDC_FILE, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
+	m_layout.AddElement( IDC_FOLDER, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
 
 	return TRUE;
 }
 
-BEGIN_MESSAGE_MAP( CJokersEncoderDlg, CDialogEx )
+BEGIN_MESSAGE_MAP( CJokersEncoderDlg, CJokersEncoderDlg::BaseType )
 	ON_WM_CREATE()
-	ON_WM_CTLCOLOR()
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 	ON_WM_SIZE()
@@ -160,15 +169,25 @@ END_MESSAGE_MAP()
 
 int CJokersEncoderDlg::OnCreate( LPCREATESTRUCT lpCreateStruct )
 {
-	int iReturn = CDialogEx::OnCreate( lpCreateStruct );
+	int iReturn = BaseType::OnCreate( lpCreateStruct );
 
 	if ( iReturn == 0 )
-	{
-//		ModifyStyleEx( 0, WS_EX_LAYERED | WS_EX_TRANSPARENT);
-//		SetLayeredWindowAttributes(0, 255 * 0.50, LWA_ALPHA);
+	{/*
+		BOOL res = ModifyStyleEx( 0, WS_EX_COMPOSITED | WS_EX_TRANSPARENT );
+
+		if ( res )
+		{
+			SetLayeredWindowAttributes( 0, 255, LWA_ALPHA );
+		}*/
 	}
 
 	return iReturn;
+}
+
+BOOL CJokersEncoderDlg::OnEraseBkgnd( CDC * pDC )
+{
+	BaseType::OnEraseBkgnd( pDC );
+	return TRUE;
 }
 
 void CJokersEncoderDlg::OnPaint()
@@ -187,51 +206,37 @@ void CJokersEncoderDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		BaseType::OnPaint();
 	}
 }
 
 void CJokersEncoderDlg::OnSize( UINT uiType, int cx, int cy )
 {
-	CDialogEx::OnSize( uiType, cx, cy );
+	LockWindowUpdate();
+	BaseType::OnSize( uiType, cx, cy );
 	m_layout.Resize();
+	GetClientRect( m_rcRect );
+	UnlockWindowUpdate();
 }
 
 void CJokersEncoderDlg::OnSizing(  UINT nSide, LPRECT lpRect )
 {
 	CRect rect( *lpRect );
 
-	if ( rect.Width() < m_rcRect.Width() )
+	if ( rect.Width() < m_rcInitialRect.Width() )
 	{
-		lpRect->right = lpRect->left + m_rcRect.Width();
+		lpRect->right = lpRect->left + m_rcInitialRect.Width();
 	}
 
-	if ( rect.Height() < m_rcRect.Height() )
+	if ( rect.Height() < m_rcInitialRect.Height() )
 	{
-		lpRect->bottom = lpRect->top + m_rcRect.Height();
+		lpRect->bottom = lpRect->top + m_rcInitialRect.Height();
 	}
 }
 
 HCURSOR CJokersEncoderDlg::OnQueryDragIcon()
 {
 	return static_cast< HCURSOR >( m_hIcon );
-}
-
-HBRUSH CJokersEncoderDlg::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
-{
-	HBRUSH hRet = NULL;
-
-	if ( uiWinID == IDC_LIST_FILES )
-	{
-		hRet = HBRUSH( GetStockObject( HOLLOW_BRUSH ) );
-	}
-
-	return hRet;
-}
-
-BOOL CJokersEncoderDlg::OnEraseBkgnd( CDC * UNUSED( pDC ) )
-{
-	return TRUE;
 }
 
 void CJokersEncoderDlg::OnBnClickedFile()
@@ -250,10 +255,10 @@ void CJokersEncoderDlg::OnBnClickedOptions()
 
 void CJokersEncoderDlg::OnBnClickedOk()
 {
-	CDialogEx::OnOK();
+	BaseType::OnOK();
 }
 
 void CJokersEncoderDlg::OnBnClickedCancel()
 {
-	CDialogEx::OnCancel();
+	BaseType::OnCancel();
 }

@@ -13,11 +13,12 @@ namespace Joker
 	\remark		En plus de la transparence de base de CTransparentCtrl, les items sont eux aussi personnalisables, par type( cf. eLB_ITEM_STATUS ).
 				<br />Leur personnalisation est possible via la classe CAlphaLBItem.
 	*/
-	class JGRA_API CTransparentListBox
-		: public CTransparentCtrlT< CListBox, eDEFAULT_RENDERER >
+	template< eRENDERER Renderer >
+	class CTransparentListBox
+		: public CTransparentCtrlT< CListBox, Renderer >
 	{
 	public:
-		typedef CTransparentCtrlT< CListBox, eDEFAULT_RENDERER > BaseType;
+		typedef CTransparentCtrlT< CListBox, Renderer > BaseType;
 
 	private:
 		CAlphaLBItem		m_itemColours[eLB_ITEM_STATUS_COUNT];	//!< Les couleurs des items, selon l'état
@@ -207,3 +208,5 @@ namespace Joker
 		afx_msg void	OnLButtonUp( UINT nFlags, CPoint point );
 	};
 }
+
+#include "TransparentListBox.inl"

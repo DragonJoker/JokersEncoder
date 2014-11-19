@@ -3,6 +3,14 @@
 #include "DrawerBase.h"
 #include "StrUtils.h"
 
+#if !defined( VLD_AVAILABLE )
+#	ifdef _DEBUG
+#		define new DEBUG_NEW
+#		undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#	endif
+#endif
+
 namespace Joker
 {
 	int CDrawerBase::FormatText( CRect & rcRect, int iMaxWidth, String const & strUnformattedp, String & strFormatted, CFont & cFont, double dRatio, UINT uiFormat )

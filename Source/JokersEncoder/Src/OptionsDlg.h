@@ -1,30 +1,34 @@
 #pragma once
 
 #include <afxwin.h>
-#include <ImageCtrl.h>
 #include <TransparentButton.h>
+#include <TransparentDialog.h>
 
 #include "JokersEncoder.h"
 
-class COptionsDlg : public CDialogEx
+namespace Joker
 {
-private:
-	DECLARE_DYNAMIC( COptionsDlg )
-	enum { IDD = IDD_OPTIONS_DIALOG };
+	class COptionsDlg
+		: public CTransparentCtrlT< CDialog, eDEFAULT_RENDERER >
+	{
+	private:
+		DECLARE_DYNAMIC( COptionsDlg )
+		enum { IDD = IDD_OPTIONS_DIALOG };
+		typedef CTransparentCtrlT< CDialog, eDEFAULT_RENDERER > BaseType;
 
-public:
-	COptionsDlg( CWnd * pParent = NULL );
-	virtual ~COptionsDlg();
+	public:
+		COptionsDlg( CWnd * pParent = NULL );
+		virtual ~COptionsDlg();
 
-protected:
-	virtual void DoDataExchange( CDataExchange * pDX );
-	virtual BOOL OnInitDialog();
+	protected:
+		virtual void DoDataExchange( CDataExchange * pDX );
+		virtual BOOL OnInitDialog();
 
-	DECLARE_MESSAGE_MAP()
+		DECLARE_MESSAGE_MAP()
 
-private:
-	HICON m_hIcon;
-	Joker::CTransparentImageCtrl m_staticBackground;
-	Joker::CTransparentButton m_buttonOK;
-	Joker::CTransparentButton m_buttonCancel;
-};
+	private:
+		HICON m_hIcon;
+		Joker::CTransparentButton< eDEFAULT_RENDERER > m_buttonOK;
+		Joker::CTransparentButton< eDEFAULT_RENDERER > m_buttonCancel;
+	};
+}

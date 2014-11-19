@@ -1,20 +1,12 @@
-#include "stdafx.h"
-
-#include "TransparentCheck.h"
 #include "Image.h"
 #include "ColourManager.h"
 #include "FontManager.h"
 #include "ImageManager.h"
 
-#ifdef _DEBUG
-#	define new DEBUG_NEW
-#	undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 namespace Joker
 {
-	CTransparentRadioCheck::CTransparentRadioCheck()
+	template< eRENDERER Renderer >
+	CTransparentRadioCheck< Renderer >::CTransparentRadioCheck()
 	{
 		m_brushesCheck[eBTN_STATE_DISABLED		].SetSolidBrush( CColour( CColour::Transparent	) );
 		m_brushesCheck[eBTN_STATE_ENABLED		].SetSolidBrush( CColour( CColour::Transparent	) );
@@ -22,15 +14,18 @@ namespace Joker
 		m_brushesCheck[eBTN_STATE_PUSHED		].SetSolidBrush( CColour( CColour::MediumAlphaLightBlue	) );
 	}
 
-	CTransparentRadioCheck::~CTransparentRadioCheck()
+	template< eRENDERER Renderer >
+	CTransparentRadioCheck< Renderer >::~CTransparentRadioCheck()
 	{
 	}
 
-	void CTransparentRadioCheck::DoRelease()
+	template< eRENDERER Renderer >
+	void CTransparentRadioCheck< Renderer >::DoRelease()
 	{
 	}
 
-	void CTransparentRadioCheck::DoDrawBackground( CRect const & rcRect )
+	template< eRENDERER Renderer >
+	void CTransparentRadioCheck< Renderer >::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
 		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
@@ -38,7 +33,8 @@ namespace Joker
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 	}
 
-	void CTransparentRadioCheck::DoDrawForeground( CRect const & rcRect )
+	template< eRENDERER Renderer >
+	void CTransparentRadioCheck< Renderer >::DoDrawForeground( CRect const & rcRect )
 	{
 		// On dessine le texte
 		ImagePtr pImage;

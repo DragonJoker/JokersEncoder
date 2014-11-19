@@ -1,58 +1,9 @@
-#include "stdafx.h"
-
-#include "TransparentListBox.h"
-#include "ImageCtrl.h"
 #include "Image.h"
-
-#ifdef _DEBUG
-#	define new DEBUG_NEW
-#	undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace Joker
 {
-	CAlphaLBItem::CAlphaLBItem( CColour const & clMaskColour, CColour const & clText, bool bHasLine, CColour const & clLineColour, int iLineStyle )
-		:	m_brushMask( clMaskColour )
-		,	m_clLine( clLineColour )
-		,	m_clText( clText )
-		,	m_bHasLine( bHasLine )
-		,	m_iLineStyle( iLineStyle )
-	{
-	}
-
-	CAlphaLBItem::CAlphaLBItem( CAlphaLBItem const & item )
-		:	m_brushMask( item.m_brushMask )
-		,	m_clLine( item.m_clLine )
-		,	m_clText( item.m_clText )
-		,	m_bHasLine( item.m_bHasLine )
-		,	m_iLineStyle( item.m_iLineStyle )
-	{
-	}
-
-	CAlphaLBItem::~CAlphaLBItem()
-	{
-	}
-
-	CAlphaLBItem & CAlphaLBItem::operator=( CAlphaLBItem const & item )
-	{
-		m_brushMask		= item.m_brushMask;
-		m_clLine		= item.m_clLine;
-		m_clText		= item.m_clText;
-		m_bHasLine		= item.m_bHasLine;
-		m_iLineStyle	= item.m_iLineStyle;
-		return * this;
-	}
-
-	void CAlphaLBItem::AlphaBlend( CBitmapDC & bmpDC, CRect const & rcDest )
-	{
-		BLENDFUNCTION blendFunction = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
-		bmpDC.AlphaBlend( rcDest, m_brushMask.GetDC(), m_brushMask.GetRect(), blendFunction );
-	}
-
-	//*************************************************************************************************
-
-	CTransparentListBox::CTransparentListBox()
+	template< eRENDERER Renderer >
+	CTransparentListBox< Renderer >::CTransparentListBox()
 		:	m_sItemHeight( 18 )
 		,	m_iFocusedItem( -1 )
 		,	m_clFocusBorder( CColour( CColour::FullAlphaGrey ) )
@@ -65,35 +16,41 @@ namespace Joker
 		m_itemColours[eLB_ITEM_STATUS_SELECTED] = CAlphaLBItem( CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHT ), 127 ),	CColour::FromCOLORREF( ::GetSysColor( COLOR_HIGHLIGHTTEXT ), 255 ) );
 	}
 
-	CTransparentListBox::~CTransparentListBox()
+	template< eRENDERER Renderer >
+	CTransparentListBox< Renderer >::~CTransparentListBox()
 	{
 	}
 
-	void CTransparentListBox::SetItemHeight( short sHeight )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::SetItemHeight( short sHeight )
 	{
 		m_sItemHeight = sHeight;
 		Invalidate();
 	}
 
-	void CTransparentListBox::SetItemTextColour( eLB_ITEM_STATUS eStatus, CColour const & clColour )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::SetItemTextColour( eLB_ITEM_STATUS eStatus, CColour const & clColour )
 	{
 		m_itemColours[eStatus].SetTextColour( clColour );
 		Invalidate();
 	}
 
-	void CTransparentListBox::SetItemLineColour( eLB_ITEM_STATUS eStatus, CColour const & clColour )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::SetItemLineColour( eLB_ITEM_STATUS eStatus, CColour const & clColour )
 	{
 		m_itemColours[eStatus].SetLineColour( clColour );
 		Invalidate();
 	}
 
-	void CTransparentListBox::SetItemLineStyle( eLB_ITEM_STATUS eStatus, int iLineStyle )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::SetItemLineStyle( eLB_ITEM_STATUS eStatus, int iLineStyle )
 	{
 		m_itemColours[eStatus].SetLineStyle( iLineStyle );
 		Invalidate();
 	}
 
-	void CTransparentListBox::DoDrawBackground( CRect const & rcRectp )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::DoDrawBackground( CRect const & rcRectp )
 	{
 		CRect rcRect( rcRectp );
 
@@ -110,49 +67,53 @@ namespace Joker
 
 		// On récupère les items sélectionnés
 		std::vector< int > arraySelected( GetCount(), 0 );
-		int iCount = GetSelItems( GetCount(), & arraySelected[0] );
 
-		if ( iCount == LB_ERR )
+		if ( !arraySelected.empty() )
 		{
-			int iSelected = GetCurSel();
+			int iCount = GetSelItems( GetCount(), &arraySelected[0] );
 
-			// Single Selection Listbox
-			if ( iSelected != LB_ERR )
+			if ( iCount == LB_ERR )
 			{
-				arraySelected.resize( 1 );
-				arraySelected[0] = iSelected;
+				int iSelected = GetCurSel();
+
+				// Single Selection Listbox
+				if ( iSelected != LB_ERR )
+				{
+					arraySelected.resize( 1 );
+					arraySelected[0] = iSelected;
+				}
+				else
+				{
+					arraySelected.clear();
+				}
 			}
 			else
 			{
-				arraySelected.clear();
+				arraySelected.resize( iCount );
 			}
-		}
-		else
-		{
-			arraySelected.resize( iCount );
 		}
 
 		// On dessine les items
 		CRect rcItem;
 
-		for ( int GL2D_SIZE_I = 0 ; GL2D_SIZE_I < GetCount() ; GL2D_SIZE_I++ )
+		for ( int i = 0 ; i < GetCount() ; i++ )
 		{
-			GetItemRect( GL2D_SIZE_I, rcItem );
+			GetItemRect( i, rcItem );
 
 			if ( rcItem.top >= rcRect.top && rcItem.bottom <= rcRect.bottom )
 			{
 				// Si l'item courant ne sort pas du cadre, on le dessine
-				DrawItem( GL2D_SIZE_I, rcItem, arraySelected );
+				DrawItem( i, rcItem, arraySelected );
 			}
 			else if ( rcItem.top < rcRect.top && rcItem.bottom > rcRect.top )
 			{
 				// Si seul le haut de l'item courant sort du cadre, on le dessine
-				DrawItem( GL2D_SIZE_I, rcItem, arraySelected );
+				DrawItem( i, rcItem, arraySelected );
 			}
 			else if ( rcItem.bottom > rcRect.bottom && rcItem.top < rcItem.bottom )
 			{
 				// Si seul le bas de l'item courant sort du cadre, on le dessine
-				DrawItem( GL2D_SIZE_I, rcItem, arraySelected );
+				DrawItem( i, rcItem, arraySelected );
 			}
 			else
 			{
@@ -161,7 +122,8 @@ namespace Joker
 		}
 	}
 
-	void CTransparentListBox::DoDrawForeground( CRect const & rcRectp )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::DoDrawForeground( CRect const & rcRectp )
 	{
 		CRect rcRect( rcRectp );
 
@@ -183,7 +145,8 @@ namespace Joker
 		}
 	}
 
-	void CTransparentListBox::DrawItem( int iItem, CRect rcRect, std::vector< int > const & arraySelected )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::DrawItem( int iItem, CRect rcRect, std::vector< int > const & arraySelected )
 	{
 		CString csItem;
 		bool bFocused;
@@ -234,7 +197,8 @@ namespace Joker
 		}
 	}
 
-	void CTransparentListBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 	{
 		if ( ( lpDrawItemStruct->itemAction & ODA_FOCUS ) && ( lpDrawItemStruct->itemState & ODS_FOCUS ) )
 		{
@@ -251,17 +215,20 @@ namespace Joker
 		}
 	}
 
-	void CTransparentListBox::MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct )
 	{
 		lpMeasureItemStruct->itemHeight = m_sItemHeight;
 	}
 
-	int CTransparentListBox::CompareItem( LPCOMPAREITEMSTRUCT UNUSED( lpCompareItemStruct ) )
+	template< eRENDERER Renderer >
+	int CTransparentListBox< Renderer >::CompareItem( LPCOMPAREITEMSTRUCT UNUSED( lpCompareItemStruct ) )
 	{
 		return 0;
 	}
 
-	void CTransparentListBox::ScrollList()
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::ScrollList()
 	{
 		if ( m_bMouseLDown )
 		{
@@ -272,14 +239,38 @@ namespace Joker
 		}
 	}
 
-	BEGIN_MESSAGE_MAP( CTransparentListBox, BaseType )
-		ON_WM_VSCROLL()
-		ON_WM_MOUSEMOVE()
-		ON_WM_LBUTTONDOWN()
-		ON_WM_LBUTTONUP()
-	END_MESSAGE_MAP()
+	PTM_WARNING_DISABLE
+    template< eRENDERER Renderer >
+	const AFX_MSGMAP * CTransparentListBox< Renderer >::GetMessageMap() const
+	{
+		return GetThisMessageMap();
+	}
+    
+    template< eRENDERER Renderer >
+	const AFX_MSGMAP * PASCAL CTransparentListBox< Renderer >::GetThisMessageMap()
+	{
+		typedef CTransparentListBox< Renderer > ThisClass;
+		typedef ThisClass::BaseType TheBaseClass;
+		static const AFX_MSGMAP_ENTRY _messageEntries[] =
+		{
+			ON_WM_VSCROLL()
+			ON_WM_MOUSEMOVE()
+			ON_WM_LBUTTONDOWN()
+			ON_WM_LBUTTONUP()
+			{
+				0, 0, 0, 0, AfxSig_end, ( AFX_PMSG )0
+			}
+		};
+		static const AFX_MSGMAP messageMap =
+		{
+			& TheBaseClass::GetThisMessageMap, &_messageEntries[0]
+		};
+		return &messageMap;
+	}
+	PTM_WARNING_RESTORE
 
-	void CTransparentListBox::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar * pScrollBar )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar * pScrollBar )
 	{
 		SetRedraw( FALSE );
 		BaseType::OnVScroll( nSBCode, nPos, pScrollBar );
@@ -287,7 +278,8 @@ namespace Joker
 		RedrawWindow( 0, 0, RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW );
 	}
 
-	void CTransparentListBox::OnMouseMove( UINT nFlags, CPoint point )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::OnMouseMove( UINT nFlags, CPoint point )
 	{
 		m_bMouseLDown = nFlags & MK_LBUTTON;
 
@@ -301,7 +293,8 @@ namespace Joker
 		BaseType::OnMouseMove( nFlags, point );
 	}
 
-	void CTransparentListBox::OnLButtonDown( UINT nFlags, CPoint point )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::OnLButtonDown( UINT nFlags, CPoint point )
 	{
 		m_bFocused = true;
 		m_bMouseLDown = true;
@@ -313,7 +306,8 @@ namespace Joker
 		BaseType::OnLButtonDown( nFlags, point );
 	}
 
-	void CTransparentListBox::OnLButtonUp( UINT nFlags, CPoint point )
+	template< eRENDERER Renderer >
+	void CTransparentListBox< Renderer >::OnLButtonUp( UINT nFlags, CPoint point )
 	{
 		m_bMouseLDown = false;
 		BaseType::OnLButtonUp( nFlags, point );

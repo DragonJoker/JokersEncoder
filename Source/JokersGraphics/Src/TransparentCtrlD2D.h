@@ -15,7 +15,7 @@ namespace Joker
 	template< typename T >
 	class CTransparentCtrlT< T, eRENDERER_D2D >
 		: public T
-		, public CTransparentCtrlBase
+		, public CTransparentCtrlBaseD2D
 	{
 	protected:
 		typedef T BaseType;
@@ -98,8 +98,6 @@ namespace Joker
 		BOOL SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags );
 
 	private:
-		void DoInitDeviceIndependent();
-		void DoCleanupDeviceIndependent();
 		void DoInitDeviceDependent();
 		void DoCleanupDeviceDependent();
 
@@ -134,6 +132,7 @@ namespace Joker
 		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID );
 		afx_msg void OnPaint();
 		afx_msg void OnSize( UINT type, int cx, int cy );
+		afx_msg void OnMove( int x, int y );
 		afx_msg LRESULT OnDisplayChange( WPARAM, LPARAM );
 		afx_msg void OnSetFocus( CWnd * pOldWnd );
 		afx_msg void OnKillFocus( CWnd * pNewWnd );
@@ -145,15 +144,6 @@ namespace Joker
 		ID2D1Bitmap * m_pBitmap;
 		//! La cible du rendu
 		ID2D1HwndRenderTarget * m_pRenderTarget;
-
-		//! Le nombre d'instanciations
-		static int m_iReferences;
-		//! La factory de création de bitmap
-		static IDWriteFactory * m_pWriteFactory;
-		//! La factory de création de cibles de rendu
-		static ID2D1Factory * m_pFactory;
-		//! Le nombre de bitmas créés
-		static std::map< HBITMAP, ID2D1Bitmap * > m_bitmaps;
 	};
 #endif
 }

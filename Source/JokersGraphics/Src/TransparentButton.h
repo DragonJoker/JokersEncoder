@@ -25,11 +25,12 @@ namespace Joker
 	\remark		Permet d'ajouter les effets de relief par état.
 				<br />Gère les états Enabled, Hovered, Focused, Pushed, Disabled
 	*/
-	class JGRA_API CTransparentButton
-		: public CTransparentCtrlT< CCursor< CButton >, eDEFAULT_RENDERER >
+	template< eRENDERER Renderer >
+	class CTransparentButton
+		: public CTransparentCtrlT< CCursor< CButton >, Renderer >
 	{
 	public:
-		typedef CTransparentCtrlT< CCursor< CButton >, eDEFAULT_RENDERER > BaseType;
+		typedef CTransparentCtrlT< CCursor< CButton >, Renderer > BaseType;
 
 	public:
 		/**
@@ -389,3 +390,5 @@ namespace Joker
 	 */
 #	define InitialiseTransparentButtonCenteredFont( btnCtrl, ImgTxtName, FntName, iRatio, tszCaption, uiCursor ) InitialiseTransparentButtonComplete( btnCtrl, ImgTxtName, ImgTxtName, FntName, iRatio , tszCaption, DT_CENTER | DT_VCENTER, uiCursor, FALSE )
 }
+
+#include "TransparentButton.inl"
