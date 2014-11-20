@@ -39,7 +39,6 @@ namespace Joker
 
 	CTransparentDlgOGL::~CTransparentCtrlT()
 	{
-		DoRelease();
 	}
 
 	bool CTransparentDlgOGL::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
@@ -213,7 +212,7 @@ namespace Joker
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
-	void CTransparentDlgOGL::DoInitDeviceDependent()
+	void CTransparentDlgOGL::DoInitialiseDeviceDependent()
 	{
 		CRect rcRect;
 		BaseType::GetClientRect( rcRect );
@@ -236,15 +235,10 @@ namespace Joker
 		}
 	}
 
-	inline void CTransparentDlgOGL::DoRelease()
-	{
-		DoCleanupDeviceDependent();
-	}
-
 	void CTransparentDlgOGL::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
-		//DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
+		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
 		// on blende le backbuffer et le masque
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 	}
@@ -284,7 +278,6 @@ namespace Joker
 	BEGIN_MESSAGE_MAP( CTransparentDlgOGL, CTransparentDlgOGL::BaseType )
 		ON_WM_ERASEBKGND()
 		ON_WM_CTLCOLOR()
-		ON_WM_DESTROY()
 		ON_WM_PAINT()
 		ON_WM_SIZE()
 		ON_MESSAGE( WM_DISPLAYCHANGE, OnDisplayChange )
@@ -301,21 +294,9 @@ namespace Joker
 			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
 				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
-				m_pRenderTarget = NULL;
-				SafeRelease( m_pRenderTarget );
-				DoInitDeviceDependent();
+				DoCleanupDeviceDependent();
+				DoInitialiseDeviceDependent();
 			}
-		}
-
-		if ( !m_bHasBackground )
-		{
-			DoInitDeviceDependent();
-			DoInitialiseBackground();
-			m_bHasBackground = true;
-		}
-		else if ( m_bReinitBackground )
-		{
-			DoInitialiseBackground();
 		}
 
 		return TRUE;
@@ -327,17 +308,18 @@ namespace Joker
 		return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
 	}
 
-	void CTransparentDlgOGL::OnDestroy()
-	{
-		DoRelease();
-	}
-
 	void CTransparentDlgOGL::OnPaint()
 	{
 		if ( BaseType::IsWindowVisible() )
 		{
+			if ( !m_bHasBackground || m_bReinitBackground )
+			{
+				DoInitialiseBackground();
+			}
+
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
+			l_paintDC.SetStretchBltMode( HALFTONE );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			DoDraw();

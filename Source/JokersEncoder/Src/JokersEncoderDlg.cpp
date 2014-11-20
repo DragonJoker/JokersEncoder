@@ -40,12 +40,12 @@ void CJokersEncoderDlg::DoDataExchange( CDataExchange * pDX )
 	BaseType::DoDataExchange( pDX );
 #if !DEF_DEBUG_OGL
 	DDX_Control( pDX, IDC_LIST_FILES,	m_listFiles );
+#endif
 	DDX_Control( pDX, IDOK,				m_btnOk );
 	DDX_Control( pDX, IDCANCEL,			m_btnCancel );
 	DDX_Control( pDX, IDC_OPTIONS,		m_btnSettings );
 	DDX_Control( pDX, IDC_FILE,			m_btnAddFile );
 	DDX_Control( pDX, IDC_FOLDER,		m_btnAddFolder );
-#endif
 }
 
 BOOL CJokersEncoderDlg::OnInitDialog()
@@ -56,13 +56,22 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 	GetWindowRect( m_rcInitialRect );
 	GetClientRect( m_rcRect );
 	ScreenToClient( m_rcInitialRect );
+
+	Initialise();
+	m_btnOk.Initialise();
+#if !DEF_DEBUG_OGL
+	m_listFiles.Initialise();
+	m_btnCancel.Initialise();
+	m_btnSettings.Initialise();
+	m_btnAddFile.Initialise();
+	m_btnAddFolder.Initialise();
+#endif
 	
 	CRect rcRect;
 	GetClientRect( rcRect );
 	ImagePtr img = CImageManager::AddImage( IDB_BMP_DRAGON );
 	this->GetMaskBrush().SetPatternBrush( *img, CRect( 0, 0, img->GetWidth(), img->GetHeight() ) );
-	
-#if !DEF_DEBUG_OGL
+
 	LOGFONT logfont;
 	::CFont * pFont = this->GetFont();
 	pFont->GetLogFont( &logfont );
@@ -81,6 +90,7 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 	m_btnOk.SetGradientBrush( eBTN_STATE_PUSHED,		0, clrSBlack, clrApGrey, clrTrnspt, 50 );
 	m_btnOk.SetFonts( font, font, font, font );
 
+#if !DEF_DEBUG_OGL
 	m_btnCancel.SetTextColour( CColour::FullAlphaBlack );
 	m_btnCancel.SetBorderColour( CColour( CColour::FullAlphaWhite ) );
 	m_btnCancel.SetGradientBrush( eBTN_STATE_ENABLED,		0, clrTrnspt, clrApGrey, clrSBlack, 50 );
@@ -142,6 +152,7 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 	m_listFiles.GetMaskBrush().SetSolidBrush( CColour( CColour::MediumAlphaWhite ) );
 	m_listFiles.SetItemTextColour( eLB_ITEM_STATUS_NORMAL, CColour( CColour::FullAlphaBlack ) );
 #endif
+
 	m_layout.Create( m_hWnd, CRect() );
 	m_layout.AddElement( IDC_LIST_FILES );
 	m_layout.AddElement( IDOK, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
@@ -154,7 +165,7 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 }
 
 BEGIN_MESSAGE_MAP( CJokersEncoderDlg, CJokersEncoderDlg::BaseType )
-	ON_WM_CREATE()
+	ON_WM_DESTROY()
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 	ON_WM_SIZE()
@@ -167,21 +178,17 @@ BEGIN_MESSAGE_MAP( CJokersEncoderDlg, CJokersEncoderDlg::BaseType )
 	ON_BN_CLICKED( IDCANCEL,	& CJokersEncoderDlg::OnBnClickedCancel )
 END_MESSAGE_MAP()
 
-int CJokersEncoderDlg::OnCreate( LPCREATESTRUCT lpCreateStruct )
+void CJokersEncoderDlg::OnDestroy()
 {
-	int iReturn = BaseType::OnCreate( lpCreateStruct );
-
-	if ( iReturn == 0 )
-	{/*
-		BOOL res = ModifyStyleEx( 0, WS_EX_COMPOSITED | WS_EX_TRANSPARENT );
-
-		if ( res )
-		{
-			SetLayeredWindowAttributes( 0, 255, LWA_ALPHA );
-		}*/
-	}
-
-	return iReturn;
+#if !DEF_DEBUG_OGL
+	m_listFiles.Cleanup();
+	m_btnCancel.Cleanup();
+	m_btnSettings.Cleanup();
+	m_btnAddFile.Cleanup();
+	m_btnAddFolder.Cleanup();
+#endif
+	m_btnOk.Cleanup();
+	Cleanup();
 }
 
 BOOL CJokersEncoderDlg::OnEraseBkgnd( CDC * pDC )

@@ -35,7 +35,6 @@ namespace Joker
 
 	CTransparentDlgGDI::~CTransparentCtrlT()
 	{
-		DoRelease();
 	}
 
 	bool CTransparentDlgGDI::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
@@ -200,10 +199,6 @@ namespace Joker
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
-	inline void CTransparentDlgGDI::DoRelease()
-	{
-	}
-
 	void CTransparentDlgGDI::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
@@ -260,12 +255,6 @@ namespace Joker
 		pDC->SetBkMode( TRANSPARENT );
 		pDC->SetStretchBltMode( HALFTONE );
 
-		if ( !m_bHasBackground )
-		{
-			DoInitialiseBackground();
-			m_bHasBackground = true;
-		}
-
 		return TRUE;
 	}
 
@@ -281,13 +270,14 @@ namespace Joker
 	{
 		if ( BaseType::IsWindowVisible() )
 		{
-			if ( m_bReinitBackground )
+			if ( !m_bHasBackground || m_bReinitBackground )
 			{
 				DoInitialiseBackground();
 			}
 
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
+			l_paintDC.SetStretchBltMode( HALFTONE );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			DoDraw();

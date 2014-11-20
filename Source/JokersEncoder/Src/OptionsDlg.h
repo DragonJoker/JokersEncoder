@@ -25,6 +25,7 @@ namespace Joker
 		virtual BOOL OnInitDialog();
 
 		DECLARE_MESSAGE_MAP()
+		afx_msg void OnDestroy();
 
 	private:
 		HICON m_hIcon;

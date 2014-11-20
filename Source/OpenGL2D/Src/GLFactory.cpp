@@ -10,13 +10,15 @@ namespace GL2D
 {
 	CComFactory::CComFactory()
 	{
-#if !defined( VLD_AVAILABLE )
-        _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#if !defined( NDEBUG ) && !defined( VLD_AVAILABLE )
+		_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 	}
 
 	CComFactory::~CComFactory()
 	{
+		m_context->Cleanup();
+		m_context.reset();
 	}
 
 	STDMETHODIMP CComFactory::ReloadSystemMetrics()
@@ -171,6 +173,11 @@ namespace GL2D
 				rt->Resize( &hwndRenderTargetProperties->pixelSize );
 				context->EndCurrent( context->GetDC() );
 				*hwndRenderTarget = rt;
+
+				if ( context == CContext::GetMainContext() )
+				{
+					m_context = context;
+				}
 			}
 		}
 

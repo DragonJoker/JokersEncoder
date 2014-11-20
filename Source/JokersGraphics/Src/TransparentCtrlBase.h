@@ -67,6 +67,14 @@ namespace Joker
 		 */
 		BOOL SetWindowPosition( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags );
 		/**
+		 *\brief		Fonction d'initialisation
+		 */
+		void Initialise();
+		/**
+		 *\brief		Fonction de nettoyage
+		 */
+		void Cleanup();
+		/**
 		 *\return		La couleur du masque de transparence
 		 */
 		inline CColour GetBorderColour()const
@@ -186,9 +194,13 @@ namespace Joker
 		 */
 		void DoInitialiseBackground();
 		/**
+		 *\brief		Fonction d'initialisation
+		 */
+		virtual void DoInitialise() = 0;
+		/**
 		 *\brief		Fonction de nettoyage
 		 */
-		virtual void DoRelease() = 0;
+		virtual void DoCleanup() = 0;
 		/**
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin
@@ -260,6 +272,14 @@ namespace Joker
 
 	protected:
 		/**
+		 *\brief		Fonction d'initialisation
+		 */
+		virtual void DoInitialise();
+		/**
+		 *\brief		Fonction de nettoyage
+		 */
+		virtual void DoCleanup();
+		/**
 		 *\brief		Initialise les données indépendantes du contrôle
 		 */
 		void DoInitialiseDeviceIndependent();
@@ -267,6 +287,14 @@ namespace Joker
 		 *\brief		Nettoie les données indépendantes du contrôle
 		 */
 		void DoCleanupDeviceIndependent();
+		/**
+		 *\brief		Initialise les données dépendantes du contrôle
+		 */
+		virtual void DoInitialiseDeviceDependent() = 0;
+		/**
+		 *\brief		Nettoie les données dépendantes du contrôle
+		 */
+		virtual void DoCleanupDeviceDependent() = 0;
 
 	protected:
 		//! Le nombre d'instanciations
@@ -309,6 +337,14 @@ namespace Joker
 
 	protected:
 		/**
+		 *\brief		Fonction d'initialisation
+		 */
+		virtual void DoInitialise();
+		/**
+		 *\brief		Fonction de nettoyage
+		 */
+		virtual void DoCleanup();
+		/**
 		 *\brief		Initialise les données indépendantes du contrôle
 		 */
 		void DoInitialiseDeviceIndependent();
@@ -316,6 +352,14 @@ namespace Joker
 		 *\brief		Nettoie les données indépendantes du contrôle
 		 */
 		void DoCleanupDeviceIndependent();
+		/**
+		 *\brief		Initialise les données dépendantes du contrôle
+		 */
+		virtual void DoInitialiseDeviceDependent() = 0;
+		/**
+		 *\brief		Nettoie les données dépendantes du contrôle
+		 */
+		virtual void DoCleanupDeviceDependent() = 0;
 
 	protected:
 		//! Le nombre d'instanciations
@@ -354,5 +398,15 @@ namespace Joker
 		{
 			return eRENDERER_GDI;
 		}
+
+	protected:
+		/**
+		 *\brief		Fonction d'initialisation
+		 */
+		virtual void DoInitialise();
+		/**
+		 *\brief		Fonction de nettoyage
+		 */
+		virtual void DoCleanup();
 	};
 }

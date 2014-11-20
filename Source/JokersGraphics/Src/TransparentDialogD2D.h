@@ -104,15 +104,15 @@ namespace Joker
 		 */
 		BOOL SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags );
 
-	private:
-		void DoInitDeviceDependent();
-		void DoCleanupDeviceDependent();
-
 	protected:
 		/**
-		 *\brief		Fonction de nettoyage
+		 *\brief		Initialise les données dépendantes du contrôle
 		 */
-		virtual void DoRelease();
+		virtual void DoInitialiseDeviceDependent();
+		/**
+		 *\brief		Nettoie les données dépendantes du contrôle
+		 */
+		virtual void DoCleanupDeviceDependent();
 		/**
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin

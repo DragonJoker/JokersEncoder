@@ -259,7 +259,7 @@ namespace Joker
 
 				m_clog.clear();
 
-				ended = m_end.wait_for( lock, std::chrono::milliseconds( 10 ) ) != std::cv_status::timeout;
+				ended = m_end.wait_for( lock, std::chrono::milliseconds( 1 ) ) != std::cv_status::timeout;
 			}
 		} );
 	}

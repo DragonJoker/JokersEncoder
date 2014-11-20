@@ -53,6 +53,13 @@ namespace Joker
 		ATL::CImage::CreateEx( iWidth, iHeight, iBPP, BI_RGB, NULL, ( iBPP == 32 ? createAlphaChannel : 0 ) );
 	}
 
+	CImage::CImage()
+		:	CResource( 0 )
+		,	m_eType( eIMAGE_TYPE_BITMAP )
+		,	m_uiResourceID( 0xFFFFFFFF )
+	{
+	}
+
 	CImage::~CImage()
 	{
 		Destroy();

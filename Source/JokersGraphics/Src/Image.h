@@ -26,6 +26,7 @@ namespace Joker
 		CImage( unsigned int uiIndex, int iWidth, int iHeight, int iBPP );
 
 	public:
+		CImage();
 		virtual ~CImage();
 		void Delete();
 

@@ -48,6 +48,10 @@ BOOL COptionsDlg::OnInitDialog()
 	ImagePtr img = CImageManager::AddImage( IDB_BMP_DRAGON );
 	this->GetMaskBrush().SetPatternBrush( *img, CRect( 0, 0, img->GetWidth(), img->GetHeight() ) );
 
+	Initialise();
+	m_buttonOK.Initialise();
+	m_buttonCancel.Initialise();
+
 	LOGFONT logfont;
 	::CFont * pFont = this->GetFont();
 	pFont->GetLogFont( &logfont );
@@ -77,7 +81,15 @@ BOOL COptionsDlg::OnInitDialog()
 }
 
 BEGIN_MESSAGE_MAP( COptionsDlg, COptionsDlg::BaseType )
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
+
+void COptionsDlg::OnDestroy()
+{
+	m_buttonOK.Cleanup();
+	m_buttonCancel.Cleanup();
+	CDialog::OnDestroy();
+}
 
 
 // Gestionnaires de messages de COptionsDlg

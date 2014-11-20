@@ -20,7 +20,7 @@ namespace GL2D
 
 		try
 		{
-			m_context = std::make_shared< CContext >( hwndRenderTargetProperties.hwnd );
+			m_context = CContext::CreateContext( hwndRenderTargetProperties.hwnd );
 			m_context->Initialise();
 			hr = S_OK;
 		}
@@ -33,7 +33,11 @@ namespace GL2D
 
 	STDMETHODIMP_( void ) CComHwndRenderTarget::DestroyContext()
 	{
-		m_context->Cleanup();
+		if ( m_context != CContext::GetMainContext() )
+		{
+			m_context->Cleanup();
+		}
+
 		m_context.reset();
 	}
 
@@ -47,11 +51,13 @@ namespace GL2D
 		context->Enable( GL_CULL_FACE );
 		context->Enable( GL_TEXTURE_2D );
 		context->Disable( GL_DEPTH_TEST );
+		context->Enable( GL_BLEND );
+		context->BlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		GL2D_SIZE_U size = GetPixelSize();
 		context->MatrixMode( GL_PROJECTION );
 		context->LoadIdentity();
 		context->Viewport( 0, 0, size.width, size.height );
-		context->Ortho( 0, 1, 1, 0, 0, 1 );
+		context->Ortho( 0, 1, 0, 1, 0, 1 );
 		context->MatrixMode( GL_MODELVIEW );
 		context->LoadIdentity();
 	}

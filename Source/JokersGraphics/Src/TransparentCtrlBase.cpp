@@ -64,6 +64,50 @@ namespace Joker
 		return m_ctrl->SetWindowPos( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
+	void CTransparentCtrlBase::Initialise()
+	{
+		DoInitialise();
+	}
+
+	void CTransparentCtrlBase::Cleanup()
+	{
+		DoCleanup();
+	}
+
+	BOOL CTransparentCtrlBase::DoDrawParentBackground( CDC * pDC, CRect const & rect )
+	{
+		ASSERT_VALID(pDC);
+		BOOL result = FALSE;
+		
+		CRgn rgn;
+		if (rectClip != NULL)
+		{
+			rgn.CreateRectRgnIndirect(rectClip);
+			pDC->SelectClipRgn(&rgn);
+		}
+		
+		CWnd* pParent = pWnd->GetParent();
+		ASSERT_VALID(pParent);
+		
+		// In Windows XP, we need to call DrawThemeParentBackground function to implement
+		// transparent controls
+		if (m_pfDrawThemeBackground != NULL)
+		{
+			bRes = (*m_pfDrawThemeBackground)(pWnd->GetSafeHwnd(), pDC->GetSafeHdc(), rectClip) == S_OK;
+		}
+		
+		if (!bRes)
+		{
+			CPoint pt(0, 0);
+			pWnd->MapWindowPoints(pParent, &pt, 1);
+			pt = pDC->OffsetWindowOrg(pt.x, pt.y);
+			
+			bRes = (BOOL) pParent->SendMessage(WM_ERASEBKGND, (WPARAM)pDC->m_hDC);
+			
+			pDC->SetWindowOrg(pt.x, pt.y);
+		}
+	}
+
 	void CTransparentCtrlBase::DoInitialiseBackground()
 	{
 		CWnd * pParent = m_ctrl->GetParent();
@@ -71,10 +115,11 @@ namespace Joker
 		if ( pParent )
 		{
 			CRect rcRect;
-			m_ctrl->GetWindowRect( & rcRect );
-			pParent->ScreenToClient( & rcRect );
+			m_ctrl->GetWindowRect( &rcRect );
+			pParent->ScreenToClient( &rcRect );
 
 			CDC * pDC = pParent->GetDC();
+
 			int iWidth = rcRect.Width();
 			int iHeight = rcRect.Height();
 
@@ -83,12 +128,20 @@ namespace Joker
 			m_bmpBackground.CreateCompatibleBitmap( pDC, rcRect.Width(), rcRect.Height() );
 			memdc.CreateCompatibleDC( pDC );
 
-			CBitmap * pOldbmp = memdc.SelectObject( & m_bmpBackground );
+			CBitmap * pOldbmp = memdc.SelectObject( &m_bmpBackground );
 			memdc.BitBlt( 0, 0, iWidth, iHeight, pDC, rcRect.left, rcRect.top, SRCCOPY );
 			memdc.SelectObject( pOldbmp );
 			pParent->ReleaseDC( pDC );
 			memdc.DeleteDC();
 			m_bReinitBackground = false;
+			m_bHasBackground = true;
+
+			//CImage img;
+			//img.Attach( m_bmpBackground );
+			//CString csFileName;
+			//csFileName.Format( _T( "BackgroundBitmap_0x%08X_0x%08X.bmp" ), pParent->GetDlgCtrlID(), m_ctrl->GetDlgCtrlID() );
+			//img.Save( csFileName, Gdiplus::ImageFormatBMP );
+			//img.Detach();
 		}
 	}
 
@@ -100,12 +153,22 @@ namespace Joker
 
 	CTransparentCtrlBaseD2D::CTransparentCtrlBaseD2D()
 	{
-		DoInitialiseDeviceIndependent();
 	}
 
 	CTransparentCtrlBaseD2D::~CTransparentCtrlBaseD2D()
 	{
+	}
+
+	inline void CTransparentCtrlBaseD2D::DoInitialise()
+	{
+		DoInitialiseDeviceIndependent();
+		DoInitialiseDeviceDependent();
+	}
+
+	inline void CTransparentCtrlBaseD2D::DoCleanup()
+	{
 		DoCleanupDeviceIndependent();
+		DoCleanupDeviceDependent();
 	}
 
 	void CTransparentCtrlBaseD2D::DoInitialiseDeviceIndependent()
@@ -150,12 +213,22 @@ namespace Joker
 
 	CTransparentCtrlBaseOGL::CTransparentCtrlBaseOGL()
 	{
-		DoInitialiseDeviceIndependent();
 	}
 
 	CTransparentCtrlBaseOGL::~CTransparentCtrlBaseOGL()
 	{
+	}
+
+	inline void CTransparentCtrlBaseOGL::DoInitialise()
+	{
+		DoInitialiseDeviceIndependent();
+		DoInitialiseDeviceDependent();
+	}
+
+	inline void CTransparentCtrlBaseOGL::DoCleanup()
+	{
 		DoCleanupDeviceIndependent();
+		DoCleanupDeviceDependent();
 	}
 
 	void CTransparentCtrlBaseOGL::DoInitialiseDeviceIndependent()
@@ -196,6 +269,14 @@ namespace Joker
 	}
 
 	CTransparentCtrlBaseGDI::~CTransparentCtrlBaseGDI()
+	{
+	}
+
+	inline void CTransparentCtrlBaseGDI::DoInitialise()
+	{
+	}
+
+	inline void CTransparentCtrlBaseGDI::DoCleanup()
 	{
 	}
 }

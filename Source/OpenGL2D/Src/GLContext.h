@@ -23,21 +23,25 @@ namespace GL2D
 	\brief		Gère un contexte OpenGL
 	*/
 	class CContext
+		: public std::enable_shared_from_this< CContext >
 	{
-	public:
+	protected:
 		/** Constructeur
 		@param window
 			L'identifcateur de la fenêtre, peut être nul, à ce moment le contexte est initiélisé avec la fenêtre du bureau
 		*/
-		CContext( HWND window = NULL );
+		CContext( HWND window );
 
+	public:
 		/** Destructeur
 		*/
 		~CContext();
 
 		HRESULT Initialise();
 		void Cleanup();
-		static CContext * GetActiveContext();
+		static std::shared_ptr< CContext > CreateContext( HWND window = NULL );
+		static std::shared_ptr< CContext > GetMainContext();
+		static std::shared_ptr< CContext > GetActiveContext();
 
 		HRESULT MakeCurrent( HDC dc );
 		HRESULT EndCurrent( HDC dc );
@@ -91,6 +95,7 @@ namespace GL2D
 		HRESULT BufferData( GL2D_GL_BUFFER_TARGET target, ptrdiff_t size, const GLvoid * data, GL2D_GL_BUFFER_USAGE usage );
 		void * MapBuffer( GL2D_GL_BUFFER_TARGET target, GL2D_GL_ACCESS access );
 		bool UnmapBuffer( GL2D_GL_BUFFER_TARGET target );
+		HRESULT BlendFuncSeparate( GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha );
 		void DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
 		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
 
@@ -109,6 +114,12 @@ namespace GL2D
 		void DoLoadContext();
 		HRESULT DoLoadProgram();
 		HRESULT DoLoadBuffer();
+		HRESULT DoActivateProgram( GLuint name );
+		HRESULT DoDeactivateProgram();
+		HRESULT DoActivateTexture( GLuint name, GL2D_GL_TEXTURE_FILTER filter );
+		HRESULT DoDeactivateTexture();
+		HRESULT DoActivateBuffer();
+		HRESULT DoDeactivateBuffer();
 
 		typedef ptrdiff_t GLintptr;
 		typedef ptrdiff_t GLsizeiptr;
@@ -117,13 +128,11 @@ namespace GL2D
 		HWND m_window;
 		HDC m_dc;
 		HGLRC m_context;
-		CContext * m_previous;
 		GLuint m_vao;
 		GLuint m_buffer;
 		GLuint m_program;
 		GLuint m_sampler;
-		GLuint m_projection;
-		GLuint m_view;
+		GLuint m_mvp;
 		GLuint m_vertex;
 		GLuint m_texture;
 		typedef glm::mat4x4 mat4x4;
@@ -131,8 +140,10 @@ namespace GL2D
 		std::stack< mat4x4 > m_viewMtx;
 		std::stack< mat4x4 > * m_currentMtx;
 
+		std::shared_ptr< CContext > m_previous;
+		static std::weak_ptr< CContext > m_main;
 		static std::recursive_mutex m_mutex;
-		static std::map< std::thread::id, CContext * > m_activeContexts;
+		static std::map< std::thread::id, std::shared_ptr< CContext > > m_activeContexts;
 
 		/**@name FBO */
 		//@{
@@ -193,6 +204,7 @@ namespace GL2D
 #else
 		void ( CALLBACK * glVertexAttribPointer )( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer );
 #endif
+		GL_FUNCTION( void, glEnableVertexAttribArray, GLuint index );
 
 		//@}
 		/**@name VAO */
@@ -223,6 +235,12 @@ namespace GL2D
 		GL_FUNCTION( void, glUniformMatrix4fv, GLint location, GLsizei count, GLboolean transpose, const GLfloat * value );
 		GL_FUNCTION( GLint, glGetAttribLocation, GLuint program, const GLchar * name );
 		GL_FUNCTION( GLint, glUseProgram, GLuint program );
+
+		//@}
+		/**@name Other */
+		//@{
+
+		GL_FUNCTION( void, glBlendFuncSeparate, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha );
 
 		//@}
 		/**@name Debug */

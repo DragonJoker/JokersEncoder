@@ -97,10 +97,6 @@ namespace Joker
 
 	protected:
 		/**
-		 *\brief		Fonction de nettoyage
-		 */
-		virtual void DoRelease();
-		/**
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin
 		 */

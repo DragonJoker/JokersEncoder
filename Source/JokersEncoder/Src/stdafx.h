@@ -72,6 +72,6 @@
 #	define eDEFAULT_RENDERER eRENDERER_GDI
 #endif
 
-#if defined( VLD_AVAILABLE )
+#if !defined( NDEBUG ) && defined( VLD_AVAILABLE )
 #	include <vld.h>
 #endif

@@ -11,7 +11,6 @@ namespace Joker
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_GDI >::~CTransparentCtrlT()
 	{
-		DoRelease();
 	}
 
 	template< typename T >
@@ -185,11 +184,6 @@ namespace Joker
 	}
 
 	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_GDI >::DoRelease()
-	{
-	}
-
-	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_GDI >::DoDrawBackground( CRect const & rcRect )
 	{
 		// On met l'image d'arrière plan dans le backbuffer
@@ -288,13 +282,6 @@ namespace Joker
 	{
 		pDC->SetBkMode( TRANSPARENT );
 		pDC->SetStretchBltMode( HALFTONE );
-
-		if ( !m_bHasBackground )
-		{
-			DoInitialiseBackground();
-			m_bHasBackground = true;
-		}
-
 		return TRUE;
 	}
 
@@ -317,13 +304,14 @@ namespace Joker
 	{
 		if ( T::IsWindowVisible() )
 		{
-			if ( m_bReinitBackground )
+			if ( !m_bHasBackground || m_bReinitBackground )
 			{
 				DoInitialiseBackground();
 			}
 
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
+			l_paintDC.SetStretchBltMode( HALFTONE );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			DoDraw();

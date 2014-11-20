@@ -29,7 +29,7 @@ namespace GL2D
 		GL2D_API STDMETHOD( CreateDCRenderTarget )( const GL2D_RENDER_TARGET_PROPERTIES * renderTargetProperties, IGL2DDCRenderTarget ** dcRenderTarget );
 
 	private:
-		CContext m_context;
+		std::shared_ptr< CContext > m_context;
 	};
 }
 

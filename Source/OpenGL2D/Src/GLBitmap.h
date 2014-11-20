@@ -27,6 +27,7 @@ namespace GL2D
 	private:
 		GL2D_SIZE_U m_size;
 		GL2D_PIXEL_FORMAT m_format;
+		std::weak_ptr< CContext > m_context;
 	};
 }
 

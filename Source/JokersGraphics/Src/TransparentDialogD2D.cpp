@@ -39,7 +39,6 @@ namespace Joker
 
 	CTransparentDlgD2D::~CTransparentCtrlT()
 	{
-		DoRelease();
 	}
 
 	bool CTransparentDlgD2D::GetBitmapInfos( HDC hDC, HBITMAP hBitmap, CSize & size, std::vector< BYTE > & arrayBits )
@@ -217,7 +216,7 @@ namespace Joker
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
-	void CTransparentDlgD2D::DoInitDeviceDependent()
+	void CTransparentDlgD2D::DoInitialiseDeviceDependent()
 	{
 		CRect rcRect;
 		BaseType::GetClientRect( rcRect );
@@ -238,11 +237,6 @@ namespace Joker
 			SafeRelease( m_pRenderTarget );
 			m_pRenderTarget = NULL;
 		}
-	}
-
-	inline void CTransparentDlgD2D::DoRelease()
-	{
-		DoCleanupDeviceDependent();
 	}
 
 	void CTransparentDlgD2D::DoDrawBackground( CRect const & rcRect )
@@ -304,21 +298,9 @@ namespace Joker
 			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
 				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
-				m_pRenderTarget = NULL;
-				SafeRelease( m_pRenderTarget );
-				DoInitDeviceDependent();
+				DoCleanupDeviceDependent();
+				DoInitialiseDeviceDependent();
 			}
-		}
-
-		if ( !m_bHasBackground )
-		{
-			DoInitDeviceDependent();
-			DoInitialiseBackground();
-			m_bHasBackground = true;
-		}
-		else if ( m_bReinitBackground )
-		{
-			DoInitialiseBackground();
 		}
 
 		return TRUE;
@@ -334,8 +316,14 @@ namespace Joker
 	{
 		if ( BaseType::IsWindowVisible() )
 		{
+			if ( !m_bHasBackground || m_bReinitBackground )
+			{
+				DoInitialiseBackground();
+			}
+
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
+			l_paintDC.SetStretchBltMode( HALFTONE );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			DoDraw();

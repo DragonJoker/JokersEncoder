@@ -7,7 +7,7 @@
 #include <TransparentDialog.h>
 #include <ScalableLayout.h>
 
-#define DEF_DEBUG_OGL 1
+#define DEF_DEBUG_OGL 0
 
 namespace Joker
 {
@@ -27,7 +27,7 @@ namespace Joker
 
 		virtual BOOL OnInitDialog();
 		DECLARE_MESSAGE_MAP()
-		afx_msg int OnCreate( LPCREATESTRUCT lpCreateStruct );
+		afx_msg void OnDestroy();
 		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
 		afx_msg void OnPaint();
 		afx_msg void OnSize( UINT uiType, int cx, int cy );
@@ -41,15 +41,14 @@ namespace Joker
 
 	private:
 		HICON m_hIcon;
+		CTransparentButton< eDEFAULT_RENDERER > m_btnOk;
 #if !DEF_DEBUG_OGL
 		CTransparentListBox< eDEFAULT_RENDERER > m_listFiles;
-		CTransparentButton< eDEFAULT_RENDERER > m_btnOk;
 		CTransparentButton< eDEFAULT_RENDERER > m_btnCancel;
 		CTransparentButton< eDEFAULT_RENDERER > m_btnSettings;
 		CTransparentButton< eDEFAULT_RENDERER > m_btnAddFile;
 		CTransparentButton< eDEFAULT_RENDERER > m_btnAddFolder;
 #else
-		CButton m_btnOk;
 		CButton m_btnCancel;
 		CButton m_btnSettings;
 		CButton m_btnAddFile;

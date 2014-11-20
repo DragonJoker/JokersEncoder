@@ -13,7 +13,6 @@ namespace Joker
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_OGL >::~CTransparentCtrlT()
 	{
-		DoRelease();
 	}
 
 	template< typename T >
@@ -196,7 +195,7 @@ namespace Joker
 	}
 
 	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::DoInitDeviceDependent()
+	void CTransparentCtrlT< T, eRENDERER_OGL >::DoInitialiseDeviceDependent()
 	{
 		CRect rcRect;
 		T::GetClientRect( rcRect );
@@ -218,12 +217,6 @@ namespace Joker
 			SafeRelease( m_pRenderTarget );
 			m_pRenderTarget = NULL;
 		}
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_OGL >::DoRelease()
-	{
-		DoCleanupDeviceDependent();
 	}
 
 	template< typename T >
@@ -302,7 +295,6 @@ namespace Joker
 		{
 			ON_WM_ERASEBKGND()
 			ON_WM_CTLCOLOR()
-			ON_WM_DESTROY()
 			ON_WM_PAINT()
 			ON_WM_SIZE()
 			ON_WM_MOVE()
@@ -324,27 +316,21 @@ namespace Joker
 	PTM_WARNING_RESTORE
 
 	template< typename T >
-	BOOL CTransparentCtrlT< T, eRENDERER_OGL >::OnEraseBkgnd( CDC * UNUSED( pDC ) )
+	BOOL CTransparentCtrlT< T, eRENDERER_OGL >::OnEraseBkgnd( CDC * pDC )
 	{
 		if ( m_bHasBackground )
 		{
 			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
 				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
-				m_pRenderTarget = NULL;
-				SafeRelease( m_pRenderTarget );
-				DoInitDeviceDependent();
+				DoCleanupDeviceDependent();
+				DoInitialiseDeviceDependent();
 			}
 		}
 
-		if ( !m_bHasBackground )
-		{
-			DoInitDeviceDependent();
-			DoInitialiseBackground();
-			m_bHasBackground = true;
-		}
-
-		return TRUE;
+		CRect rect;
+		GetClientRect( rect );
+		return DoDrawParentBackground( pDC, rect );
 	}
 
 	template< typename T >
@@ -355,23 +341,18 @@ namespace Joker
 	}
 
 	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_OGL >::OnDestroy()
-	{
-		DoRelease();
-	}
-
-	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::OnPaint()
 	{
 		if ( T::IsWindowVisible() )
 		{
-			if ( m_bReinitBackground )
+			if ( !m_bHasBackground || m_bReinitBackground )
 			{
 				DoInitialiseBackground();
 			}
 
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
+			l_paintDC.SetStretchBltMode( HALFTONE );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			DoDraw();

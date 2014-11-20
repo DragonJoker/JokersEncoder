@@ -22,6 +22,6 @@
 
 #include "OpenGL2DPrerequisites.h"
 
-#if defined( VLD_AVAILABLE )
+#if !defined( NDEBUG ) && defined( VLD_AVAILABLE )
 #	include <vld.h>
 #endif

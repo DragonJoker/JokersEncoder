@@ -13,7 +13,6 @@ namespace Joker
 	template< typename T >
 	CTransparentCtrlT< T, eRENDERER_D2D >::~CTransparentCtrlT()
 	{
-		DoRelease();
 	}
 
 	template< typename T >
@@ -200,7 +199,7 @@ namespace Joker
 	}
 
 	template< typename T >
-	void CTransparentCtrlT< T, eRENDERER_D2D >::DoInitDeviceDependent()
+	void CTransparentCtrlT< T, eRENDERER_D2D >::DoInitialiseDeviceDependent()
 	{
 		CRect rcRect;
 		T::GetClientRect( rcRect );
@@ -222,12 +221,6 @@ namespace Joker
 			SafeRelease( m_pRenderTarget );
 			m_pRenderTarget = NULL;
 		}
-	}
-
-	template< typename T >
-	inline void CTransparentCtrlT< T, eRENDERER_D2D >::DoRelease()
-	{
-		DoCleanupDeviceDependent();
 	}
 
 	template< typename T >
@@ -334,17 +327,9 @@ namespace Joker
 			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
 				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
-				m_pRenderTarget = NULL;
-				SafeRelease( m_pRenderTarget );
-				DoInitDeviceDependent();
+				DoCleanupDeviceDependent();
+				DoInitialiseDeviceDependent();
 			}
-		}
-
-		if ( !m_bHasBackground )
-		{
-			DoInitDeviceDependent();
-			DoInitialiseBackground();
-			m_bHasBackground = true;
 		}
 
 		return TRUE;
@@ -362,13 +347,14 @@ namespace Joker
 	{
 		if ( T::IsWindowVisible() )
 		{
-			if ( m_bReinitBackground )
+			if ( !m_bHasBackground || m_bReinitBackground )
 			{
 				DoInitialiseBackground();
 			}
 
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
+			l_paintDC.SetStretchBltMode( HALFTONE );
 			m_bPainting = true;
 			m_hDC = l_paintDC;
 			DoDraw();
@@ -430,8 +416,8 @@ namespace Joker
 			mouseEvent.hwndTrack = m_hWnd;
 			mouseEvent.dwHoverTime = HOVER_DEFAULT;
 			TrackMouseEvent( & mouseEvent );
-			m_bMouseOver = true;
 			BaseType::Invalidate();
+			m_bMouseOver = true;
 		}
 
 		BaseType::OnMouseMove( nFlags, point );
