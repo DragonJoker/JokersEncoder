@@ -1259,12 +1259,12 @@ namespace GL2D
 	{
 		SVertex quad[] =
 		{
-			{ { 0, 1 }, { 0, 0 } },
-			{ { 0, 0 }, { 0, 1 } },
-			{ { 1, 0 }, { 1, 1 } },
-			{ { 0, 1 }, { 0, 0 } },
-			{ { 1, 0 }, { 1, 1 } },
-			{ { 1, 1 }, { 1, 0 } },
+			SVertex( glm::vec2( 0, 1 ), glm::vec2( 0, 0 ) ),
+			SVertex( glm::vec2( 0, 0 ), glm::vec2( 0, 1 ) ),
+			SVertex( glm::vec2( 1, 0 ), glm::vec2( 1, 1 ) ),
+			SVertex( glm::vec2( 0, 1 ), glm::vec2( 0, 0 ) ),
+			SVertex( glm::vec2( 1, 0 ), glm::vec2( 1, 1 ) ),
+			SVertex( glm::vec2( 1, 1 ), glm::vec2( 1, 0 ) ),
 		};
 
 		HRESULT hr = S_OK;

@@ -80,6 +80,11 @@ namespace Joker
 		 */
 		void GetLogFont( LOGFONT * pLogFont );
 		/**
+		 *\brief		Définit la police à partir d'un LOGFONT
+		 *\param[in]	logFont	Le LOGFONT
+		 */
+		void SetLogFont( const LOGFONT & logFont );
+		/**
 		 *\brief		Opérateur de conversion implicite vers HFONT
 		 */
 		operator HFONT();

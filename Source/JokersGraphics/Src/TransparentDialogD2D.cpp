@@ -18,7 +18,9 @@ namespace Joker
 	typedef CTransparentCtrlT< CDialog, eRENDERER_D2D > CTransparentDlgD2D;
 
 	CTransparentDlgD2D::CTransparentCtrlT()
-		: m_pRenderTarget( NULL )
+		: BaseType()
+		, m_pRenderTarget( NULL )
+		, m_brush( NULL )
 	{
 		m_ctrl = this;
 	}
@@ -26,6 +28,7 @@ namespace Joker
 	CTransparentDlgD2D::CTransparentCtrlT( UINT nTemplate, CWnd * pParent )
 		: BaseType( nTemplate, pParent )
 		, m_pRenderTarget( NULL )
+		, m_brush( NULL )
 	{
 		m_ctrl = this;
 	}
@@ -33,6 +36,7 @@ namespace Joker
 	CTransparentDlgD2D::CTransparentCtrlT( LPCTSTR szTemplate, CWnd * pParent )
 		: BaseType( szTemplate, pParent )
 		, m_pRenderTarget( NULL )
+		, m_brush( NULL )
 	{
 		m_ctrl = this;
 	}
@@ -216,6 +220,14 @@ namespace Joker
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
+	BOOL CTransparentDlgD2D::SetTransparentColour( COLORREF colour )
+	{
+		m_colour = colour;
+		Delete( m_brush );
+		m_brush = ::CreateSolidBrush( colour );
+		return SetLayeredWindowAttributes( colour, 255, LWA_COLORKEY | LWA_ALPHA );
+	}
+
 	void CTransparentDlgD2D::DoInitialiseDeviceDependent()
 	{
 		CRect rcRect;
@@ -239,18 +251,6 @@ namespace Joker
 		}
 	}
 
-	void CTransparentDlgD2D::DoDrawBackground( CRect const & rcRect )
-	{
-		// On met l'image d'arrière plan dans le backbuffer
-		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
-		// on blende le backbuffer et le masque
-		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
-	}
-
-	void CTransparentDlgD2D::DoDrawForeground( CRect const & rcRect )
-	{
-	}
-
 	inline void CTransparentDlgD2D::DoDraw()
 	{
 		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
@@ -263,11 +263,8 @@ namespace Joker
 				m_pRenderTarget->BeginDraw();
 				m_pRenderTarget->Clear( D2D1::ColorF( D2D1::ColorF::Enum::Black, 0.0F ) );
 
-				// On dessine l'arrière plan
-				DoDrawBackground( rcRect );
-
-				// On dessine le premier plan
-				DoDrawForeground( rcRect );
+				// on blende le backbuffer et le masque
+				DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 
 				m_pRenderTarget->EndDraw();
 			}
@@ -280,6 +277,7 @@ namespace Joker
 	}
 
 	BEGIN_MESSAGE_MAP( CTransparentDlgD2D, CTransparentDlgD2D::BaseType )
+		ON_WM_CREATE()
 		ON_WM_ERASEBKGND()
 		ON_WM_CTLCOLOR()
 		ON_WM_PAINT()
@@ -290,6 +288,23 @@ namespace Joker
 		ON_WM_SETFOCUS()
 		ON_WM_KILLFOCUS()
 	END_MESSAGE_MAP()
+
+	int CTransparentDlgD2D::OnCreate( LPCREATESTRUCT pCreate )
+	{
+		int ret = BaseType::OnCreate( pCreate );
+
+		if ( !ret )
+		{
+			BOOL res = ModifyStyleEx( 0, WS_EX_COMPOSITED | WS_EX_LAYERED, 0 );
+
+			if ( res )
+			{
+				res = SetTransparentColour( RGB( 0, 255, 0 ) );
+			}
+		}
+
+		return ret;
+	}
 
 	BOOL CTransparentDlgD2D::OnEraseBkgnd( CDC * pDC )
 	{
@@ -309,18 +324,22 @@ namespace Joker
 	HBRUSH CTransparentDlgD2D::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
 	{
 		pDC->SetBkMode( TRANSPARENT );
-		return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
+		pDC->SetStretchBltMode( HALFTONE );
+
+		if ( m_brush )
+		{
+			return m_brush;
+		}
+		else
+		{
+			return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
+		}
 	}
 
 	void CTransparentDlgD2D::OnPaint()
 	{
 		if ( BaseType::IsWindowVisible() )
 		{
-			if ( !m_bHasBackground || m_bReinitBackground )
-			{
-				DoInitialiseBackground();
-			}
-
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
 			l_paintDC.SetStretchBltMode( HALFTONE );

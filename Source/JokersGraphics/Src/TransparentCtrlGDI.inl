@@ -282,6 +282,11 @@ namespace Joker
 	{
 		pDC->SetBkMode( TRANSPARENT );
 		pDC->SetStretchBltMode( HALFTONE );
+
+		CRect rect;
+		GetClientRect( rect );
+		DoDrawParentBackground( pDC, rect );
+
 		return TRUE;
 	}
 

@@ -76,6 +76,7 @@ namespace Joker
 
 	BOOL CTransparentCtrlBase::DoDrawParentBackground( CDC * pDC, CRect const & rect )
 	{
+#if 0
 		ASSERT_VALID( pDC );
 		BOOL result = FALSE;
 		CRgn rgn;
@@ -115,6 +116,9 @@ namespace Joker
 		}
 
 		return result;
+#else
+		return TRUE;
+#endif
 	}
 
 	void CTransparentCtrlBase::DoInitialiseBackground()
@@ -143,6 +147,13 @@ namespace Joker
 			memdc.DeleteDC();
 			m_bReinitBackground = false;
 			m_bHasBackground = true;
+
+			CImage img;
+			img.Attach( m_bmpBackground );
+			CString csFileName;
+			csFileName.Format( _T( "BackgroundBitmap_0x%08X_0x%08X.bmp" ), pParent->GetDlgCtrlID(), m_ctrl->GetDlgCtrlID() );
+			img.Save( csFileName, Gdiplus::ImageFormatBMP );
+			img.Detach();
 		}
 	}
 

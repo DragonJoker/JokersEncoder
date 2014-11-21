@@ -388,10 +388,10 @@ namespace GL2D
 				float uv_x = ( character % 16 ) / 16.0f;
 				float uv_y = ( character / 16 ) / 16.0f;
 
-				SVertex vertex_up_left		= { { x + i * size       , y + size }, { uv_x              , 1.0f - uv_y } };
-				SVertex vertex_up_right		= { { x + i * size + size, y + size }, { uv_x + 1.0f /16.0f, 1.0f - uv_y } };
-				SVertex vertex_down_right	= { { x + i * size + size, y        }, { uv_x + 1.0f /16.0f, 1.0f - ( uv_y + 1.0f / 16.0f ) } };
-				SVertex vertex_down_left	= { { x + i * size       , y        }, { uv_x              , 1.0f - ( uv_y + 1.0f / 16.0f ) } };
+				SVertex vertex_up_left		= SVertex( glm::vec2( x + i * size       , y + size ), glm::vec2( uv_x              , 1.0f - uv_y  ) );
+				SVertex vertex_up_right		= SVertex( glm::vec2( x + i * size + size, y + size ), glm::vec2( uv_x + 1.0f /16.0f, 1.0f - uv_y ) );
+				SVertex vertex_down_right	= SVertex( glm::vec2( x + i * size + size, y        ), glm::vec2( uv_x + 1.0f /16.0f, 1.0f - ( uv_y + 1.0f / 16.0f ) ) );
+				SVertex vertex_down_left	= SVertex( glm::vec2( x + i * size       , y        ), glm::vec2( uv_x              , 1.0f - ( uv_y + 1.0f / 16.0f ) ) );
  
 				vertices.push_back( vertex_up_left );
 				vertices.push_back( vertex_down_left );

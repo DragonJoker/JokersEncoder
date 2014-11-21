@@ -103,6 +103,12 @@ namespace Joker
 		::GetObject( m_hFont, sizeof( LOGFONT ), pLogFont );
 	}
 
+	void CFont::SetLogFont( const LOGFONT & logFont )
+	{
+		m_lfLogFont = logFont;
+		DoCreate();
+	}
+
 	CFont::operator HFONT()
 	{
 		return m_hFont;

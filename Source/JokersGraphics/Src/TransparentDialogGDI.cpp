@@ -17,18 +17,22 @@ namespace Joker
 	typedef CTransparentCtrlT< CDialog, eRENDERER_GDI > CTransparentDlgGDI;
 
 	CTransparentDlgGDI::CTransparentCtrlT()
+		: BaseType()
+		, m_brush( NULL )
 	{
 		m_ctrl = this;
 	}
 
 	CTransparentDlgGDI::CTransparentCtrlT( UINT nTemplate, CWnd * pParent )
 		: BaseType( nTemplate, pParent )
+		, m_brush( NULL )
 	{
 		m_ctrl = this;
 	}
 
 	CTransparentDlgGDI::CTransparentCtrlT( LPCTSTR szTemplate, CWnd * pParent )
 		: BaseType( szTemplate, pParent )
+		, m_brush( NULL )
 	{
 		m_ctrl = this;
 	}
@@ -199,40 +203,33 @@ namespace Joker
 		return SetWindowPosition( pWndInsertAfter, x, y, cx, cy, uiFlags );
 	}
 
-	void CTransparentDlgGDI::DoDrawBackground( CRect const & rcRect )
+	BOOL CTransparentDlgGDI::SetTransparentColour( COLORREF colour )
 	{
-		// On met l'image d'arrière plan dans le backbuffer
-		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
-		// on blende le backbuffer et le masque
-		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
-	}
-
-	void CTransparentDlgGDI::DoDrawForeground( CRect const & rcRect )
-	{
+		m_colour = colour;
+		Delete( m_brush );
+		m_brush = ::CreateSolidBrush( colour );
+		return SetLayeredWindowAttributes( colour, 255, LWA_COLORKEY | LWA_ALPHA );
 	}
 
 	inline void CTransparentDlgGDI::DoDraw()
 	{
-		::SetBkMode( m_hDC, TRANSPARENT );
-		//::SetStretchBltMode( m_hDC, HALFTONE );
+		if ( m_hWnd &&::IsWindowVisible( m_hWnd ) )
+		{
+			CRect rcRect;
+			GetClientRect( & rcRect );
 
-		CRect rcRect;
-		GetClientRect( & rcRect );
+			// On crée le backbuffer
+			CBitmapDC backDC( m_hDC );
+			backDC.CreateBitmap( rcRect );
+			m_pBackDC = & backDC;
 
-		// On crée le backbuffer
-		CBitmapDC backDC( m_hDC );
-		backDC.CreateBitmap( rcRect );
-		m_pBackDC = & backDC;
+			// on blende le backbuffer et le masque
+			DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
 
-		// On dessine l'arrière plan
-		DoDrawBackground( rcRect );
-
-		// On dessine le premier plan
-		DoDrawForeground( rcRect );
-
-		// On blitte le backbuffer dans le dc final
-		::BitBlt( m_hDC, 0, 0, rcRect.Width(), rcRect.Height(), backDC, 0, 0, SRCCOPY );
-		m_pBackDC = NULL;
+			// On blitte le backbuffer dans le dc final
+			::BitBlt( m_hDC, 0, 0, rcRect.Width(), rcRect.Height(), backDC, 0, 0, SRCCOPY );
+			m_pBackDC = NULL;
+		}
 	}
 
 	void CTransparentDlgGDI::PreSubclassWindow()
@@ -241,7 +238,9 @@ namespace Joker
 	}
 
 	BEGIN_MESSAGE_MAP( CTransparentDlgGDI, CTransparentDlgGDI::BaseType )
+		ON_WM_CREATE()
 		ON_WM_ERASEBKGND()
+		ON_WM_CTLCOLOR()
 		ON_WM_PAINT()
 		ON_WM_SIZE()
 		ON_WM_MOUSEMOVE()
@@ -250,12 +249,44 @@ namespace Joker
 		ON_WM_KILLFOCUS()
 	END_MESSAGE_MAP()
 
+	int CTransparentDlgGDI::OnCreate( LPCREATESTRUCT pCreate )
+	{
+		int ret = BaseType::OnCreate( pCreate );
+
+		if ( !ret )
+		{
+			BOOL res = ModifyStyleEx( 0, WS_EX_LAYERED, 0 );
+
+			if ( res )
+			{
+				res = SetTransparentColour( RGB( 0, 255, 0 ) );
+			}
+		}
+
+		return ret;
+	}
+
 	BOOL CTransparentDlgGDI::OnEraseBkgnd( CDC * pDC )
 	{
 		pDC->SetBkMode( TRANSPARENT );
 		pDC->SetStretchBltMode( HALFTONE );
 
 		return TRUE;
+	}
+
+	HBRUSH CTransparentDlgGDI::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
+	{
+		pDC->SetBkMode( TRANSPARENT );
+		pDC->SetStretchBltMode( HALFTONE );
+
+		if ( m_brush )
+		{
+			return m_brush;
+		}
+		else
+		{
+			return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
+		}
 	}
 
 	void CTransparentDlgGDI::OnSize( UINT type, int cx, int cy )
@@ -270,11 +301,6 @@ namespace Joker
 	{
 		if ( BaseType::IsWindowVisible() )
 		{
-			if ( !m_bHasBackground || m_bReinitBackground )
-			{
-				DoInitialiseBackground();
-			}
-
 			CPaintDC l_paintDC( this );
 			l_paintDC.SetBkMode( TRANSPARENT );
 			l_paintDC.SetStretchBltMode( HALFTONE );

@@ -48,7 +48,7 @@ if ( MSVC )
 	# Looking for needed libraries
 	#--------------------------------------------------------------------------------------------------
 	find_package( Doxygen )
-#	find_package( VLD )
+	find_package( VLD )
 	
 	#--------------------------------------------------------------------------------------------------
 	# Adding include dirs to include search path
@@ -65,7 +65,10 @@ if ( MSVC )
 	# Adding few library dirs to link search path
 	#--------------------------------------------------------------------------------------------------
 	if( VLD_FOUND )
+		option( PROJECTS_USE_VLD "Use VLD to detect memory leaks" TRUE )
 		link_directories( ${VLD_LIBRARY_DIR} )
+	else()
+		SET( PROJECTS_USE_VLD FALSE )
 	endif()
 	link_directories( ${PROJECTS_BINARIES_OUTPUT_DIR}/lib )
 	link_directories( ${CMAKE_SOURCE_DIR}/../Lib/strmbase )
@@ -88,7 +91,7 @@ if ( MSVC )
 	#--------------------------------------------------------------------------------------------------
 	# If VLD found, we tell it to the compiler
 	#--------------------------------------------------------------------------------------------------
-	if( VLD_FOUND )
+	if( VLD_FOUND AND PROJECTS_USE_VLD )
 		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVLD_AVAILABLE")
 		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -DVLD_AVAILABLE")
 		msg_debug( "Using Visual Leak Detector to check for Memory leaks" )

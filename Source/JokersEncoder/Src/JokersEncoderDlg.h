@@ -28,7 +28,6 @@ namespace Joker
 		virtual BOOL OnInitDialog();
 		DECLARE_MESSAGE_MAP()
 		afx_msg void OnDestroy();
-		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
 		afx_msg void OnPaint();
 		afx_msg void OnSize( UINT uiType, int cx, int cy );
 		afx_msg void OnSizing(  UINT nSide, LPRECT lpRect );

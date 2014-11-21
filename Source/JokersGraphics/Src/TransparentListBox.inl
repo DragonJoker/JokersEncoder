@@ -157,12 +157,7 @@ namespace Joker
 		GetText( iItem, csItem );
 
 		// On vérifie si l'item courant est sélectionné ou pas
-
-		while ( GL2D_SIZE_I < arraySelected.size() && !bSelected )
-		{
-			bSelected = ( arraySelected[GL2D_SIZE_I] == iItem );
-			GL2D_SIZE_I++;
-		}
+		bSelected = std::find( arraySelected.begin(), arraySelected.end(), iItem ) != arraySelected.end();
 
 		// On définit le statut de l'item courant
 		bFocused = iItem == m_iFocusedItem;
@@ -176,7 +171,7 @@ namespace Joker
 			eStatus = eLB_ITEM_STATUS_NORMAL;
 		}
 
-		// On blend le masque et le dc final_
+		// On blend le masque et le dc final
 		DrawBitmap( rcRect, m_itemColours[eStatus].GetBrush(), m_itemColours[eStatus].GetBrush().GetRect() );
 
 		// On dessine le texte de l'item

@@ -290,6 +290,7 @@ namespace Joker
 		afx_msg void OnLButtonUp( UINT nFlags, CPoint point );
 		afx_msg void OnSetFocus( CWnd * pOldWnd );
 		afx_msg void OnKillFocus( CWnd * pNewWnd );
+		afx_msg LRESULT OnSetFont( WPARAM wParam, LPARAM lParam );
 
 	protected:
 		//! Les masques du bouton (contiennent les images)

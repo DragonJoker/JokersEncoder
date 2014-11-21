@@ -93,28 +93,15 @@ namespace Joker
 		pPointer = NULL;
 	}
 
-	template< typename T > struct Deleter;
-
-	template <> struct Deleter< HBRUSH >
+	template< typename T >
+	struct Deleter
 	{
-		inline void operator()( HBRUSH & hBrush )
+		inline void operator()( T & hObject )
 		{
-			if ( hBrush )
+			if ( hObject )
 			{
-				::DeleteObject( hBrush );
-				hBrush = NULL;
-			}
-		}
-	};
-
-	template <> struct Deleter< HBITMAP >
-	{
-		inline void operator()( HBITMAP & hBitmap )
-		{
-			if ( hBitmap )
-			{
-				::DeleteObject( hBitmap );
-				hBitmap = NULL;
+				::DeleteObject( hObject );
+				hObject = NULL;
 			}
 		}
 	};
@@ -132,12 +119,11 @@ namespace Joker
 	};
 
 	template< typename T >
-	void Delete( T pPointer )
+	void Delete( T & pPointer )
 	{
 		Deleter< T > deleter;
 		deleter( pPointer );
 	}
-
 
 	template< typename T, eRENDERER Renderer > class CTransparentCtrlT;
 }

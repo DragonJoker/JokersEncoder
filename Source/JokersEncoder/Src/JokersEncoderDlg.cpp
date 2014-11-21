@@ -155,18 +155,17 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 
 	m_layout.Create( m_hWnd, CRect() );
 	m_layout.AddElement( IDC_LIST_FILES );
-	m_layout.AddElement( IDOK );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDCANCEL );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDC_OPTIONS );//, false, eHORIZ_ALIGN_LEFT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDC_FILE );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
-	m_layout.AddElement( IDC_FOLDER );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
+	m_layout.AddElement( IDOK, true, true );//, false, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDCANCEL, true, true );//, false, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDC_OPTIONS, true, true );//, false, false, eHORIZ_ALIGN_LEFT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDC_FILE, true, true );//, false, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
+	m_layout.AddElement( IDC_FOLDER, true, true );//, false, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
 
 	return TRUE;
 }
 
 BEGIN_MESSAGE_MAP( CJokersEncoderDlg, CJokersEncoderDlg::BaseType )
 	ON_WM_DESTROY()
-	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 	ON_WM_SIZE()
 	ON_WM_SIZING()
@@ -189,12 +188,6 @@ void CJokersEncoderDlg::OnDestroy()
 #endif
 	m_btnOk.Cleanup();
 	Cleanup();
-}
-
-BOOL CJokersEncoderDlg::OnEraseBkgnd( CDC * pDC )
-{
-	BaseType::OnEraseBkgnd( pDC );
-	return TRUE;
 }
 
 void CJokersEncoderDlg::OnPaint()

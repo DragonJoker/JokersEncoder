@@ -298,7 +298,6 @@ namespace Joker
 		static const AFX_MSGMAP_ENTRY _messageEntries[] =
 		{
 			ON_WM_ERASEBKGND()
-			ON_WM_CTLCOLOR()
 			ON_WM_PAINT()
 			ON_WM_SIZE()
 			ON_WM_MOVE()
@@ -320,7 +319,7 @@ namespace Joker
 	PTM_WARNING_RESTORE
 
 	template< typename T >
-	BOOL CTransparentCtrlT< T, eRENDERER_D2D >::OnEraseBkgnd( CDC * UNUSED( pDC ) )
+	BOOL CTransparentCtrlT< T, eRENDERER_D2D >::OnEraseBkgnd( CDC * pDC )
 	{
 		if ( m_bHasBackground )
 		{
@@ -332,14 +331,11 @@ namespace Joker
 			}
 		}
 
-		return TRUE;
-	}
+		CRect rect;
+		GetClientRect( rect );
+		return DoDrawParentBackground( pDC, rect );
 
-	template< typename T >
-	HBRUSH CTransparentCtrlT< T, eRENDERER_D2D >::OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID )
-	{
-		pDC->SetBkMode( TRANSPARENT );
-		return HBRUSH( ::GetStockObject( NULL_BRUSH ) );
+		return TRUE;
 	}
 
 	template< typename T >
@@ -416,7 +412,6 @@ namespace Joker
 			mouseEvent.hwndTrack = m_hWnd;
 			mouseEvent.dwHoverTime = HOVER_DEFAULT;
 			TrackMouseEvent( & mouseEvent );
-			BaseType::Invalidate();
 			m_bMouseOver = true;
 		}
 
@@ -428,7 +423,6 @@ namespace Joker
 	{
 		m_bMouseOver = false;
 		BaseType::Invalidate();
-		BaseType::OnMouseLeave();
 		return 0;
 	}
 #endif

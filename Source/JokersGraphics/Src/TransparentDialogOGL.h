@@ -104,6 +104,11 @@ namespace Joker
 		 *\return		\p FALSE si problème
 		 */
 		BOOL SetWindowPos( const CWnd * pWndInsertAfter, int x, int y, int cx, int cy, UINT uiFlags );
+		/**
+		 *\brief		Définit la couleur de transparence
+		 *\param[in]	colour	La couleur
+		 */
+		BOOL SetTransparentColour( COLORREF colour );
 
 	protected:
 		/**
@@ -118,12 +123,12 @@ namespace Joker
 		 *\brief		Fonction de dessin de l'arrière plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin
 		 */
-		virtual void DoDrawBackground( CRect const & rcRect );
+		virtual void DoDrawBackground( CRect const & ) {}
 		/**
 		 *\brief		Fonction de dessin du premier plan
 		 *\param[in]	rcRect	Rectangle affecté par le dessin
 		 */
-		virtual void DoDrawForeground( CRect const & rcRect );
+		virtual void DoDrawForeground( CRect const & ) {}
 		/**
 		 *\brief		Fonction de dessin
 		 */
@@ -136,6 +141,7 @@ namespace Joker
 		virtual void PreSubclassWindow();
 
 		DECLARE_MESSAGE_MAP()
+		afx_msg int OnCreate( LPCREATESTRUCT pCreate );
 		afx_msg BOOL OnEraseBkgnd( CDC * pDC );
 		afx_msg HBRUSH OnCtlColor( CDC * pDC, CWnd * pWnd, UINT uiWinID );
 		afx_msg void OnDestroy();
@@ -152,6 +158,10 @@ namespace Joker
 		IGL2DBitmap * m_pBitmap;
 		//! La cible du rendu
 		IGL2DHwndRenderTarget * m_pRenderTarget;
+		//! Le brush de couleur transparente
+		HBRUSH m_brush;
+		//! La couleur transparente
+		COLORREF m_colour;
 	};
 #endif
 }

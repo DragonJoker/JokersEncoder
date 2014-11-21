@@ -346,8 +346,9 @@ namespace Joker
 		typedef ThisClass::BaseType TheBaseClass;
 		static const AFX_MSGMAP_ENTRY _messageEntries[] =
 		{
+			ON_MESSAGE( WM_SETFONT, OnSetFont )
 			ON_WM_MOUSEMOVE()
-			ON_MESSAGE( WM_MOUSELEAVE,	OnMouseLeave )
+			ON_MESSAGE( WM_MOUSELEAVE, OnMouseLeave )
 			ON_WM_SETFOCUS()
 			ON_WM_KILLFOCUS()
 			ON_WM_LBUTTONDOWN()
@@ -363,8 +364,35 @@ namespace Joker
 		return &messageMap;
 	}
 	PTM_WARNING_RESTORE
-    
-    template< eRENDERER Renderer >
+
+	template< eRENDERER Renderer >
+	LRESULT CTransparentButton< Renderer >::OnSetFont( WPARAM wParam, LPARAM lParam )
+	{
+		HFONT hFont = HFONT( wParam );
+
+		if ( !hFont )
+		{
+			hFont = HFONT( ::GetStockObject( SYSTEM_FONT ) );
+		}
+
+		if ( hFont )
+		{
+			LOGFONT logfont;
+			::GetObject( hFont, sizeof( LOGFONT ), &logfont );
+
+			for ( int i = 0; i < eBTN_STATE_COUNT; ++i )
+			{
+				if ( m_pFonts[i] )
+				{
+					m_pFonts[i]->SetLogFont( logfont );
+				}
+			}
+		}
+
+		return LRESULT( 0 );
+	}
+
+	template< eRENDERER Renderer >
 	void CTransparentButton< Renderer >::OnMouseMove( UINT nFlags, CPoint point )
 	{
 		if ( m_eState != eBTN_STATE_DISABLED )

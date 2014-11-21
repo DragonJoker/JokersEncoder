@@ -20,19 +20,6 @@ namespace Joker
 	public:
 		typedef CTransparentCtrlT< CListBox, Renderer > BaseType;
 
-	private:
-		CAlphaLBItem		m_itemColours[eLB_ITEM_STATUS_COUNT];	//!< Les couleurs des items, selon l'état
-		short				m_sItemHeight;							//!< La hauteur des items
-		int					m_iFocusedItem;							//!< L'index de l'item ayant le focus
-		CColour				m_clFocusBorder;						//!< La couleur du contour de focus
-		int					m_iFocusBorderStyle;					//!< Le style du contour de focus
-		bool				m_bMouseLDown;							//!< Dit si le bouton gauche de la souris est appuyé
-		CRect				m_rcMouse;								//!< Le rectangle défini par la souris en mode sélection
-		CTransparentBrush	m_brushMouse;							//!< Le brush du rectangle de sélection
-		CColour				m_clMouseLine;							//!< La couleur de la ligne de contour du rectangle de sélection
-		int					m_iMouseLineStyle;						//!< Le style de la ligne de contour du rectangle de sélection
-		int					m_iScrollPos;							//!< La position courante, en fonction du scroll
-
 	public:
 		/**
 		 *\brief		Constructeur
@@ -202,10 +189,34 @@ namespace Joker
 
 	private:
 		DECLARE_MESSAGE_MAP()
-		afx_msg void	OnVScroll( UINT nSBCode, UINT nPos, CScrollBar * pScrollBar );
-		afx_msg void	OnMouseMove( UINT nFlags, CPoint point );
-		afx_msg void	OnLButtonDown( UINT nFlags, CPoint point );
-		afx_msg void	OnLButtonUp( UINT nFlags, CPoint point );
+		afx_msg void OnVScroll( UINT nSBCode, UINT nPos, CScrollBar * pScrollBar );
+		afx_msg void OnMouseMove( UINT nFlags, CPoint point );
+		afx_msg void OnLButtonDown( UINT nFlags, CPoint point );
+		afx_msg void OnLButtonUp( UINT nFlags, CPoint point );
+
+	private:
+		//! Les couleurs des items, selon l'état
+		CAlphaLBItem m_itemColours[eLB_ITEM_STATUS_COUNT];
+		//! La hauteur des items
+		short m_sItemHeight;
+		//! L'index de l'item ayant le focus
+		int m_iFocusedItem;
+		//! La couleur du contour de focus
+		CColour m_clFocusBorder;
+		//! Le style du contour de focus
+		int m_iFocusBorderStyle;
+		//! Dit si le bouton gauche de la souris est appuyé
+		bool m_bMouseLDown;
+		//! Le rectangle défini par la souris en mode sélection
+		CRect m_rcMouse;
+		//! Le brush du rectangle de sélection
+		CTransparentBrush m_brushMouse;
+		//! La couleur de la ligne de contour du rectangle de sélection
+		CColour m_clMouseLine;
+		//! Le style de la ligne de contour du rectangle de sélection
+		int m_iMouseLineStyle;
+		//! La position courante, en fonction du scroll
+		int m_iScrollPos;
 	};
 }
 

@@ -68,6 +68,12 @@ namespace GL2D
 	{
 		glm::vec2 pos;
 		glm::vec2 tex;
+
+		SVertex( glm::vec2 const & pos, glm::vec2 const & tex )
+			: pos( pos )
+			, tex( tex )
+		{
+		}
 	};
 
 	template< class T >

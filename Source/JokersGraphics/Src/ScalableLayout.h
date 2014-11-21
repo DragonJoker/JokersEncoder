@@ -31,11 +31,15 @@ namespace Joker
 			SIZE m_sizeOriginal;
 			LPRECT m_rcFixed;
 			bool m_scalable;
+			bool m_scalableText;
 			eHORIZ_ALIGN m_horizAlign;
 			eVERTIC_ALIGN m_verticAlign;
+			LOGFONT m_logfont;
+			HFONT m_font;
 
 		public:
-			CElement( HWND hElement, HWND hParent, LPRECT rcFixed, bool scalable, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic );
+			CElement( HWND hElement, HWND hParent, LPRECT rcFixed, bool scalable, bool scalableText, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic );
+			~CElement();
 
 			void Resize( double dX, double dY, LPRECT rcMaxExtent );
 		};
@@ -47,8 +51,8 @@ namespace Joker
 		CScalableLayout();
 		virtual ~CScalableLayout();
 
-		void AddElement( UINT uiId, HWND hElement, bool scalable = true, eHORIZ_ALIGN horiz = eHORIZ_ALIGN_CENTER, eVERTIC_ALIGN vertic = eVERTIC_ALIGN_CENTER );
-		void AddElement( UINT uiId, bool scalable = true, eHORIZ_ALIGN horiz = eHORIZ_ALIGN_CENTER, eVERTIC_ALIGN vertic = eVERTIC_ALIGN_CENTER );
+		void AddElement( UINT uiId, HWND hElement, bool scalable = true, bool scalableText = false, eHORIZ_ALIGN horiz = eHORIZ_ALIGN_CENTER, eVERTIC_ALIGN vertic = eVERTIC_ALIGN_CENTER );
+		void AddElement( UINT uiId, bool scalable = true, bool scalableText = false, eHORIZ_ALIGN horiz = eHORIZ_ALIGN_CENTER, eVERTIC_ALIGN vertic = eVERTIC_ALIGN_CENTER );
 		void RemoveElement( UINT uiId );
 		void Flush();
 

@@ -12,12 +12,14 @@ static char THIS_FILE[] = __FILE__;
 
 namespace Joker
 {
-	CScalableLayout::CElement::CElement( HWND hElement, HWND hParent, LPRECT rcFixed, bool scalable, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
+	CScalableLayout::CElement::CElement( HWND hElement, HWND hParent, LPRECT rcFixed, bool scalable, bool scalableText, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
 		:	m_hElement( hElement )
 		,	m_rcFixed( rcFixed )
 		,	m_scalable( scalable )
+		,	m_scalableText( scalableText )
 		,	m_horizAlign( horiz )
 		,	m_verticAlign( vertic )
+		,	m_font( NULL )
 	{
 		CRect rcOriginal;
 		CRect rcParent;
@@ -35,9 +37,27 @@ namespace Joker
 		m_ptLTOriginal.y -= m_rcFixed->top;
 		m_ptRBOriginal.x -= m_rcFixed->right;
 		m_ptRBOriginal.y -= m_rcFixed->bottom;
+
+		m_font = HFONT( SendMessage( hElement, WM_GETFONT, WPARAM( 0 ), LPARAM( 0 ) ) );
+
+		if ( !m_font )
+		{
+			m_font = HFONT( ::GetStockObject( SYSTEM_FONT ) );
+		}
+
+		if ( m_font )
+		{
+			::GetObject( m_font, sizeof( m_logfont ), &m_logfont );
+			m_font = ::CreateFontIndirect( &m_logfont );
+		}
 	}
 
-	void CScalableLayout::CElement ::Resize( double dX, double dY, LPRECT rcMaxExtent )
+	CScalableLayout::CElement::~CElement()
+	{
+		Delete( m_font );
+	}
+
+	void CScalableLayout::CElement::Resize( double dX, double dY, LPRECT rcMaxExtent )
 	{
 		LONG iLeft = LONG( dX * m_ptLTOriginal.x );
 		LONG iTop = LONG( dY * m_ptLTOriginal.y );
@@ -75,6 +95,14 @@ namespace Joker
 			iWidth = m_sizeOriginal.cx;
 			iHeight = m_sizeOriginal.cy;
 		}
+		else if ( m_scalableText )
+		{
+			LOGFONT logFont( m_logfont );
+			logFont.lfHeight = LONG( m_logfont.lfHeight * dY );
+			Delete( m_font );
+			m_font = ::CreateFontIndirect( &logFont );
+			::SendMessage( m_hElement, WM_SETFONT, WPARAM( m_font ), LPARAM( FALSE ) );
+		}
 
 		if( iLeft < rcMaxExtent->left )
 		{
@@ -109,23 +137,23 @@ namespace Joker
 		Flush();
 	}
 
-	void CScalableLayout::AddElement( UINT uiId, HWND hElement, bool scalable, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
+	void CScalableLayout::AddElement( UINT uiId, HWND hElement, bool scalable, bool scalableText, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
 	{
 		ElementMap::iterator it = m_mapElements.find( uiId );
 
 		if( it == m_mapElements.end() )
 		{
-			m_mapElements.insert( std::make_pair( uiId, CElement( hElement, m_hParent, &m_rcFixedBorders, scalable, horiz, vertic ) ) );
+			m_mapElements.insert( std::make_pair( uiId, CElement( hElement, m_hParent, &m_rcFixedBorders, scalable, scalableText, horiz, vertic ) ) );
 		}
 	}
 
-	void CScalableLayout::AddElement( UINT uiId, bool scalable, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
+	void CScalableLayout::AddElement( UINT uiId, bool scalable, bool scalableText, eHORIZ_ALIGN horiz, eVERTIC_ALIGN vertic )
 	{
 		HWND hWnd = ::GetDlgItem( m_hParent, uiId );
 
 		if( hWnd )
 		{
-			AddElement( uiId, hWnd, scalable, horiz, vertic );
+			AddElement( uiId, hWnd, scalable, scalableText, horiz, vertic );
 		}
 	}
 
