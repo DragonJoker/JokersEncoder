@@ -49,7 +49,6 @@ namespace GL2D
 		glFrontFace( GL_CW );
 		glCullFace( GL_BACK );
 		context->Enable( GL_CULL_FACE );
-		context->Enable( GL_TEXTURE_2D );
 		context->Disable( GL_DEPTH_TEST );
 		context->Enable( GL_BLEND );
 		context->BlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );

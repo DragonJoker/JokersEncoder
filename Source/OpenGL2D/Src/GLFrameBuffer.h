@@ -24,20 +24,25 @@ namespace GL2D
 
 		/** Initialise le frame buffer, crée ses attaches et autres
 		*/
-		HRESULT Initialise( std::shared_ptr< CContext > context );
+		STDMETHOD( Initialise )( std::shared_ptr< CContext > context );
 
 		/** Nettoie le frame buffer
 		*/
-		void Cleanup();
+		STDMETHOD_( void, Cleanup )();
+
+		/** Récupère les pixels du frame buffer, dans le format donné
+		*/
+		STDMETHOD( ReadPixels )( std::shared_ptr< CContext > context, GL2D_RECT_U const & srcRect, GL2D_PIXEL_FORMAT format, void * data );
+
 		/** Active le frame buffer, dans le mode voulu
 		@param mode
 			Le mode d'activation
 		*/
-		HRESULT Bind( GL2D_GL_FRAMEBUFFER_MODE mode );
+		STDMETHOD( Bind )( GL2D_GL_FRAMEBUFFER_MODE mode );
 
 		/** Désactive le frame buffer
 		*/
-		HRESULT Unbind();
+		STDMETHOD( Unbind )();
 
 	private:
 		std::weak_ptr< CContext > m_context;

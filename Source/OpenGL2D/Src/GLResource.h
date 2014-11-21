@@ -10,7 +10,8 @@ namespace GL2D
 		: public CUnknown< Object, &__uuidof( Interface ) >
 	{
 	public:
-		GL2D_API CResource()
+		GL2D_API CResource( IGL2DFactory * factory )
+			: m_factory( factory )
 		{
 		}
 
@@ -20,12 +21,19 @@ namespace GL2D
 
 		GL2D_API STDMETHOD_( void, GetFactory )( IGL2DFactory ** pFactory ) const
 		{
+			if ( pFactory )
+			{
+				*pFactory = m_factory;
+			}
 		}
 
-		static Interface * CreateInstance()
+		static Interface * CreateInstance( IGL2DFactory * factory )
 		{
-			return new CResource< Object, Interface >();
+			return new CResource< Object, Interface >( factory );
 		}
+
+	protected:
+		IGL2DFactory * m_factory;
 	};
 }
 

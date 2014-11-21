@@ -11,47 +11,23 @@
 namespace GL2D
 {
 	CComBitmap::CComBitmap()
-		: CObject()
+		: m_texture( std::make_unique< CTexture >() )
 	{
 	}
 
 	CComBitmap::~CComBitmap()
 	{
-		std::shared_ptr< CContext > context = m_context.lock();
-
-		if ( !context )
-		{
-			context = CContext::GetMainContext();
-		}
-
-		if ( context )
-		{
-			context->MakeCurrent( context->GetDC() );
-			CObject::Destroy();
-			context->EndCurrent( context->GetDC() );
-		}
-		else
-		{
-			m_name = GL_INVALID_INDEX;
-			std::cerr << "Leaked a texture" << std::endl;
-		}
 	}
 
 	HRESULT CComBitmap::Initialise( const GL2D_SIZE_U & size, const void * data, uint32_t pitch, const GL2D_BITMAP_PROPERTIES & props )
 	{
-		std::shared_ptr< CContext > context = CContext::GetActiveContext();
-		m_context = context;
-		m_format = props.pixelFormat;
 		m_size = size;
-		HRESULT hr = context->BindTexture( GL_TEXTURE_2D, m_name );
-
-		if ( hr == S_OK )
-		{
-			hr = context->TexImage2D( GL_TEXTURE_2D, 0, m_format.internal, size.width, size.height, 0, m_format.format, m_format.type, data );
-			context->BindTexture( GL_TEXTURE_2D, 0 );
-		}
-
-		return hr;
+		std::shared_ptr< CContext > context = CContext::GetActiveContext();
+		m_texture->Create(
+			std::bind( &CContext::GenTextures, context.get(), std::placeholders::_1, std::placeholders::_2 ),
+			std::bind( &CContext::DeleteTextures, context.get(), std::placeholders::_1, std::placeholders::_2 )
+		);
+		return m_texture->Initialise( size, data, pitch, props );
 	}
 
 	STDMETHODIMP_( GL2D_SIZE_F ) CComBitmap::GetSize()const
@@ -68,7 +44,7 @@ namespace GL2D
 
 	STDMETHODIMP_( GL2D_PIXEL_FORMAT ) CComBitmap::GetPixelFormat()const
 	{
-		return m_format;
+		return m_texture->GetPixelFormat();
 	}
 
 	STDMETHODIMP_( void ) CComBitmap::GetDpi( float * dpiX, float * dpiY )const
@@ -85,23 +61,23 @@ namespace GL2D
 		std::shared_ptr< CContext > context = CContext::GetActiveContext();
 		GLvoid * srcData = NULL;
 		CComBitmap * bmp = static_cast< CComBitmap * >( bitmap );
-		HRESULT hr = context->BindTexture( GL_TEXTURE_2D, bmp->m_name );
+		HRESULT hr = bmp->m_texture->Bind( context );
 
 		if ( hr == S_OK )
 		{
-			hr = context->GetTexImage( GL_TEXTURE_2D, 0, m_format.format, m_format.type, srcData );
-			context->BindTexture( GL_TEXTURE_2D, 0 );
+			hr = bmp->m_texture->GetImage( context, GetPixelFormat(), srcData );
+			bmp->m_texture->Unbind( context );
 		}
 
 		if ( hr == S_OK )
 		{
-			hr = context->BindTexture( GL_TEXTURE_2D, m_name );
+			hr = m_texture->Bind( context );
 		}
 
 		if ( hr == S_OK )
 		{
-			hr = context->TexSubImage2D( GL_TEXTURE_2D, 0, destPoint->x, destPoint->y, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
-			context->BindTexture( GL_TEXTURE_2D, 0 );
+			hr = m_texture->Fill( context, srcData );
+			m_texture->Unbind( context );
 		}
 
 		return hr;
@@ -111,14 +87,14 @@ namespace GL2D
 	{
 		GLvoid * srcData = NULL;
 		CRenderTarget * rt = static_cast< CRenderTarget * >( renderTarget );
-		CContext * context = rt->GetContext().get();
+		std::shared_ptr< CContext > context = rt->GetContext();
 		HRESULT hr = rt->GetFrameBuffer()->Bind( GL2D_GL_FRAMEBUFFER_MODE_READ );
 
 		if ( hr == S_OK )
 		{
 			int componentSize = 0;
 
-			switch ( m_format.type )
+			switch ( GetPixelFormat().type )
 			{
 			case GL2D_GL_TYPE_BYTE:
 			case GL2D_GL_TYPE_UNSIGNED_BYTE:
@@ -143,7 +119,7 @@ namespace GL2D
 
 			int componentCount = 0;
 
-			switch ( m_format.format )
+			switch ( GetPixelFormat().format )
 			{
 			case GL2D_GL_FORMAT_STENCIL:
 			case GL2D_GL_FORMAT_DEPTH:
@@ -173,20 +149,20 @@ namespace GL2D
 			}
 
 			srcData = new uint8_t[componentSize * componentCount * std::abs( int( srcRect->right - srcRect->left ) ) * std::abs( int( srcRect->bottom - srcRect->top ) )];
-			hr = context->ReadPixels( srcRect->left, srcRect->top, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
+			hr = rt->GetFrameBuffer()->ReadPixels( context, *srcRect, GetPixelFormat(), srcData );
 			delete [] srcData;
-			context->BindTexture( GL_TEXTURE_2D, 0 );
+			rt->GetFrameBuffer()->Unbind();
 		}
 
 		if ( hr == S_OK )
 		{
-			hr = context->BindTexture( GL_TEXTURE_2D, m_name );
+			hr = m_texture->Bind( context );
 		}
 
 		if ( hr == S_OK )
 		{
-			hr = context->TexSubImage2D( GL_TEXTURE_2D, 0, destPoint->x, destPoint->y, srcRect->right - srcRect->left, srcRect->bottom - srcRect->top, m_format.format, m_format.type, srcData );
-			context->BindTexture( GL_TEXTURE_2D, 0 );
+			hr = m_texture->Fill( context, srcData );
+			m_texture->Unbind( context );
 		}
 
 		return hr;
@@ -195,12 +171,12 @@ namespace GL2D
 	STDMETHODIMP CComBitmap::CopyFromMemory( const GL2D_RECT_U * dstRect, const void * srcData, uint32_t pitch )
 	{
 		std::shared_ptr< CContext > context = CContext::GetActiveContext();
-		HRESULT hr = context->BindTexture( GL_TEXTURE_2D, m_name );
+		HRESULT hr = m_texture->Bind( context );
 
 		if ( hr == S_OK )
 		{
-			hr = context->TexSubImage2D( GL_TEXTURE_2D, 0, dstRect->left, dstRect->top, dstRect->right - dstRect->left, dstRect->bottom - dstRect->top, m_format.format, m_format.type, srcData );
-			context->BindTexture( GL_TEXTURE_2D, 0 );
+			hr = m_texture->Fill( context, srcData );
+			m_texture->Unbind( context );
 		}
 
 		return hr;

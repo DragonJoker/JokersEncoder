@@ -18,12 +18,12 @@ namespace GL2D
 		: public CResource< Object, Interface >
 	{
 	public:
-		CRenderTargetInterface();
+		CRenderTargetInterface( IGL2DFactory * factory );
 		virtual ~CRenderTargetInterface();
 
-		static Interface * CreateInstance()
+		static Interface * CreateInstance( IGL2DFactory * factory )
 		{
-			return new CRenderTargetInterface< Object, Interface >();
+			return new CRenderTargetInterface< Object, Interface >( factory );
 		}
 
 		inline const std::shared_ptr< CContext > & GetContext()const
@@ -300,6 +300,9 @@ namespace GL2D
 		{
 			return IsSupported( &renderTargetProperties );
 		}
+
+	private:
+		STDMETHOD_( CTexture *, DoLoadFont )( IDWriteTextFormat * textFormat );
 	};
 }
 

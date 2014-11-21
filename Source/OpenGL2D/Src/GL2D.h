@@ -443,9 +443,9 @@ interface IGL2DFactory;
 */
 typedef struct GL2D_PIXEL_FORMAT
 {
-	GL2D_GL_FORMAT		format;
-	GL2D_GL_INTERNAL	internal;
-	GL2D_GL_TYPE		type;
+	GL2D_GL_FORMAT format;
+	GL2D_GL_INTERNAL internal;
+	GL2D_GL_TYPE type;
 } GL2D_PIXEL_FORMAT;
 
 /**
@@ -625,7 +625,8 @@ typedef struct GL2D_DRAWING_STATE_DESCRIPTION
 */
 typedef struct GL2D_FACTORY_OPTIONS
 {
-	GL2D_DEBUG_LEVEL debugLevel;	//!< Requests a certain level of debugging information from the debug layer. This parameter is ignored if the debug layer DLL is not present.
+	//! Requests a certain level of debugging information from the debug layer. This parameter is ignored if the debug layer DLL is not present.
+	GL2D_DEBUG_LEVEL debugLevel;
 } GL2D_FACTORY_OPTIONS;
 
 /** The root interface for all resources in D2D.

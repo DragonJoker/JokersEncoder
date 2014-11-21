@@ -96,10 +96,34 @@ namespace GL2D
 		void * MapBuffer( GL2D_GL_BUFFER_TARGET target, GL2D_GL_ACCESS access );
 		bool UnmapBuffer( GL2D_GL_BUFFER_TARGET target );
 		HRESULT BlendFuncSeparate( GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha );
+		GLuint CreateShader( GLenum type );
+		HRESULT AttachShader( GLuint name, GLuint shader );
+		HRESULT GetShaderiv( GLuint name, GLenum info, GLint * linked );
+		HRESULT GetShaderInfoLog( GLuint name, GLint length, GLint * written, char * log );
+		HRESULT ShaderSource( GLuint shader, GLsizei count, const char ** string, const GLint * length );
+		HRESULT CompileShader( GLuint shader );
+		HRESULT DeleteShader( GLuint shader );
+		HRESULT UseProgram( GLuint name );
+		GLuint CreateProgram();
+		HRESULT LinkProgram( GLuint name );
+		HRESULT GetProgramiv( GLuint name, GLenum info, GLint * linked );
+		HRESULT GetProgramInfoLog( GLuint name, GLint length, GLint * written, char * log );
+		HRESULT DeleteProgram( GLuint name );
+		HRESULT VertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer );
+		HRESULT EnableVertexAttribArray( GLuint index );
+		HRESULT Uniform1i( GLuint location, GLint value );
+		HRESULT UniformMatrix4fv( GLint location, GLsizei count, GLboolean transpose, const GLfloat * value );
+		GLint GetUniformLocation( GLuint program, std::string const & name );
+		GLint GetAttribLocation( GLuint program, std::string const & name );
+		HRESULT GenVertexArrays( GLsizei n, GLuint * buffers );
+		HRESULT DeleteVertexArrays( GLsizei n, GLuint const * buffers );
+		HRESULT BindVertexArray( GLuint buffer );
+
 		void DebugLog( GL2D_GL_DEBUG_SOURCE source, GL2D_GL_DEBUG_TYPE type, uint32_t id, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
 		void DebugLogAMD( uint32_t id, GL2D_GL_DEBUG_CATEGORY category, GL2D_GL_DEBUG_SEVERITY severity, int length, const char * message );
 
-		HRESULT DrawTexture( GLuint name, const GL2D_RECT_F & destinationRectangle, GL2D_BITMAP_INTERPOLATION_MODE interpolationMode, const GL2D_RECT_F & sourceRectangle );
+		HRESULT DrawTexture( CTexture * texture, const GL2D_RECT_F & destinationRectangle, GL2D_BITMAP_INTERPOLATION_MODE interpolationMode, const GL2D_RECT_F & sourceRectangle );
+		HRESULT DummyDeleter( GLsizei, const GLuint * ) { return S_OK; }
 
 		inline HDC GetDC()const
 		{
@@ -109,17 +133,9 @@ namespace GL2D
 	private:
 		HGLRC DoCreateContext();
 		bool DoSelectPixelFormat();
-		void DoCleanup();
-		GLuint DoCreateShader( const std::string & source, GL2D_GL_SHADER_TYPE type );
 		void DoLoadContext();
 		HRESULT DoLoadProgram();
 		HRESULT DoLoadBuffer();
-		HRESULT DoActivateProgram( GLuint name );
-		HRESULT DoDeactivateProgram();
-		HRESULT DoActivateTexture( GLuint name, GL2D_GL_TEXTURE_FILTER filter );
-		HRESULT DoDeactivateTexture();
-		HRESULT DoActivateBuffer();
-		HRESULT DoDeactivateBuffer();
 
 		typedef ptrdiff_t GLintptr;
 		typedef ptrdiff_t GLsizeiptr;
@@ -128,13 +144,12 @@ namespace GL2D
 		HWND m_window;
 		HDC m_dc;
 		HGLRC m_context;
-		GLuint m_vao;
-		GLuint m_buffer;
-		GLuint m_program;
-		GLuint m_sampler;
-		GLuint m_mvp;
-		GLuint m_vertex;
-		GLuint m_texture;
+		std::unique_ptr< CGeometryBuffer > m_buffer;
+		std::unique_ptr< CShaderProgram > m_program;
+		std::shared_ptr< CUniform > m_sampler;
+		std::shared_ptr< CUniform > m_mvp;
+		std::shared_ptr< CAttribute > m_vertex;
+		std::shared_ptr< CAttribute > m_texture;
 		typedef glm::mat4x4 mat4x4;
 		std::stack< mat4x4 > m_projMtx;
 		std::stack< mat4x4 > m_viewMtx;

@@ -48,7 +48,7 @@ if ( MSVC )
 	# Looking for needed libraries
 	#--------------------------------------------------------------------------------------------------
 	find_package( Doxygen )
-	find_package( VLD )
+#	find_package( VLD )
 	
 	#--------------------------------------------------------------------------------------------------
 	# Adding include dirs to include search path

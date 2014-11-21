@@ -14,7 +14,7 @@ namespace GL2D
 	{
 	}
 
-	HRESULT CFrameBuffer::Initialise( std::shared_ptr< CContext > context )
+	STDMETHODIMP CFrameBuffer::Initialise( std::shared_ptr< CContext > context )
 	{
 		HRESULT hr = CObject::Create(
 						 std::bind( &CContext::GenFramebuffers, context, std::placeholders::_1, std::placeholders::_2 ),
@@ -25,12 +25,17 @@ namespace GL2D
 		return hr;
 	}
 
-	void CFrameBuffer::Cleanup()
+	STDMETHODIMP_( void ) CFrameBuffer::Cleanup()
 	{
 		CObject::Destroy();
 	}
 
-	HRESULT CFrameBuffer::Bind( GL2D_GL_FRAMEBUFFER_MODE mode )
+	STDMETHODIMP CFrameBuffer::ReadPixels( std::shared_ptr< CContext > context, GL2D_RECT_U const & rect, GL2D_PIXEL_FORMAT format, void * data )
+	{
+		return context->ReadPixels( rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, format.format, format.type, data );
+	}
+
+	STDMETHODIMP CFrameBuffer::Bind( GL2D_GL_FRAMEBUFFER_MODE mode )
 	{
 		std::shared_ptr< CContext > context = m_context.lock();
 		HRESULT hr = E_POINTER;
@@ -44,7 +49,7 @@ namespace GL2D
 		return hr;
 	}
 
-	HRESULT CFrameBuffer::Unbind()
+	STDMETHODIMP CFrameBuffer::Unbind()
 	{
 		std::shared_ptr< CContext > context = m_context.lock();
 		HRESULT hr = E_POINTER;

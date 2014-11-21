@@ -3,7 +3,10 @@
 
 #include "GL2D.h"
 #include <memory>
+#include <vector>
 #include <glm/glm.hpp>
+
+#define BUFFER_OFFSET( x ) ( ( const GLvoid * )( x ) )
 
 namespace GL2D
 {
@@ -52,8 +55,31 @@ namespace GL2D
 	typedef CRenderTargetInterface< CComBitmapRenderTarget, IGL2DBitmapRenderTarget > CBitmapRenderTarget;
 
 	class CContext;
+	class CTexture;
+	class CFrameBuffer;
+	class CGeometryBuffer;
+	class CShaderProgram;
+	class CUniform;
+	class CAttribute;
 
 	HRESULT glGetLastError( char const * const name );
+
+	struct SVertex
+	{
+		glm::vec2 pos;
+		glm::vec2 tex;
+	};
+
+	template< class T >
+	inline void SafeRelease( T *& pPointer, bool bDelete = true )
+	{
+		if ( pPointer && bDelete )
+		{
+			pPointer->Release();
+		}
+
+		pPointer = NULL;
+	}
 }
 
 #if !DEF_HAS_MAKE_UNIQUE

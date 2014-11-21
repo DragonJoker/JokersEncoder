@@ -193,6 +193,7 @@ namespace Joker
 		 *\brief		Initialise l'arrière plan, pour la transparence
 		 */
 		void DoInitialiseBackground();
+		BOOL DoDrawParentBackground( CDC * pDC, CRect const & rect );
 		/**
 		 *\brief		Fonction d'initialisation
 		 */

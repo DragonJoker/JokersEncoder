@@ -151,7 +151,7 @@ namespace GL2D
 
 		if ( renderTarget )
 		{
-			*renderTarget = CRenderTarget::CreateInstance();
+			*renderTarget = CRenderTarget::CreateInstance( this );
 		}
 
 		return hr;
@@ -163,7 +163,7 @@ namespace GL2D
 
 		if ( hwndRenderTarget )
 		{
-			CHwndRenderTarget * rt = reinterpret_cast< CHwndRenderTarget * >( CHwndRenderTarget::CreateInstance() );
+			CHwndRenderTarget * rt = reinterpret_cast< CHwndRenderTarget * >( CHwndRenderTarget::CreateInstance( this ) );
 			hr = rt->CreateContext( *renderTargetProperties, *hwndRenderTargetProperties );
 
 			if ( hr == S_OK )

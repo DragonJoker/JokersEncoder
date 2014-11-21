@@ -4,6 +4,8 @@
 #include "GLResource.h"
 #include "GLFactory.h"
 
+#include <glm/glm.hpp>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -14,7 +16,7 @@ HRESULT WINAPI GL2DCreateFactory( GL2D_FACTORY_TYPE factoryType, REFIID riid, co
 
 	if ( ppIFactory )
 	{
-		*ppIFactory = GL2D::CFactory::CreateInstance();
+		*ppIFactory = GL2D::CFactory::CreateInstance( NULL );
 	}
 
 	return hr;

@@ -155,11 +155,11 @@ BOOL CJokersEncoderDlg::OnInitDialog()
 
 	m_layout.Create( m_hWnd, CRect() );
 	m_layout.AddElement( IDC_LIST_FILES );
-	m_layout.AddElement( IDOK, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDCANCEL, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDC_OPTIONS, false, eHORIZ_ALIGN_LEFT, eVERTIC_ALIGN_BOTTOM );
-	m_layout.AddElement( IDC_FILE, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
-	m_layout.AddElement( IDC_FOLDER, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
+	m_layout.AddElement( IDOK );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDCANCEL );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDC_OPTIONS );//, false, eHORIZ_ALIGN_LEFT, eVERTIC_ALIGN_BOTTOM );
+	m_layout.AddElement( IDC_FILE );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
+	m_layout.AddElement( IDC_FOLDER );//, false, eHORIZ_ALIGN_RIGHT, eVERTIC_ALIGN_TOP );
 
 	return TRUE;
 }

@@ -68,7 +68,7 @@ namespace Joker
 
 			if ( GetBitmapInfos( m_hDC, hBitmap, size, arrayBits ) )
 			{
-				GL2D_BITMAP_PROPERTIES props = GL2D::BitmapProperties( GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_4, GL2D_GL_TYPE_UNSIGNED_BYTE ) );
+				GL2D_BITMAP_PROPERTIES props = GL2D::BitmapProperties( GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_RGB8, GL2D_GL_TYPE_UNSIGNED_BYTE ) );
 				m_pRenderTarget->CreateBitmap( GL2D::SizeU( size.cx, size.cy ), & arrayBits[0], size.cx * 4, props, & pBmp );
 
 				if ( pBmp )
@@ -200,7 +200,7 @@ namespace Joker
 		CRect rcRect;
 		T::GetClientRect( rcRect );
 		GL2D_SIZE_U size = GL2D::SizeU( rcRect.Width(), rcRect.Height() );
-		GL2D_RENDER_TARGET_PROPERTIES props = GL2D::RenderTargetProperties( GL2D_RENDER_TARGET_TYPE_DEFAULT, GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_4, GL2D_GL_TYPE_UNSIGNED_BYTE ) );
+		GL2D_RENDER_TARGET_PROPERTIES props = GL2D::RenderTargetProperties( GL2D_RENDER_TARGET_TYPE_DEFAULT, GL2D::PixelFormat( GL2D_GL_FORMAT_RGBA, GL2D_GL_INTERNAL_RGB8, GL2D_GL_TYPE_UNSIGNED_BYTE ) );
 		HRESULT hr = m_pFactory->CreateHwndRenderTarget( props, GL2D::HwndRenderTargetProperties( m_hWnd, size ), &m_pRenderTarget );
 
 		if ( hr != S_OK )

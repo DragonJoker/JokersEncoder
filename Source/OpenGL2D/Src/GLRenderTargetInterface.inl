@@ -101,8 +101,8 @@ namespace GL2D
 	}
 
 	template< typename Object, typename Interface >
-	CRenderTargetInterface< Object, Interface >::CRenderTargetInterface()
-		: CResource< Object, Interface >()
+	CRenderTargetInterface< Object, Interface >::CRenderTargetInterface( IGL2DFactory * factory )
+		: CResource< Object, Interface >( factory )
 	{
 	}
 
@@ -118,13 +118,7 @@ namespace GL2D
 
 		if ( bitmap )
 		{
-			CBitmap * bmp = reinterpret_cast< CBitmap * >( CBitmap::CreateInstance() );
-			std::shared_ptr< CContext > context = GetContext();
-			static_cast< CObject * >( bmp )->Create(
-				std::bind( &CContext::GenTextures, context.get(), std::placeholders::_1, std::placeholders::_2 ),
-				std::bind( &CContext::DeleteTextures, context.get(), std::placeholders::_1, std::placeholders::_2 )
-			);
-
+			CBitmap * bmp = reinterpret_cast< CBitmap * >( CBitmap::CreateInstance( m_factory ) );
 			hr = bmp->Initialise( size, srcData, pitch, *bitmapProperties );
 
 			if ( hr == S_OK )
@@ -242,7 +236,7 @@ namespace GL2D
 
 		if ( bitmapRenderTarget )
 		{
-			*bitmapRenderTarget = CBitmapRenderTarget::CreateInstance();
+			*bitmapRenderTarget = CBitmapRenderTarget::CreateInstance( m_factory );
 			hr = S_OK;
 		}
 
@@ -338,13 +332,76 @@ namespace GL2D
 		if ( bitmap )
 		{
 			CBitmap * bmp = reinterpret_cast< CBitmap * >( bitmap );
-			GetContext()->DrawTexture( bmp->GetName(), *destinationRectangle, interpolationMode, *sourceRectangle );
+			GetContext()->DrawTexture( bmp->GetTexture(), *destinationRectangle, interpolationMode, *sourceRectangle );
 		}
 	}
 
 	template< typename Object, typename Interface >
 	STDMETHODIMP_( void ) CRenderTargetInterface< Object, Interface >::DrawText( const WCHAR * string, uint32_t stringLength, IDWriteTextFormat * textFormat, const GL2D_RECT_F * layoutRect, IGL2DBrush * defaultForegroundBrush, GL2D_DRAW_TEXT_OPTIONS options, DWRITE_MEASURING_MODE measuringMode )
 	{
+		if ( textFormat && defaultForegroundBrush && string && stringLength )
+		{
+			CTexture * texture = DoLoadFont( textFormat );
+			float x = layoutRect->left;
+			float y = layoutRect->top;
+			IDWriteFontCollection * collection = NULL;
+			UINT32 index = 0;
+			BOOL exists = FALSE;
+			textFormat->GetFontCollection( &collection );
+			DWRITE_FONT_METRICS metrics = { 0 };
+
+			if ( collection )
+			{
+				WCHAR * szName = new WCHAR[textFormat->GetFontFamilyNameLength() + 1];
+				collection->FindFamilyName( szName, &index, &exists );
+
+				if ( exists )
+				{
+					IDWriteFontFamily * family = NULL;
+					collection->GetFontFamily( index, &family );
+
+					if ( family )
+					{
+						IDWriteFont * font = NULL;
+						family->GetFirstMatchingFont( textFormat->GetFontWeight(), textFormat->GetFontStretch(), textFormat->GetFontStyle(), &font );
+
+						if ( font )
+						{
+							font->GetMetrics( &metrics );
+							SafeRelease( font );
+						}
+					
+						SafeRelease( family );
+					}
+				}
+
+				SafeRelease( collection );
+			}
+
+			std::vector< SVertex > vertices;
+			vertices.reserve( stringLength * 6 );
+			float size = textFormat->GetFontSize();
+
+			for ( uint32_t i = 0; i < stringLength; ++i )
+			{
+				WCHAR character = string[i];
+				float uv_x = ( character % 16 ) / 16.0f;
+				float uv_y = ( character / 16 ) / 16.0f;
+
+				SVertex vertex_up_left		= { { x + i * size       , y + size }, { uv_x              , 1.0f - uv_y } };
+				SVertex vertex_up_right		= { { x + i * size + size, y + size }, { uv_x + 1.0f /16.0f, 1.0f - uv_y } };
+				SVertex vertex_down_right	= { { x + i * size + size, y        }, { uv_x + 1.0f /16.0f, 1.0f - ( uv_y + 1.0f / 16.0f ) } };
+				SVertex vertex_down_left	= { { x + i * size       , y        }, { uv_x              , 1.0f - ( uv_y + 1.0f / 16.0f ) } };
+ 
+				vertices.push_back( vertex_up_left );
+				vertices.push_back( vertex_down_left );
+				vertices.push_back( vertex_up_right );
+
+				vertices.push_back( vertex_down_right );
+				vertices.push_back( vertex_up_right );
+				vertices.push_back( vertex_down_left );
+			}
+		}
 	}
 
 	template< typename Object, typename Interface >
@@ -493,5 +550,11 @@ namespace GL2D
 	STDMETHODIMP_( bool ) CRenderTargetInterface< Object, Interface >::IsSupported( const GL2D_RENDER_TARGET_PROPERTIES * renderTargetProperties ) const
 	{
 		return false;
+	}
+
+	template< typename Object, typename Interface >
+	STDMETHODIMP_( CTexture * ) CRenderTargetInterface< Object, Interface >::DoLoadFont( IDWriteTextFormat * textFormat )
+	{
+		return NULL;
 	}
 }
