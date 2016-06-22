@@ -168,9 +168,9 @@ namespace Joker
 		rcTextRect.bottom	= LONG( dRatio * rcTextRect.bottom	);
 
 #if defined( _UNICODE )
-		LONG lReturn = ::DrawTextW( m_hDC, strText.c_str(), strText.size(), rcTextRect, uiFormat );
+		LONG lReturn = ::DrawTextW( m_hDC, strText.c_str(), int( strText.size() ), rcTextRect, uiFormat );
 #else
-		LONG lReturn = ::DrawTextA( m_hDC, strText.c_str(), strText.size(), rcTextRect, uiFormat );
+		LONG lReturn = ::DrawTextA( m_hDC, strText.c_str(), int( strText.size() ), rcTextRect, uiFormat );
 #endif
 
 		pRect->left		= LONG( rcTextRect.left		/ dRatio );

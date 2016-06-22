@@ -55,8 +55,8 @@ namespace Joker
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			int bitCount = 32;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			WORD bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, WORD( 1 ), bitCount, BI_RGB } };
 			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
 
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
@@ -65,7 +65,7 @@ namespace Joker
 			if ( result && result != ERROR_INVALID_PARAMETER )
 			{
 				bReturn = true;
-				UINT uiStep = arrayBits.size() / size.cy;
+				UINT uiStep = UINT( arrayBits.size() / size.cy );
 
 				for ( int i = 0 ; i < size.cy ; ++i )
 				{
@@ -184,9 +184,9 @@ namespace Joker
 			if ( !strTmp.empty() )
 			{
 #if defined( _UNICODE )
-				m_pRenderTarget->DrawTextW( strTmp.c_str(), strTmp.size(), pTextFormat, D2D1::RectF( float( rcRect.left ), float( rcRect.top ), float( rcRect.right ), float( rcRect.bottom ) ), pBrush );
+				m_pRenderTarget->DrawTextW( strTmp.c_str(), UINT32( strTmp.size() ), pTextFormat, D2D1::RectF( float( rcRect.left ), float( rcRect.top ), float( rcRect.right ), float( rcRect.bottom ) ), pBrush );
 #else
-				m_pRenderTarget->DrawTextA( strTmp.c_str(), strTmp.size(), pTextFormat, D2D1::RectF( float( rcRect.left ), float( rcRect.top ), float( rcRect.right ), float( rcRect.bottom ) ), pBrush );
+				m_pRenderTarget->DrawTextA( strTmp.c_str(), UINT32( strTmp.size() ), pTextFormat, D2D1::RectF( float( rcRect.left ), float( rcRect.top ), float( rcRect.right ), float( rcRect.bottom ) ), pBrush );
 #endif
 			}
 		}
@@ -312,7 +312,7 @@ namespace Joker
 		{
 			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
-				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
+				// Si on a dï¿½truit la partie graphique du contrï¿½le puis reconstruite, on doit rï¿½initialiser la partie Device Dependant
 				DoCleanupDeviceDependent();
 				DoInitialiseDeviceDependent();
 			}

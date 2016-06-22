@@ -12,9 +12,6 @@ set( CMAKE_MODULE_PATH
     "${CMAKE_SOURCE_DIR}/CMake/Modules"
 )
 
-include( DateUtils )
-get_date( JE_TODAY JE_DAY JE_MONTH JE_YEAR )
-
 # Set project version numbers
 set( VERSION_MAJOR	1			)
 set( VERSION_MINOR	0			)

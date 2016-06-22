@@ -1,7 +1,7 @@
 
-// stdafx.h : fichier Include pour les fichiers Include système standard,
-// ou les fichiers Include spécifiques aux projets qui sont utilisés fréquemment,
-// et sont rarement modifiés
+// stdafx.hï¿½: fichier Include pour les fichiers Include systï¿½me standard,
+// ou les fichiers Include spï¿½cifiques aux projets qui sont utilisï¿½s frï¿½quemment,
+// et sont rarement modifiï¿½s
 
 #pragma once
 
@@ -10,27 +10,27 @@
 #endif
 
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN            // Exclure les en-têtes Windows rarement utilisés
+#define VC_EXTRALEAN            // Exclure les en-tï¿½tes Windows rarement utilisï¿½s
 #endif
 
 #include "targetver.h"
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // certains constructeurs CString seront explicites
 
-// désactive le masquage MFC de certains messages d'avertissement courants et par ailleurs souvent ignorés
+// dï¿½sactive le masquage MFC de certains messages d'avertissement courants et par ailleurs souvent ignorï¿½s
 #define _AFX_ALL_WARNINGS
 
 #include <afxwin.h>         // composants MFC principaux et standard
 #include <afxext.h>         // extensions MFC
 
 #ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // Prise en charge MFC pour les contrôles communs Internet Explorer 4
+#include <afxdtctl.h>           // Prise en charge MFC pour les contrï¿½les communs Internet Explorerï¿½4
 #endif
 #ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>             // Prise en charge des MFC pour les contrôles communs Windows
+#include <afxcmn.h>             // Prise en charge des MFC pour les contrï¿½les communs Windows
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-#include <afxcontrolbars.h>     // prise en charge des MFC pour les rubans et les barres de contrôles
+#include <afxcontrolbars.h>     // prise en charge des MFC pour les rubans et les barres de contrï¿½les
 #include <afxdialogex.h>
 
 #ifdef _UNICODE

@@ -23,8 +23,8 @@ namespace Joker
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			int bitCount = 32;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			WORD bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, WORD( 1 ), bitCount, BI_RGB } };
 			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
 
@@ -186,7 +186,7 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_GDI >::DoDrawBackground( CRect const & rcRect )
 	{
-		// On met l'image d'arrière plan dans le backbuffer
+		// On met l'image d'arriï¿½re plan dans le backbuffer
 		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
 		// on blende le backbuffer et le masque
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
@@ -222,12 +222,12 @@ namespace Joker
 		CRect rcRect;
 		GetClientRect( & rcRect );
 
-		// On crée le backbuffer
+		// On crï¿½e le backbuffer
 		CBitmapDC backDC( m_hDC );
 		backDC.CreateBitmap( rcRect );
 		m_pBackDC = & backDC;
 
-		// On dessine l'arrière plan
+		// On dessine l'arriï¿½re plan
 		DoDrawBackground( rcRect );
 
 		// On dessine le premier plan

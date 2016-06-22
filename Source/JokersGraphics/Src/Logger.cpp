@@ -115,7 +115,7 @@ namespace Joker
 		::OutputDebugString( _T( "\n" ) );
 
 		DWORD l_dwWritten;
-		::WriteConsoleW( m_hScreenBuffer, CStrUtils::ToWStr( p_strToLog ).c_str(), p_strToLog.size(), & l_dwWritten, NULL );
+		::WriteConsoleW( m_hScreenBuffer, CStrUtils::ToWStr( p_strToLog ).c_str(), DWORD( p_strToLog.size() ), & l_dwWritten, NULL );
 
 		CONSOLE_SCREEN_BUFFER_INFO l_csbiInfo;
 

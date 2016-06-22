@@ -50,8 +50,8 @@ namespace Joker
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			int bitCount = 32;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			WORD bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, WORD( 1 ), bitCount, BI_RGB } };
 			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
 
@@ -218,7 +218,7 @@ namespace Joker
 			CRect rcRect;
 			GetClientRect( & rcRect );
 
-			// On crée le backbuffer
+			// On crï¿½e le backbuffer
 			CBitmapDC backDC( m_hDC );
 			backDC.CreateBitmap( rcRect );
 			m_pBackDC = & backDC;

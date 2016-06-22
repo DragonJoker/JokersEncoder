@@ -192,9 +192,9 @@ namespace Joker
 		{
 			m_pCurrentFont->Select( m_hDC );
 #if defined( _UNICODE )
-			::DrawTextW( m_hDC, strText.c_str(), strText.size(), rcRect, uiFormat );
+			::DrawTextW( m_hDC, strText.c_str(), int( strText.size() ), rcRect, uiFormat );
 #else
-			::DrawTextA( m_hDC, strText.c_str(), strText.size(), rcRect, uiFormat );
+			::DrawTextA( m_hDC, strText.c_str(), int( strText.size() ), rcRect, uiFormat );
 #endif
 			m_pCurrentFont->Deselect( m_hDC );
 			pRect->left = LONG( rcRect.left / dRatio );
@@ -252,7 +252,7 @@ namespace Joker
 					pTextFormat->SetReadingDirection( DWRITE_READING_DIRECTION_LEFT_TO_RIGHT );
 				}
 
-				hr = m_pWriteFactory->CreateTextLayout( CStrUtils::ToWStr( strText ).c_str(), strText.size(), pTextFormat, FLOAT( rcRect.Width() ), FLOAT( rcRect.Height() ), & pTextLayout );
+				hr = m_pWriteFactory->CreateTextLayout( CStrUtils::ToWStr( strText ).c_str(), int( strText.size() ), pTextFormat, FLOAT( rcRect.Width() ), FLOAT( rcRect.Height() ), & pTextLayout );
 			}
 
 			if ( hr == S_OK )
@@ -505,7 +505,7 @@ namespace Joker
 		bool bReturn = false;
 		BITMAPINFO bmiSrc = { { sizeof( BITMAPINFOHEADER ), 0, 0, 0, 0, 0 } };
 
-		// On récupère tout d'abord les infos du HBITMAP (dimensions, bpp, taille en bytes)
+		// On rï¿½cupï¿½re tout d'abord les infos du HBITMAP (dimensions, bpp, taille en bytes)
 		if ( ::GetDIBits( hDC, hBitmap, 0, 1, NULL, & bmiSrc, DIB_RGB_COLORS ) )
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
@@ -515,7 +515,7 @@ namespace Joker
 
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
 
-			// ON récupère maintenant le contenu de l'image que l'on met dans notre buffer à nous
+			// ON rï¿½cupï¿½re maintenant le contenu de l'image que l'on met dans notre buffer ï¿½ nous
 			if ( ::GetDIBits( hDC, hBitmap, 0, size.cy, & arrayBitsSrc[0], & bmi, DIB_RGB_COLORS ) )
 			{
 				bReturn = true;

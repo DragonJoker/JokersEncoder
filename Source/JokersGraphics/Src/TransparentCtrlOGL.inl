@@ -26,8 +26,8 @@ namespace Joker
 		{
 			size.cx = bmiSrc.bmiHeader.biWidth;
 			size.cy = bmiSrc.bmiHeader.biHeight;
-			int bitCount = 32;
-			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, 1, bitCount, BI_RGB } };
+			WORD bitCount = 32;
+			BITMAPINFO bmi = { { sizeof( BITMAPINFOHEADER ), size.cx, size.cy, WORD( 1 ), bitCount, BI_RGB } };
 			arrayBits.resize( size.cx * size.cy * bitCount / 8, 0 );
 
 			std::vector< BYTE > arrayBitsSrc( arrayBits.size(), 0 );
@@ -36,7 +36,7 @@ namespace Joker
 			if ( result && result != ERROR_INVALID_PARAMETER )
 			{
 				bReturn = true;
-				UINT uiStep = arrayBits.size() / size.cy;
+				UINT uiStep = UINT( arrayBits.size() / size.cy );
 
 				for ( int i = 0 ; i < size.cy ; ++i )
 				{
@@ -157,7 +157,7 @@ namespace Joker
 
 			if ( !strTmp.empty() )
 			{
-				m_pRenderTarget->DrawText( strTmp.c_str(), strTmp.size(), pTextFormat, GL2D::RectF( float( rcRect.left ), float( rcRect.top ), float( rcRect.right ), float( rcRect.bottom ) ), pBrush );
+				m_pRenderTarget->DrawText( strTmp.c_str(), uint32_t( strTmp.size() ), pTextFormat, GL2D::RectF( float( rcRect.left ), float( rcRect.top ), float( rcRect.right ), float( rcRect.bottom ) ), pBrush );
 			}
 		}
 
@@ -222,7 +222,7 @@ namespace Joker
 	template< typename T >
 	void CTransparentCtrlT< T, eRENDERER_OGL >::DoDrawBackground( CRect const & rcRect )
 	{
-		// On met l'image d'arrière plan dans le backbuffer
+		// On met l'image d'arriï¿½re plan dans le backbuffer
 		DrawBitmap( rcRect, m_bmpBackground, rcRect, FALSE );
 		// on blende le backbuffer et le masque
 		DrawBitmap( rcRect, m_brushMask.GetDC(), m_brushMask.GetRect() );
@@ -262,7 +262,7 @@ namespace Joker
 				m_pRenderTarget->BeginDraw();
 				m_pRenderTarget->Clear( GL2D::ColorF( GL2D::ColorF::Enum::Black, 0.0F ) );
 
-				// On dessine l'arrière plan
+				// On dessine l'arriï¿½re plan
 				DoDrawBackground( rcRect );
 
 				// On dessine le premier plan
@@ -322,7 +322,7 @@ namespace Joker
 		{
 			if ( !m_pRenderTarget || m_hWnd != m_pRenderTarget->GetHwnd() )
 			{
-				// Si on a détruit la partie graphique du contrôle puis reconstruite, on doit réinitialiser la partie Device Dependant
+				// Si on a dï¿½truit la partie graphique du contrï¿½le puis reconstruite, on doit rï¿½initialiser la partie Device Dependant
 				DoCleanupDeviceDependent();
 				DoInitialiseDeviceDependent();
 			}
